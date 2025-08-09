@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 09 Agu 2025 pada 23.12
+-- Waktu pembuatan: 10 Agu 2025 pada 00.30
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.0.30
 
@@ -66,7 +66,9 @@ CREATE TABLE `alat_produksi` (
 --
 -- Dumping data untuk tabel `alat_produksi`
 --
----------------------------------------------------
+
+
+-- --------------------------------------------------------
 
 --
 -- Struktur dari tabel `anggaran_awal`
@@ -150,7 +152,6 @@ CREATE TABLE `anggota_tim` (
 -- Dumping data untuk tabel `anggota_tim`
 --
 
-
 -- --------------------------------------------------------
 
 --
@@ -203,7 +204,8 @@ CREATE TABLE `bahan_baku` (
 -- Dumping data untuk tabel `bahan_baku`
 --
 
------------------------------------------------------
+
+-- --------------------------------------------------------
 
 --
 -- Struktur dari tabel `biaya_non_operasional`
@@ -225,7 +227,8 @@ CREATE TABLE `biaya_non_operasional` (
 -- Dumping data untuk tabel `biaya_non_operasional`
 --
 
----------------------------------------------------
+
+-- --------------------------------------------------------
 
 --
 -- Struktur dari tabel `biaya_operasional`
@@ -249,6 +252,153 @@ CREATE TABLE `biaya_operasional` (
 -- Dumping data untuk tabel `biaya_operasional`
 --
 
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `bimbingan`
+--
+
+CREATE TABLE `bimbingan` (
+  `id` int(11) NOT NULL,
+  `nim` varchar(20) NOT NULL,
+  `proposal_id` int(11) NOT NULL,
+  `judul_bimbingan` varchar(255) NOT NULL,
+  `hasil_bimbingan` text DEFAULT NULL,
+  `tanggal_buat` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `bimbingan`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `detail_penilaian_laporan_akhir`
+--
+
+CREATE TABLE `detail_penilaian_laporan_akhir` (
+  `id` int(11) NOT NULL,
+  `id_penilaian_laporan_akhir` int(11) NOT NULL,
+  `id_pertanyaan` int(11) NOT NULL,
+  `skor_diberikan` int(11) NOT NULL DEFAULT 0,
+  `bobot_pertanyaan` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `skor_maksimal` int(11) NOT NULL DEFAULT 100,
+  `nilai_terbobot` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `skor` int(11) NOT NULL COMMENT 'Skor yang diberikan reviewer',
+  `nilai` decimal(5,2) NOT NULL COMMENT 'Nilai = (skor/skor_maksimal) * bobot',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `detail_penilaian_laporan_akhir`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `detail_penilaian_laporan_kemajuan`
+--
+
+CREATE TABLE `detail_penilaian_laporan_kemajuan` (
+  `id` int(11) NOT NULL,
+  `id_penilaian_laporan_kemajuan` int(11) NOT NULL,
+  `id_pertanyaan` int(11) NOT NULL,
+  `skor_diberikan` int(11) NOT NULL COMMENT 'Skor yang diberikan reviewer',
+  `bobot_pertanyaan` decimal(5,2) NOT NULL COMMENT 'Bobot pertanyaan',
+  `skor_maksimal` int(11) NOT NULL COMMENT 'Skor maksimal pertanyaan',
+  `nilai_terbobot` decimal(5,2) NOT NULL COMMENT 'Nilai = (skor/skor_maksimal) * bobot',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `detail_penilaian_laporan_kemajuan`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `detail_penilaian_mahasiswa`
+--
+
+CREATE TABLE `detail_penilaian_mahasiswa` (
+  `id` int(11) NOT NULL,
+  `id_penilaian_mahasiswa` int(11) NOT NULL,
+  `id_pertanyaan` int(11) NOT NULL,
+  `skor` int(11) NOT NULL COMMENT 'Skor yang diberikan pembimbing',
+  `nilai` decimal(5,2) NOT NULL COMMENT 'Nilai = (skor/skor_maksimal) * bobot',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `detail_penilaian_mahasiswa`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `detail_penilaian_proposal`
+--
+
+CREATE TABLE `detail_penilaian_proposal` (
+  `id` int(11) NOT NULL,
+  `id_proposal` int(11) NOT NULL,
+  `id_reviewer` int(11) NOT NULL,
+  `id_pertanyaan` int(11) NOT NULL,
+  `skor` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `bobot` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `nilai` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `detail_penilaian_proposal`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `file_laporan_akhir`
+--
+
+CREATE TABLE `file_laporan_akhir` (
+  `id` int(11) NOT NULL,
+  `id_proposal` int(11) NOT NULL,
+  `nama_file` varchar(255) NOT NULL,
+  `file_path` varchar(500) NOT NULL,
+  `status` enum('draf','diajukan','disetujui','revisi') DEFAULT 'draf',
+  `komentar_pembimbing` text DEFAULT NULL,
+  `tanggal_upload` timestamp NOT NULL DEFAULT current_timestamp(),
+  `tanggal_update` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `file_laporan_kemajuan`
+--
+
+CREATE TABLE `file_laporan_kemajuan` (
+  `id` int(11) NOT NULL,
+  `id_proposal` int(11) NOT NULL,
+  `nama_file` varchar(255) NOT NULL,
+  `file_path` varchar(500) NOT NULL,
+  `status` enum('draf','diajukan','disetujui','revisi') DEFAULT 'draf',
+  `komentar_pembimbing` text DEFAULT NULL,
+  `tanggal_upload` timestamp NOT NULL DEFAULT current_timestamp(),
+  `tanggal_update` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `file_laporan_kemajuan`
+--
 
 -- --------------------------------------------------------
 
@@ -364,7 +514,7 @@ CREATE TABLE `laporan_kemajuan_awal` (
 -- Dumping data untuk tabel `laporan_kemajuan_awal`
 --
 
-------------------------------------------------
+-- --------------------------------------------------------
 
 --
 -- Struktur dari tabel `laporan_kemajuan_bertumbuh`
@@ -451,7 +601,7 @@ CREATE TABLE `laporan_neraca` (
 CREATE TABLE `log_aktivitas_mahasiswa` (
   `id` int(11) NOT NULL,
   `mahasiswa_id` int(11) NOT NULL,
-  `nim` varchar(30) NOT NULL,
+  `nim` varchar(20) NOT NULL,
   `nama_mahasiswa` varchar(100) NOT NULL,
   `jenis_aktivitas` enum('login','logout','tambah','edit','hapus','view') NOT NULL,
   `modul` varchar(50) NOT NULL,
@@ -503,25 +653,10 @@ CREATE TABLE `log_aktivitas_pembimbing` (
 -- Struktur dari tabel `mahasiswa`
 --
 
-CREATE TABLE `mahasiswa` (
-  `id` int(11) NOT NULL,
-  `perguruan_tinggi` varchar(100) NOT NULL,
-  `program_studi` varchar(100) NOT NULL,
-  `nim` varchar(30) NOT NULL,
-  `nama_ketua` varchar(100) NOT NULL,
-  `no_telp` varchar(20) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `status` enum('aktif','proses','tolak','selesai') DEFAULT 'proses',
-  `tanggal_daftar` timestamp NOT NULL DEFAULT current_timestamp(),
-  `tanggal_verifikasi` timestamp NULL DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `mahasiswa`
 --
-
--- --------------------------------------------------------
 
 --
 -- Struktur dari tabel `pembimbing`
@@ -542,7 +677,173 @@ CREATE TABLE `pembimbing` (
 -- Dumping data untuk tabel `pembimbing`
 --
 
-------------------------------------------------------
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pengaturan_anggaran`
+--
+
+CREATE TABLE `pengaturan_anggaran` (
+  `id` int(11) NOT NULL,
+  `min_total_awal` bigint(20) DEFAULT 0,
+  `max_total_awal` bigint(20) DEFAULT 0,
+  `min_total_bertumbuh` bigint(20) DEFAULT 0,
+  `max_total_bertumbuh` bigint(20) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `pengaturan_anggaran`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pengaturan_bimbingan`
+--
+
+CREATE TABLE `pengaturan_bimbingan` (
+  `id` int(11) NOT NULL,
+  `maksimal_bimbingan_per_hari` int(11) DEFAULT 3,
+  `pesan_batasan` text DEFAULT 'Anda telah mencapai batas maksimal bimbingan hari ini. Silakan coba lagi besok.',
+  `status_aktif` enum('aktif','nonaktif') DEFAULT 'aktif',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `pengaturan_bimbingan`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pengaturan_jadwal`
+--
+
+CREATE TABLE `pengaturan_jadwal` (
+  `id` int(11) NOT NULL,
+  `proposal_mulai` datetime DEFAULT NULL,
+  `proposal_selesai` datetime DEFAULT NULL,
+  `kemajuan_mulai` datetime DEFAULT NULL,
+  `kemajuan_selesai` datetime DEFAULT NULL,
+  `akhir_mulai` datetime DEFAULT NULL,
+  `akhir_selesai` datetime DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `pembimbing_nilai_mulai` datetime DEFAULT NULL,
+  `pembimbing_nilai_selesai` datetime DEFAULT NULL,
+  `reviewer_proposal_mulai` datetime DEFAULT NULL,
+  `reviewer_proposal_selesai` datetime DEFAULT NULL,
+  `reviewer_kemajuan_mulai` datetime DEFAULT NULL,
+  `reviewer_kemajuan_selesai` datetime DEFAULT NULL,
+  `reviewer_akhir_mulai` datetime DEFAULT NULL,
+  `reviewer_akhir_selesai` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `pengaturan_jadwal`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `penilaian_laporan_akhir`
+--
+
+CREATE TABLE `penilaian_laporan_akhir` (
+  `id` int(11) NOT NULL,
+  `id_proposal` int(11) NOT NULL,
+  `id_reviewer` int(11) NOT NULL,
+  `nilai_akhir` decimal(5,2) DEFAULT 0.00 COMMENT 'Nilai akhir dalam persentase (seperti IPK)',
+  `komentar_reviewer` text DEFAULT NULL,
+  `rekomendasi_kelulusan` enum('lulus sempurna','tidak lolos') DEFAULT NULL,
+  `alasan_rekomendasi` text DEFAULT NULL,
+  `tanggal_penilaian` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `penilaian_laporan_akhir`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `penilaian_laporan_kemajuan`
+--
+
+CREATE TABLE `penilaian_laporan_kemajuan` (
+  `id` int(11) NOT NULL,
+  `id_proposal` int(11) NOT NULL,
+  `id_reviewer` int(11) NOT NULL,
+  `nilai_akhir` decimal(5,2) DEFAULT 0.00,
+  `komentar_reviewer` text DEFAULT NULL COMMENT 'Catatan penilaian dari reviewer',
+  `rekomendasi_pendanaan` enum('berhenti pendanaan','lanjutkan pendanaan') DEFAULT NULL,
+  `alasan_rekomendasi` text DEFAULT NULL,
+  `tanggal_penilaian` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `penilaian_laporan_kemajuan`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `penilaian_mahasiswa`
+--
+
+CREATE TABLE `penilaian_mahasiswa` (
+  `id` int(11) NOT NULL,
+  `id_proposal` int(11) NOT NULL,
+  `id_pembimbing` int(11) NOT NULL,
+  `nilai_akhir` decimal(5,2) DEFAULT 0.00 COMMENT 'Nilai akhir dalam persentase (seperti IPK)',
+  `komentar_pembimbing` text DEFAULT NULL,
+  `status` enum('Draft','Selesai') DEFAULT 'Draft',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `penilaian_mahasiswa`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `penilaian_proposal`
+--
+
+CREATE TABLE `penilaian_proposal` (
+  `id` int(11) NOT NULL,
+  `id_proposal` int(11) NOT NULL,
+  `id_reviewer` int(11) NOT NULL,
+  `total_skor` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `total_nilai` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `nilai_akhir` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'Nilai akhir dalam persentase (seperti IPK)',
+  `catatan` text DEFAULT NULL,
+  `nilai_bantuan` decimal(15,2) NOT NULL DEFAULT 0.00,
+  `persentase_bantuan` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `tanggal_penilaian` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `penilaian_proposal`
+--
+
+-- --------------------------------------------------------
 
 --
 -- Struktur dari tabel `penjualan`
@@ -562,6 +863,87 @@ CREATE TABLE `penjualan` (
 
 --
 -- Dumping data untuk tabel `penjualan`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pertanyaan_penilaian_laporan_akhir`
+--
+
+CREATE TABLE `pertanyaan_penilaian_laporan_akhir` (
+  `id` int(11) NOT NULL,
+  `pertanyaan` text NOT NULL,
+  `bobot` decimal(5,2) NOT NULL COMMENT 'Bobot yang diinput admin (1-100)',
+  `skor_maksimal` int(11) NOT NULL COMMENT 'Skor maksimal yang bisa diberikan (1-100)',
+  `urutan` int(11) NOT NULL DEFAULT 0,
+  `status` enum('Aktif','Nonaktif') DEFAULT 'Aktif',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `pertanyaan_penilaian_laporan_akhir`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pertanyaan_penilaian_laporan_kemajuan`
+--
+
+CREATE TABLE `pertanyaan_penilaian_laporan_kemajuan` (
+  `id` int(11) NOT NULL,
+  `pertanyaan` text NOT NULL,
+  `bobot` decimal(5,2) NOT NULL COMMENT 'Bobot yang diinput admin (1-100)',
+  `skor_maksimal` int(11) NOT NULL COMMENT 'Skor maksimal yang bisa diberikan (1-100)',
+  `status` enum('Aktif','Nonaktif') DEFAULT 'Aktif',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `pertanyaan_penilaian_laporan_kemajuan`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pertanyaan_penilaian_mahasiswa`
+--
+
+CREATE TABLE `pertanyaan_penilaian_mahasiswa` (
+  `id` int(11) NOT NULL,
+  `pertanyaan` text NOT NULL,
+  `bobot` decimal(5,2) NOT NULL COMMENT 'Bobot yang diinput admin (1-100)',
+  `skor_maksimal` int(11) NOT NULL COMMENT 'Skor maksimal yang bisa diberikan (1-100)',
+  `status` enum('Aktif','Nonaktif') DEFAULT 'Aktif',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `pertanyaan_penilaian_mahasiswa`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `pertanyaan_penilaian_proposal`
+--
+
+CREATE TABLE `pertanyaan_penilaian_proposal` (
+  `id` int(11) NOT NULL,
+  `pertanyaan` text NOT NULL,
+  `bobot` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `skor_maksimal` int(11) NOT NULL DEFAULT 100 COMMENT 'Skor maksimal yang bisa diberikan reviewer (1-100)',
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data untuk tabel `pertanyaan_penilaian_proposal`
 --
 
 -- --------------------------------------------------------
@@ -609,43 +991,60 @@ CREATE TABLE `produk_bahan_baku` (
 -- Dumping data untuk tabel `produk_bahan_baku`
 --
 
---------------------------------------------------------
+
+-- --------------------------------------------------------
 
 --
--- Struktur dari tabel `proposal`
+-- Struktur dari tabel `program_studi`
 --
 
-CREATE TABLE `proposal` (
+CREATE TABLE `program_studi` (
   `id` int(11) NOT NULL,
-  `nim` varchar(20) NOT NULL,
-  `judul_usaha` varchar(255) NOT NULL,
-  `kategori` varchar(100) NOT NULL,
-  `tahapan_usaha` varchar(50) NOT NULL,
-  `merk_produk` varchar(100) NOT NULL,
-  `nib` varchar(50) NOT NULL,
-  `tahun_nib` int(11) NOT NULL,
-  `platform_penjualan` varchar(100) NOT NULL,
-  `dosen_pembimbing` varchar(100) NOT NULL,
-  `nid_dosen` varchar(20) NOT NULL,
-  `program_studi_dosen` varchar(100) NOT NULL,
-  `file_path` varchar(500) NOT NULL,
-  `status` enum('draf','diajukan','disetujui','ditolak','revisi','selesai') DEFAULT 'draf',
-  `status_admin` enum('belum_ditinjau','lolos','tidak_lolos') DEFAULT 'belum_ditinjau',
-  `tahun` int(11) NOT NULL,
-  `tanggal_buat` timestamp NOT NULL DEFAULT current_timestamp(),
-  `tanggal_kirim` timestamp NULL DEFAULT NULL,
-  `tanggal_review` timestamp NULL DEFAULT NULL,
-  `tanggal_konfirmasi_pembimbing` timestamp NULL DEFAULT NULL,
-  `tanggal_konfirmasi_admin` timestamp NULL DEFAULT NULL,
-  `tanggal_revisi` timestamp NULL DEFAULT NULL,
-  `id_reviewer` int(11) DEFAULT NULL,
-  `komentar_pembimbing` text DEFAULT NULL COMMENT 'Komentar atau catatan dari pembimbing untuk mahasiswa',
-  `komentar_revisi` text DEFAULT NULL,
-  `tanggal_komentar_pembimbing` timestamp NULL DEFAULT NULL COMMENT 'Tanggal pembimbing memberikan komentar'
+  `nama_program_studi` varchar(100) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Dumping data untuk tabel `program_studi`
+--
+
+
+--
 -- Dumping data untuk tabel `proposal`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `proposal_reviewer`
+--
+
+CREATE TABLE `proposal_reviewer` (
+  `id` int(11) NOT NULL,
+  `id_proposal` int(11) NOT NULL,
+  `id_reviewer` int(11) NOT NULL,
+  `tanggal_assign` timestamp NOT NULL DEFAULT current_timestamp(),
+  `status_review` enum('belum_direview','sedang_direview','selesai_review','sudah_dinilai') DEFAULT 'belum_direview',
+  `komentar_reviewer` text DEFAULT NULL,
+  `tanggal_review` timestamp NULL DEFAULT NULL,
+  `tanggal_penilaian` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data untuk tabel `proposal_reviewer`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `reviewer`
+--
+
+
+--
+-- Dumping data untuk tabel `reviewer`
 --
 
 
@@ -658,7 +1057,7 @@ CREATE TABLE `proposal` (
 CREATE TABLE `session_mahasiswa` (
   `id` int(11) NOT NULL,
   `mahasiswa_id` int(11) NOT NULL,
-  `nim` varchar(30) NOT NULL,
+  `nim` varchar(20) NOT NULL,
   `nama_mahasiswa` varchar(100) NOT NULL,
   `session_id` varchar(255) NOT NULL,
   `login_time` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -700,6 +1099,67 @@ CREATE TABLE `session_pembimbing` (
 -- Dumping data untuk tabel `session_pembimbing`
 --
 
+
+CREATE TABLE `reviewer` (
+  `id` int(11) NOT NULL,
+  `nama` varchar(255) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `kuota_review` int(11) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE `mahasiswa` (
+  `id` int(11) NOT NULL,
+  `perguruan_tinggi` varchar(100) NOT NULL,
+  `program_studi` varchar(100) NOT NULL,
+  `nim` varchar(20) NOT NULL,
+  `nama_ketua` varchar(100) NOT NULL,
+  `no_telp` varchar(20) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `status` enum('aktif','proses','tolak','selesai') DEFAULT 'proses',
+  `tanggal_daftar` timestamp NOT NULL DEFAULT current_timestamp(),
+  `tanggal_verifikasi` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+-- --------------------------------------------------------
+
+--
+-- Struktur dari tabel `proposal`
+--
+
+CREATE TABLE `proposal` (
+  `id` int(11) NOT NULL,
+  `nim` varchar(20) NOT NULL,
+  `judul_usaha` varchar(255) NOT NULL,
+  `kategori` varchar(100) NOT NULL,
+  `tahapan_usaha` varchar(50) NOT NULL,
+  `merk_produk` varchar(100) NOT NULL,
+  `nib` varchar(50) NOT NULL,
+  `tahun_nib` int(11) NOT NULL,
+  `platform_penjualan` varchar(100) NOT NULL,
+  `dosen_pembimbing` varchar(100) NOT NULL,
+  `nid_dosen` varchar(20) NOT NULL,
+  `program_studi_dosen` varchar(100) NOT NULL,
+  `file_path` varchar(500) NOT NULL,
+  `status` enum('draf','diajukan','disetujui','ditolak','revisi','selesai') DEFAULT 'draf',
+  `status_admin` enum('belum_ditinjau','lolos','tidak_lolos') DEFAULT 'belum_ditinjau',
+  `tahun` int(11) NOT NULL,
+  `tanggal_buat` timestamp NOT NULL DEFAULT current_timestamp(),
+  `tanggal_kirim` timestamp NULL DEFAULT NULL,
+  `tanggal_review` timestamp NULL DEFAULT NULL,
+  `tanggal_konfirmasi_pembimbing` timestamp NULL DEFAULT NULL,
+  `tanggal_konfirmasi_admin` timestamp NULL DEFAULT NULL,
+  `tanggal_revisi` timestamp NULL DEFAULT NULL,
+  `id_reviewer` int(11) DEFAULT NULL,
+  `komentar_pembimbing` text DEFAULT NULL COMMENT 'Komentar atau catatan dari pembimbing untuk mahasiswa',
+  `komentar_revisi` text DEFAULT NULL,
+  `tanggal_komentar_pembimbing` timestamp NULL DEFAULT NULL COMMENT 'Tanggal pembimbing memberikan komentar'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Indexes for dumped tables
@@ -773,6 +1233,63 @@ ALTER TABLE `biaya_non_operasional`
 ALTER TABLE `biaya_operasional`
   ADD PRIMARY KEY (`id`),
   ADD KEY `proposal_id` (`proposal_id`);
+
+--
+-- Indeks untuk tabel `bimbingan`
+--
+ALTER TABLE `bimbingan`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `nim` (`nim`),
+  ADD KEY `proposal_id` (`proposal_id`);
+
+--
+-- Indeks untuk tabel `detail_penilaian_laporan_akhir`
+--
+ALTER TABLE `detail_penilaian_laporan_akhir`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_detail_penilaian_laporan_akhir` (`id_penilaian_laporan_akhir`,`id_pertanyaan`),
+  ADD KEY `id_pertanyaan` (`id_pertanyaan`),
+  ADD KEY `idx_detail_penilaian_laporan_akhir_penilaian` (`id_penilaian_laporan_akhir`);
+
+--
+-- Indeks untuk tabel `detail_penilaian_laporan_kemajuan`
+--
+ALTER TABLE `detail_penilaian_laporan_kemajuan`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_detail_penilaian_laporan_kemajuan` (`id_penilaian_laporan_kemajuan`,`id_pertanyaan`),
+  ADD KEY `id_pertanyaan` (`id_pertanyaan`);
+
+--
+-- Indeks untuk tabel `detail_penilaian_mahasiswa`
+--
+ALTER TABLE `detail_penilaian_mahasiswa`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_detail_penilaian_mahasiswa` (`id_penilaian_mahasiswa`,`id_pertanyaan`),
+  ADD KEY `id_pertanyaan` (`id_pertanyaan`);
+
+--
+-- Indeks untuk tabel `detail_penilaian_proposal`
+--
+ALTER TABLE `detail_penilaian_proposal`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_proposal_reviewer_pertanyaan` (`id_proposal`,`id_reviewer`,`id_pertanyaan`),
+  ADD KEY `id_pertanyaan` (`id_pertanyaan`),
+  ADD KEY `idx_detail_penilaian_proposal_proposal` (`id_proposal`),
+  ADD KEY `idx_detail_penilaian_proposal_reviewer` (`id_reviewer`);
+
+--
+-- Indeks untuk tabel `file_laporan_akhir`
+--
+ALTER TABLE `file_laporan_akhir`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_proposal` (`id_proposal`);
+
+--
+-- Indeks untuk tabel `file_laporan_kemajuan`
+--
+ALTER TABLE `file_laporan_kemajuan`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `id_proposal` (`id_proposal`);
 
 --
 -- Indeks untuk tabel `laba_rugi`
@@ -858,12 +1375,91 @@ ALTER TABLE `pembimbing`
   ADD UNIQUE KEY `nip` (`nip`);
 
 --
+-- Indeks untuk tabel `pengaturan_anggaran`
+--
+ALTER TABLE `pengaturan_anggaran`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `pengaturan_bimbingan`
+--
+ALTER TABLE `pengaturan_bimbingan`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `pengaturan_jadwal`
+--
+ALTER TABLE `pengaturan_jadwal`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `penilaian_laporan_akhir`
+--
+ALTER TABLE `penilaian_laporan_akhir`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_penilaian_laporan_akhir` (`id_proposal`,`id_reviewer`),
+  ADD KEY `id_reviewer` (`id_reviewer`),
+  ADD KEY `idx_penilaian_laporan_akhir_proposal` (`id_proposal`);
+
+--
+-- Indeks untuk tabel `penilaian_laporan_kemajuan`
+--
+ALTER TABLE `penilaian_laporan_kemajuan`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_penilaian_laporan_kemajuan` (`id_proposal`,`id_reviewer`);
+
+--
+-- Indeks untuk tabel `penilaian_mahasiswa`
+--
+ALTER TABLE `penilaian_mahasiswa`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_penilaian_mahasiswa` (`id_proposal`,`id_pembimbing`),
+  ADD KEY `id_pembimbing` (`id_pembimbing`),
+  ADD KEY `idx_penilaian_mahasiswa_proposal` (`id_proposal`);
+
+--
+-- Indeks untuk tabel `penilaian_proposal`
+--
+ALTER TABLE `penilaian_proposal`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_proposal_reviewer` (`id_proposal`,`id_reviewer`),
+  ADD KEY `idx_penilaian_proposal_proposal` (`id_proposal`),
+  ADD KEY `idx_penilaian_proposal_reviewer` (`id_reviewer`);
+
+--
 -- Indeks untuk tabel `penjualan`
 --
 ALTER TABLE `penjualan`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_penjualan_proposal_id` (`proposal_id`),
   ADD KEY `idx_penjualan_tanggal` (`tanggal_penjualan`);
+
+--
+-- Indeks untuk tabel `pertanyaan_penilaian_laporan_akhir`
+--
+ALTER TABLE `pertanyaan_penilaian_laporan_akhir`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_pertanyaan_laporan_akhir_status` (`status`);
+
+--
+-- Indeks untuk tabel `pertanyaan_penilaian_laporan_kemajuan`
+--
+ALTER TABLE `pertanyaan_penilaian_laporan_kemajuan`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indeks untuk tabel `pertanyaan_penilaian_mahasiswa`
+--
+ALTER TABLE `pertanyaan_penilaian_mahasiswa`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_pertanyaan_mahasiswa_status` (`status`);
+
+--
+-- Indeks untuk tabel `pertanyaan_penilaian_proposal`
+--
+ALTER TABLE `pertanyaan_penilaian_proposal`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_pertanyaan_proposal_active` (`is_active`,`created_at`);
 
 --
 -- Indeks untuk tabel `produksi`
@@ -881,6 +1477,13 @@ ALTER TABLE `produk_bahan_baku`
   ADD KEY `bahan_baku_id` (`bahan_baku_id`);
 
 --
+-- Indeks untuk tabel `program_studi`
+--
+ALTER TABLE `program_studi`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `nama_program_studi` (`nama_program_studi`);
+
+--
 -- Indeks untuk tabel `proposal`
 --
 ALTER TABLE `proposal`
@@ -889,6 +1492,23 @@ ALTER TABLE `proposal`
   ADD KEY `idx_proposal_status` (`status`),
   ADD KEY `idx_proposal_reviewer` (`id_reviewer`),
   ADD KEY `idx_proposal_status_revisi` (`status`);
+
+--
+-- Indeks untuk tabel `proposal_reviewer`
+--
+ALTER TABLE `proposal_reviewer`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `unique_proposal_reviewer` (`id_proposal`,`id_reviewer`),
+  ADD KEY `id_reviewer` (`id_reviewer`),
+  ADD KEY `idx_proposal_reviewer_status` (`status_review`),
+  ADD KEY `idx_proposal_reviewer_tanggal` (`tanggal_assign`);
+
+--
+-- Indeks untuk tabel `reviewer`
+--
+ALTER TABLE `reviewer`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`);
 
 --
 -- Indeks untuk tabel `session_mahasiswa`
@@ -971,6 +1591,48 @@ ALTER TABLE `biaya_operasional`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT untuk tabel `bimbingan`
+--
+ALTER TABLE `bimbingan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT untuk tabel `detail_penilaian_laporan_akhir`
+--
+ALTER TABLE `detail_penilaian_laporan_akhir`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT untuk tabel `detail_penilaian_laporan_kemajuan`
+--
+ALTER TABLE `detail_penilaian_laporan_kemajuan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
+-- AUTO_INCREMENT untuk tabel `detail_penilaian_mahasiswa`
+--
+ALTER TABLE `detail_penilaian_mahasiswa`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT untuk tabel `detail_penilaian_proposal`
+--
+ALTER TABLE `detail_penilaian_proposal`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT untuk tabel `file_laporan_akhir`
+--
+ALTER TABLE `file_laporan_akhir`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `file_laporan_kemajuan`
+--
+ALTER TABLE `file_laporan_kemajuan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
 -- AUTO_INCREMENT untuk tabel `laba_rugi`
 --
 ALTER TABLE `laba_rugi`
@@ -1031,10 +1693,76 @@ ALTER TABLE `pembimbing`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT untuk tabel `pengaturan_anggaran`
+--
+ALTER TABLE `pengaturan_anggaran`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `pengaturan_bimbingan`
+--
+ALTER TABLE `pengaturan_bimbingan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `pengaturan_jadwal`
+--
+ALTER TABLE `pengaturan_jadwal`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `penilaian_laporan_akhir`
+--
+ALTER TABLE `penilaian_laporan_akhir`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT untuk tabel `penilaian_laporan_kemajuan`
+--
+ALTER TABLE `penilaian_laporan_kemajuan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT untuk tabel `penilaian_mahasiswa`
+--
+ALTER TABLE `penilaian_mahasiswa`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT untuk tabel `penilaian_proposal`
+--
+ALTER TABLE `penilaian_proposal`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
 -- AUTO_INCREMENT untuk tabel `penjualan`
 --
 ALTER TABLE `penjualan`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
+--
+-- AUTO_INCREMENT untuk tabel `pertanyaan_penilaian_laporan_akhir`
+--
+ALTER TABLE `pertanyaan_penilaian_laporan_akhir`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT untuk tabel `pertanyaan_penilaian_laporan_kemajuan`
+--
+ALTER TABLE `pertanyaan_penilaian_laporan_kemajuan`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT untuk tabel `pertanyaan_penilaian_mahasiswa`
+--
+ALTER TABLE `pertanyaan_penilaian_mahasiswa`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT untuk tabel `pertanyaan_penilaian_proposal`
+--
+ALTER TABLE `pertanyaan_penilaian_proposal`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT untuk tabel `produksi`
@@ -1049,10 +1777,28 @@ ALTER TABLE `produk_bahan_baku`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
+-- AUTO_INCREMENT untuk tabel `program_studi`
+--
+ALTER TABLE `program_studi`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+
+--
 -- AUTO_INCREMENT untuk tabel `proposal`
 --
 ALTER TABLE `proposal`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+
+--
+-- AUTO_INCREMENT untuk tabel `proposal_reviewer`
+--
+ALTER TABLE `proposal_reviewer`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT untuk tabel `reviewer`
+--
+ALTER TABLE `reviewer`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT untuk tabel `session_mahasiswa`
@@ -1119,6 +1865,54 @@ ALTER TABLE `biaya_operasional`
   ADD CONSTRAINT `biaya_operasional_ibfk_1` FOREIGN KEY (`proposal_id`) REFERENCES `proposal` (`id`) ON DELETE CASCADE;
 
 --
+-- Ketidakleluasaan untuk tabel `bimbingan`
+--
+ALTER TABLE `bimbingan`
+  ADD CONSTRAINT `bimbingan_ibfk_1` FOREIGN KEY (`nim`) REFERENCES `mahasiswa` (`nim`) ON DELETE CASCADE,
+  ADD CONSTRAINT `bimbingan_ibfk_2` FOREIGN KEY (`proposal_id`) REFERENCES `proposal` (`id`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `detail_penilaian_laporan_akhir`
+--
+ALTER TABLE `detail_penilaian_laporan_akhir`
+  ADD CONSTRAINT `detail_penilaian_laporan_akhir_ibfk_1` FOREIGN KEY (`id_penilaian_laporan_akhir`) REFERENCES `penilaian_laporan_akhir` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `detail_penilaian_laporan_akhir_ibfk_2` FOREIGN KEY (`id_pertanyaan`) REFERENCES `pertanyaan_penilaian_laporan_akhir` (`id`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `detail_penilaian_laporan_kemajuan`
+--
+ALTER TABLE `detail_penilaian_laporan_kemajuan`
+  ADD CONSTRAINT `detail_penilaian_laporan_kemajuan_ibfk_1` FOREIGN KEY (`id_penilaian_laporan_kemajuan`) REFERENCES `penilaian_laporan_kemajuan` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `detail_penilaian_laporan_kemajuan_ibfk_2` FOREIGN KEY (`id_pertanyaan`) REFERENCES `pertanyaan_penilaian_laporan_kemajuan` (`id`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `detail_penilaian_mahasiswa`
+--
+ALTER TABLE `detail_penilaian_mahasiswa`
+  ADD CONSTRAINT `detail_penilaian_mahasiswa_ibfk_1` FOREIGN KEY (`id_penilaian_mahasiswa`) REFERENCES `penilaian_mahasiswa` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `detail_penilaian_mahasiswa_ibfk_2` FOREIGN KEY (`id_pertanyaan`) REFERENCES `pertanyaan_penilaian_mahasiswa` (`id`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `detail_penilaian_proposal`
+--
+ALTER TABLE `detail_penilaian_proposal`
+  ADD CONSTRAINT `detail_penilaian_proposal_ibfk_1` FOREIGN KEY (`id_proposal`) REFERENCES `proposal` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `detail_penilaian_proposal_ibfk_2` FOREIGN KEY (`id_reviewer`) REFERENCES `reviewer` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `detail_penilaian_proposal_ibfk_3` FOREIGN KEY (`id_pertanyaan`) REFERENCES `pertanyaan_penilaian_proposal` (`id`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `file_laporan_akhir`
+--
+ALTER TABLE `file_laporan_akhir`
+  ADD CONSTRAINT `file_laporan_akhir_ibfk_1` FOREIGN KEY (`id_proposal`) REFERENCES `proposal` (`id`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `file_laporan_kemajuan`
+--
+ALTER TABLE `file_laporan_kemajuan`
+  ADD CONSTRAINT `file_laporan_kemajuan_ibfk_1` FOREIGN KEY (`id_proposal`) REFERENCES `proposal` (`id`) ON DELETE CASCADE;
+
+--
 -- Ketidakleluasaan untuk tabel `laba_rugi`
 --
 ALTER TABLE `laba_rugi`
@@ -1161,6 +1955,27 @@ ALTER TABLE `log_aktivitas_pembimbing`
   ADD CONSTRAINT `fk_log_pembimbing_id` FOREIGN KEY (`pembimbing_id`) REFERENCES `pembimbing` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Ketidakleluasaan untuk tabel `penilaian_laporan_akhir`
+--
+ALTER TABLE `penilaian_laporan_akhir`
+  ADD CONSTRAINT `penilaian_laporan_akhir_ibfk_1` FOREIGN KEY (`id_proposal`) REFERENCES `proposal` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `penilaian_laporan_akhir_ibfk_2` FOREIGN KEY (`id_reviewer`) REFERENCES `reviewer` (`id`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `penilaian_mahasiswa`
+--
+ALTER TABLE `penilaian_mahasiswa`
+  ADD CONSTRAINT `penilaian_mahasiswa_ibfk_1` FOREIGN KEY (`id_proposal`) REFERENCES `proposal` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `penilaian_mahasiswa_ibfk_2` FOREIGN KEY (`id_pembimbing`) REFERENCES `pembimbing` (`id`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `penilaian_proposal`
+--
+ALTER TABLE `penilaian_proposal`
+  ADD CONSTRAINT `penilaian_proposal_ibfk_1` FOREIGN KEY (`id_proposal`) REFERENCES `proposal` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `penilaian_proposal_ibfk_2` FOREIGN KEY (`id_reviewer`) REFERENCES `reviewer` (`id`) ON DELETE CASCADE;
+
+--
 -- Ketidakleluasaan untuk tabel `penjualan`
 --
 ALTER TABLE `penjualan`
@@ -1185,6 +2000,13 @@ ALTER TABLE `produk_bahan_baku`
 ALTER TABLE `proposal`
   ADD CONSTRAINT `fk_proposal_reviewer` FOREIGN KEY (`id_reviewer`) REFERENCES `reviewer` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `proposal_ibfk_1` FOREIGN KEY (`nim`) REFERENCES `mahasiswa` (`nim`) ON DELETE CASCADE;
+
+--
+-- Ketidakleluasaan untuk tabel `proposal_reviewer`
+--
+ALTER TABLE `proposal_reviewer`
+  ADD CONSTRAINT `proposal_reviewer_ibfk_1` FOREIGN KEY (`id_proposal`) REFERENCES `proposal` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `proposal_reviewer_ibfk_2` FOREIGN KEY (`id_reviewer`) REFERENCES `reviewer` (`id`) ON DELETE CASCADE;
 
 --
 -- Ketidakleluasaan untuk tabel `session_pembimbing`
