@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Penilaian Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-pembimbing.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+    
+    <style>
+        /* Custom button styles for penilaian */
+        .btn-rounded-circle {
+            border-radius: 50% !important;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-rounded-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-rounded-pill {
+            border-radius: 50px !important;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-rounded-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Table Styling */
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+        .table th, .table td {
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        @media (max-width: 1200px) {
+            .table th, .table td {
+                font-size: 0.85rem;
+                padding: 7px 3px;
+            }
+        }
+        
+        /* Styling untuk badge status */
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Styling untuk progress bar */
+        .progress {
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .progress-bar {
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+        
+        /* Styling untuk nilai display */
+        .nilai-display {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .nilai-display.belum-dinilai {
+            color: #6c757d;
+        }
+        
+        .nilai-display.draft {
+            color: #fd7e14;
+        }
+        
+        .nilai-display.selesai {
+            color: #198754;
+        }
+        
+        /* DataTable Pagination Styling */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1.1rem;
+            line-height: 40px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+        
+        /* Card Styling */
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+        .judul-usaha {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .judul-usaha:hover {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                <span>Pendanaan Hibah</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_laporan_akhir') }}">Laporan Akhir</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Non Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('pembimbing.daftar_penilaian_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-pencil-square"></i>
+                                <span>Penilaian Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Daftar Penilaian Mahasiswa</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">
+                                Daftar mahasiswa bimbingan yang dapat dinilai di AYMP UNJAYA.
+                            </p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.das_pembimbing') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Daftar Penilaian Mahasiswa</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <div class="card" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h5 style="font-weight:700;font-size:1.25rem;color:#435ebe;">
+                                        <i class="bi bi-list-check me-2"></i>Daftar Mahasiswa Bimbingan
+                                    </h5>
+                                    <p class="text-muted mb-0">Pilih mahasiswa untuk melakukan penilaian</p>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="tableDaftarMahasiswa">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama Mahasiswa</th>
+                                            <th>Judul Usaha</th>
+                                            <th>Nilai</th>
+                                            <th>Progress Nilai</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Data akan diisi melalui AJAX -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Inisialisasi DataTable
+            var daftarMahasiswaTable = $('#tableDaftarMahasiswa').DataTable({
+                language: {
+                    "sProcessing":   "Sedang memproses...",
+                    "sLengthMenu":   "Tampilkan _MENU_ data",
+                    "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                    "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                    "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Cari:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "Pertama",
+                        "sPrevious": "Sebelumnya",
+                        "sNext":     "Selanjutnya",
+                        "sLast":     "Terakhir"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                        "sSortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                    }
+                },
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
+                columnDefs: [
+                    { orderable: false, targets: [5] } // Kolom aksi tidak bisa diurutkan
+                ]
+            });
+
+            // Load data mahasiswa
+            loadDaftarMahasiswa();
+
+            function loadDaftarMahasiswa() {
+                $.ajax({
+                    url: '{{ url_for("pembimbing.get_daftar_mahasiswa_penilaian") }}',
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            daftarMahasiswaTable.clear();
+                            response.data.forEach(function(item, index) {
+                                // Progress bar dan nilai berdasarkan status penilaian
+                                var progressClass = '';
+                                var progressText = '';
+                                var nilaiDisplay = '';
+                                var progressBar = '';
+                                
+                                if (item.status_penilaian === 'Belum Dinilai') {
+                                    // Jika belum dinilai
+                                    progressClass = 'bg-secondary';
+                                    progressText = 'Belum Dinilai';
+                                    nilaiDisplay = '<span class="nilai-display belum-dinilai">-</span>';
+                                    progressBar = `
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                <div class="progress-bar ${progressClass}" role="progressbar" 
+                                                     style="width: 0%" aria-valuenow="0" 
+                                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <small class="text-muted">0%</small>
+                                        </div>
+                                        <small class="text-muted">${progressText}</small>
+                                    `;
+                                } else if (item.status_penilaian === 'Draft') {
+                                    // Jika masih draft
+                                    progressClass = 'bg-warning';
+                                    progressText = 'Draft';
+                                    nilaiDisplay = `<span class="nilai-display draft">${item.nilai}%</span>`;
+                                    progressBar = `
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                <div class="progress-bar ${progressClass}" role="progressbar" 
+                                                     style="width: ${item.nilai}%" aria-valuenow="${item.nilai}" 
+                                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <small class="text-muted">${item.nilai}%</small>
+                                        </div>
+                                        <small class="text-muted">${progressText}</small>
+                                    `;
+                                } else if (item.status_penilaian === 'Selesai') {
+                                    // Jika sudah selesai dinilai
+                                    if (item.nilai >= 85) {
+                                        progressClass = 'bg-success';
+                                        progressText = 'Sangat Baik';
+                                    } else if (item.nilai >= 70) {
+                                        progressClass = 'bg-info';
+                                        progressText = 'Baik';
+                                    } else if (item.nilai >= 55) {
+                                        progressClass = 'bg-warning';
+                                        progressText = 'Cukup';
+                                    } else if (item.nilai >= 40) {
+                                        progressClass = 'bg-danger';
+                                        progressText = 'Kurang';
+                                    } else {
+                                        progressClass = 'bg-secondary';
+                                        progressText = 'Sangat Kurang';
+                                    }
+                                    
+                                    nilaiDisplay = `<span class="nilai-display selesai">${item.nilai}%</span>`;
+                                    progressBar = `
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                <div class="progress-bar ${progressClass}" role="progressbar" 
+                                                     style="width: ${item.nilai}%" aria-valuenow="${item.nilai}" 
+                                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <small class="text-muted">${item.nilai}%</small>
+                                        </div>
+                                        <small class="text-muted">${progressText}</small>
+                                    `;
+                                } else {
+                                    // Status lain
+                                    progressClass = 'bg-secondary';
+                                    progressText = item.status_penilaian;
+                                    nilaiDisplay = `<span class="text-muted">${item.nilai}%</span>`;
+                                    progressBar = `
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                <div class="progress-bar ${progressClass}" role="progressbar" 
+                                                     style="width: ${item.nilai}%" aria-valuenow="${item.nilai}" 
+                                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <small class="text-muted">${item.nilai}%</small>
+                                        </div>
+                                        <small class="text-muted">${progressText}</small>
+                                    `;
+                                }
+
+                                // Tentukan tombol berdasarkan status penilaian
+                                var actionButton = '';
+                                if (item.status_penilaian === 'Belum Dinilai' || item.status_penilaian === 'Draft') {
+                                    // Tampilkan tombol nilai jika belum dinilai atau masih draft
+                                    actionButton = `
+                                        <button type="button" class="btn btn-primary btn-rounded-circle" 
+                                                onclick="window.location.href='{{ url_for("pembimbing.penilaian_mahasiswa") }}?nim=${item.nim_mahasiswa}'"
+                                                title="Nilai Mahasiswa">
+                                            <i class="bi bi-pencil" style="font-size: 1rem;"></i>
+                                        </button>
+                                    `;
+                                } else if (item.status_penilaian === 'Selesai') {
+                                    // Tampilkan badge selesai jika sudah dinilai
+                                    actionButton = `
+                                        <span class="badge bg-success" title="Penilaian Selesai - Klik untuk lihat detail" 
+                                              style="cursor: pointer;" onclick="lihatDetailNilai('${item.nim_mahasiswa}')">
+                                            <i class="bi bi-check-circle me-1"></i>Selesai
+                                        </span>
+                                    `;
+                                } else {
+                                    // Tampilkan tombol edit jika status lain
+                                    actionButton = `
+                                        <button type="button" class="btn btn-warning btn-rounded-circle" 
+                                                onclick="window.location.href='{{ url_for("pembimbing.penilaian_mahasiswa") }}?nim=${item.nim_mahasiswa}'"
+                                                title="Edit Penilaian">
+                                            <i class="bi bi-pencil-square" style="font-size: 1rem;"></i>
+                                        </button>
+                                    `;
+                                }
+
+                                daftarMahasiswaTable.row.add([
+                                    index + 1,
+                                    item.nama_mahasiswa,
+                                    item.judul_usaha,
+                                    nilaiDisplay,
+                                    progressBar,
+                                    actionButton
+                                ]);
+                            });
+                            daftarMahasiswaTable.draw();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Terjadi kesalahan saat memuat data mahasiswa'
+                        });
+                    }
+                });
+            }
+        });
+
+        // Fungsi untuk melihat detail nilai mahasiswa yang sudah selesai
+        function lihatDetailNilai(nim) {
+            // Redirect ke halaman daftar nilai dengan parameter untuk membuka modal
+            window.location.href = '{{ url_for("pembimbing.daftar_penilaian_mahasiswa") }}?nim=' + nim;
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Pembimbing - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/iconly/bold.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-pembimbing.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+
+    <style>
+        /* Styling untuk stats cards */
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .stats-icon i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.5rem;
+            line-height: 1;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* Memastikan icon Bootstrap terpusat */
+        .bi {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .stats-icon:hover {
+            transform: scale(1.05);
+        }
+
+        /* Card styling tanpa gradient */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Text styling */
+        .font-extrabold {
+            font-weight: 800;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+        
+        /* Custom scrollbar styling untuk horizontal scroll */
+        .overflow-auto::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .overflow-auto::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .overflow-auto::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        .overflow-auto::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Firefox scrollbar */
+        .overflow-auto {
+            scrollbar-width: thin;
+            scrollbar-color: #c1c1c1 #f1f1f1;
+        }
+        
+        /* Smooth scroll behavior */
+        .overflow-auto {
+            scroll-behavior: smooth;
+        }
+        
+        /* Hover effect untuk tombol scroll */
+        .btn-scroll:hover {
+            background: linear-gradient(135deg, #0f5132, #0a3624) !important;
+            transform: translateY(-50%) scale(1.15) !important;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4) !important;
+            transition: all 0.3s ease;
+        }
+        
+        /* Disabled state untuk tombol scroll */
+        .btn-scroll:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: linear-gradient(135deg, #6c757d, #495057) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+        }
+        
+        /* Active state untuk tombol scroll */
+        .btn-scroll:active {
+            transform: translateY(-50%) scale(0.95) !important;
+        }
+        
+        /* Memastikan tombol selalu terlihat */
+        .btn-scroll {
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        /* Container untuk memastikan tombol tidak tertutup */
+        .card-body.position-relative {
+            overflow: visible !important;
+        }
+        
+        /* Memastikan icon berada di tengah sempurna */
+        .btn-scroll i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Override Bootstrap button padding */
+        .btn-scroll {
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            /* Responsive untuk stats cards */
+            .col-6.col-lg-3.col-md-6 {
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+                margin-bottom: 1rem;
+            }
+            
+            /* Responsive untuk mahasiswa cards */
+            #mahasiswaContainer {
+                flex-wrap: wrap !important;
+                overflow: visible !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+            
+            #mahasiswaContainer .col-12 {
+                min-width: auto !important;
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+            
+            /* Sembunyikan tombol scroll di mobile */
+            .btn-scroll {
+                display: none !important;
+            }
+            
+            /* Responsive untuk card header */
+            .card-header.d-flex {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 1rem !important;
+            }
+            
+            .card-header .d-flex.align-items-center {
+                flex-wrap: wrap !important;
+                gap: 0.5rem !important;
+            }
+            
+            .card-header .me-3 {
+                margin-right: 0 !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+            /* Responsive untuk stats icon */
+            .stats-icon {
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 1.3rem !important;
+            }
+            
+            .stats-icon i {
+                font-size: 1.3rem !important;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            /* Responsive untuk stats cards di mobile kecil */
+            .col-6.col-lg-3.col-md-6 {
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+                margin-bottom: 1rem;
+            }
+            
+            /* Responsive untuk text dan spacing */
+            .card-title {
+                font-size: 1rem !important;
+            }
+            
+            .text-muted {
+                font-size: 0.8rem !important;
+            }
+            
+            .badge {
+                font-size: 0.65rem !important;
+                padding: 0.3rem 0.6rem !important;
+            }
+            
+            /* Responsive untuk mahasiswa card content */
+            .card-body.p-4 {
+                padding: 1rem !important;
+            }
+            
+            .avatar.avatar-lg.me-3 {
+                width: 50px !important;
+                height: 50px !important;
+            }
+            
+            .avatar.avatar-lg.me-3 span {
+                font-size: 1.2rem !important;
+            }
+            
+            /* Responsive untuk card header info */
+            .card-header .d-flex.align-items-center {
+                flex-direction: column !important;
+                align-items: stretch !important;
+            }
+            
+            .card-header .me-3 {
+                text-align: center !important;
+                padding: 0.25rem 0 !important;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            .card-header .me-3:last-child {
+                border-bottom: none !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Responsive untuk mobile sangat kecil */
+            .page-heading h3 {
+                font-size: 1.5rem !important;
+            }
+            
+            .page-heading p {
+                font-size: 1rem !important;
+            }
+            
+            .card-body {
+                padding: 1rem !important;
+            }
+            
+            .card-body.px-3.py-4-5 {
+                padding: 1rem !important;
+            }
+            
+            .stats-icon {
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 1.2rem !important;
+            }
+            
+            .stats-icon i {
+                font-size: 1.2rem !important;
+            }
+            
+            /* Responsive untuk mahasiswa cards di mobile kecil */
+            .card-body.p-4 {
+                padding: 0.75rem !important;
+            }
+            
+            .avatar.avatar-lg.me-3 {
+                width: 45px !important;
+                height: 45px !important;
+            }
+            
+            .avatar.avatar-lg.me-3 span {
+                font-size: 1.1rem !important;
+            }
+            
+            /* Responsive footer */
+            .footer {
+                text-align: center !important;
+            }
+            
+            .footer .float-start,
+            .footer .float-end {
+                float: none !important;
+                display: block !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+                    .footer .float-end {
+            margin-bottom: 0 !important;
+        }
+    }
+
+    /* Progress bar styling untuk dashboard */
+    .progress {
+        background-color: #e9ecef;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+
+    .progress-bar.bg-success {
+        background-color: #22c55e !important;
+    }
+
+    /* Table responsive untuk dashboard */
+    @media (max-width: 768px) {
+        .table-responsive {
+            font-size: 0.8rem;
+        }
+        
+        .progress {
+            width: 40px !important;
+        }
+        
+        .badge {
+            font-size: 0.7rem;
+        }
+    }
+</style>
+
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+    <div class="sidebar-header">
+        <div class="d-flex justify-content-between">
+            <div class="logo">
+                <a href="{{ url_for('reviewer.dashboard') }}"><img src= "{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+            </div>
+            <div class="toggler">
+                <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar-menu">
+        <ul class="menu">
+            <li class="sidebar-title">Menu</li>
+            
+            <li
+                class="sidebar-item active">
+                <a href="{{ url_for('reviewer.dashboard') }}" class='sidebar-link'>
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-item  ">
+                <a href="{{ url_for('reviewer.proposal') }}" class='sidebar-link'>
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Proposal untuk Review</span>
+                </a>
+            </li>
+            <li class="sidebar-item ">
+                <a href="{{ url_for('reviewer.daftar_mahasiswa_laporan_kemajuan') }}" class='sidebar-link'>
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Laporan Kemajuan</span>
+                </a>
+            </li>
+            <li class="sidebar-item ">
+                <a href="{{ url_for('reviewer.daftar_mahasiswa_laporan_akhir') }}" class='sidebar-link'>
+                    <i class="bi bi-file-earmark-text"></i>
+                    <span>Laporan Akhir</span>
+                </a>
+            </li>
+            <li
+                class="sidebar-item">
+                <a href="{{ url_for('index') }}" class='sidebar-link'>
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+    <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+</div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+            
+<div class="page-heading">
+    <h3>Selamat datang, {{ session.get('nama', 'Reviewer')|e }}!</h3>
+    <p class="text-muted" style="font-size:1.2rem;">Sebagai: {{ session.get('user_type', 'Reviewer')|e }} | ID: {{ session.get('user_id', 'N/A')|e }}</p>
+</div>
+<div class="page-content">
+    <section class="row">
+        <div class="col-12">
+            <div class="row">
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon" style="background-color: #28a745;">
+                                        <i class="bi bi-people-fill" style="color: white;"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Total Proposal</h6>
+                                    <h6 class="font-extrabold mb-0" style="color: #28a745;">{{ stats.total_proposal|default(0) }}</h6>
+                                    <small class="text-muted">Semua proposal yang ditugaskan</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon" style="background-color: #17a2b8;">
+                                        <i class="bi bi-award-fill" style="color: white;"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Belum Direview</h6>
+                                    <h6 class="font-extrabold mb-0" style="color: #17a2b8;">{{ stats.belum_direview|default(0) }}</h6>
+                                    <small class="text-muted">Proposal yang belum direview</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon" style="background-color: #ffc107;">
+                                        <i class="bi bi-clock-fill" style="color: white;"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Sedang Direview</h6>
+                                    <h6 class="font-extrabold mb-0" style="color: #ffc107;">{{ stats.sedang_direview|default(0) }}</h6>
+                                    <small class="text-muted">Proposal sedang direview</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3 col-md-6">
+                    <div class="card">
+                        <div class="card-body px-3 py-4-5">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="stats-icon" style="background-color: #28a745;">
+                                        <i class="bi bi-check-circle-fill" style="color: white;"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <h6 class="text-muted font-semibold">Selesai Review</h6>
+                                    <h6 class="font-extrabold mb-0" style="color: #28a745;">{{ stats.selesai_review|default(0) }}</h6>
+                                    <small class="text-muted">Proposal selesai direview</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Proposal Terbaru -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Proposal Terbaru</h4>
+                        </div>
+                        <div class="card-body">
+                            {% if recent_proposals %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Judul Usaha</th>
+                                                <th>Nama Ketua</th>
+                                                <th>Dosen Pembimbing</th>
+                                                <th>Status Review</th>
+                                                <th>Progress Anggaran</th>
+                                                <th>Tanggal Ditugaskan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for proposal in recent_proposals %}
+                                            <tr>
+                                                <td>{{ proposal.judul_usaha }}</td>
+                                                <td>{{ proposal.nama_ketua }}</td>
+                                                <td>{{ proposal.dosen_pembimbing or 'Belum ditentukan' }}</td>
+                                                <td>
+                                                    {% if proposal.status_review == 'belum_direview' %}
+                                                        <span class="badge bg-warning">Belum Direview</span>
+                                                    {% elif proposal.status_review == 'sedang_direview' %}
+                                                        <span class="badge bg-info">Sedang Direview</span>
+                                                    {% elif proposal.status_review == 'selesai_review' %}
+                                                        <span class="badge bg-success">Selesai Review</span>
+                                                    {% elif proposal.status_review == 'sudah_dinilai' %}
+                                                        <span class="badge bg-success">Sudah Dinilai</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">{{ proposal.status_review|title }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% set total_anggaran = (proposal.total_anggaran_awal or 0) + (proposal.total_anggaran_bertumbuh or 0) %}
+                                                    {% set total_reviewed = (proposal.anggaran_awal_reviewed or 0) + (proposal.anggaran_bertumbuh_reviewed or 0) %}
+                                                    {% set total_ditolak = (proposal.anggaran_awal_ditolak or 0) + (proposal.anggaran_bertumbuh_ditolak or 0) %}
+                                                    {% set total_completed = total_reviewed + total_ditolak %}
+                                                    
+                                                    {% if total_anggaran > 0 %}
+                                                        <div class="d-flex align-items-center" title="Progress Review Anggaran">
+                                                            <div class="progress me-2" style="width: 60px; height: 6px;">
+                                                                <div class="progress-bar {% if total_ditolak > 0 %}bg-warning{% else %}bg-success{% endif %}" role="progressbar" 
+                                                                     style="width: {{ (total_completed / total_anggaran) * 100 }}%"></div>
+                                                            </div>
+                                                            <small class="text-muted">{{ total_completed }}/{{ total_anggaran }} ({{ ((total_completed / total_anggaran) * 100)|round(1) }}%)</small>
+                                                        </div>
+                                                        {% if total_reviewed > 0 %}
+                                                            <small class="text-success d-block mt-1">
+                                                                <i class="bi bi-check-circle"></i> {{ total_reviewed }} disetujui
+                                                            </small>
+                                                        {% endif %}
+                                                        {% if total_ditolak > 0 %}
+                                                            <small class="text-danger d-block mt-1">
+                                                                <i class="bi bi-x-circle"></i> {{ total_ditolak }} ditolak
+                                                            </small>
+                                                        {% endif %}
+                                                        {% if total_completed == total_anggaran %}
+                                                            <small class="text-success d-block mt-1">
+                                                                <i class="bi bi-check-circle-fill"></i> Selesai review
+                                                            </small>
+                                                        {% elif total_completed > 0 and total_completed < total_anggaran %}
+                                                            <small class="text-info d-block mt-1">
+                                                                <i class="bi bi-clock"></i> Sedang direview
+                                                            </small>
+                                                        {% elif total_completed == 0 and total_anggaran > 0 %}
+                                                            <small class="text-muted d-block mt-1">
+                                                                <i class="bi bi-hourglass-split"></i> Belum direview
+                                                            </small>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <span class="text-muted">Belum ada anggaran</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ proposal.tanggal_assign }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="text-center text-muted">
+                                    <i class="bi bi-inbox-fill" style="font-size: 3rem;"></i>
+                                    <p class="mt-2">Belum ada proposal yang ditugaskan</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</div>
+
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    
+<script src="{{ url_for('static', filename='assets/vendors/apexcharts/apexcharts.js') }}"></script>
+<script src="{{ url_for('static', filename='assets/js/pages/dashboard.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+</body>
+
+</html>
+

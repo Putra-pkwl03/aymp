@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pendaftaran - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-logdaf.css') }}">
+    <!-- Choices.js CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/choices.js/choices.min.css') }}">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap');
+
+        /* Base Styles */
+        body {
+            font-family: 'Baloo 2', Arial, sans-serif;
+            font-size: 1.1rem;
+            background: url('{{ url_for('static', filename='lodaf/bg.svg') }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Login Container */
+        .login-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 0;
+            margin: 0;
+            width: 100%;
+            min-height: 100vh;
+            border-radius: 0;
+        }
+
+        .login-content {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Card wrapper */
+        }
+
+        .card {
+            background: rgba(255,255,255,0.85);
+            border-radius: 18px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.10);
+            padding: 38px 32px 32px 32px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Logo Styles */
+        .logo {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .logo img {
+            max-height: 120px;
+            width: auto;
+        }
+
+        /* Header */
+        .header-title {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .sub-header-title {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.15rem;
+            color: #333;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Form Styles */
+        .login-form {
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 18px;
+        }
+
+        .login-form .row {
+            margin-bottom: 18px;
+        }
+
+        .login-form .form-control {
+            border-radius: 10px;
+            margin-bottom: 0;
+            padding: 18px 20px;
+            font-size: 1.13rem;
+            min-height: 48px;
+            height: 48px;
+            line-height: 1.5;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .login-form .form-control:focus {
+            border-color: #28a15a;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(40, 161, 90, 0.25);
+        }
+        
+        .login-form .form-select {
+            border-radius: 10px;
+            margin-bottom: 0;
+            padding: 18px 20px;
+            font-size: 1.13rem;
+            min-height: 48px;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            height: 48px;
+            line-height: 1.5;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+            padding-right: 2.5rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .login-form .form-select:focus {
+            border-color: #28a15a;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(40, 161, 90, 0.25);
+        }
+
+        /* Choices.js Custom Styling */
+        .choices {
+            margin-bottom: 0;
+        }
+
+        .choices__inner {
+            border-radius: 10px !important;
+            padding: 18px 20px !important;
+            font-size: 1.13rem !important;
+            min-height: 48px !important;
+            height: 48px !important;
+            line-height: 1.5 !important;
+            background-color: #fff !important;
+            border: 1px solid #ced4da !important;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+
+        .choices__inner:focus-within {
+            border-color: #28a15a !important;
+            outline: 0 !important;
+            box-shadow: 0 0 0 0.2rem rgba(40, 161, 90, 0.25) !important;
+        }
+
+        .choices__input {
+            font-size: 1.13rem !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        .choices__list--dropdown {
+            border-radius: 10px !important;
+            border: 1px solid #ced4da !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+            font-size: 1.13rem !important;
+            margin-top: 4px !important;
+        }
+
+        .choices__list--dropdown .choices__item {
+            padding: 12px 20px !important;
+        }
+
+        .choices__list--dropdown .choices__item--selectable {
+            transition: background-color 0.2s ease !important;
+        }
+
+        .choices__list--dropdown .choices__item--selectable:hover {
+            background-color: #f8f9fa !important;
+        }
+
+        .choices__list--dropdown .choices__item--selectable.is-highlighted {
+            background-color: #28a15a !important;
+            color: white !important;
+        }
+
+        .choices[data-type*="select-one"] .choices__inner {
+            padding-bottom: 18px !important;
+        }
+
+        /* Custom arrow styling */
+        .choices[data-type*="select-one"]:after {
+            border-color: #343a40 transparent transparent !important;
+            border-style: solid !important;
+            border-width: 5px !important;
+            content: "" !important;
+            height: 0 !important;
+            right: 11.5px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            width: 0 !important;
+            position: absolute !important;
+            pointer-events: none !important;
+            transition: transform 0.2s ease !important;
+        }
+
+        .choices[data-type*="select-one"].is-open:after {
+            border-color: transparent transparent #343a40 !important;
+            margin-top: -2.5px !important;
+            transform: translateY(-50%) rotate(180deg) !important;
+        }
+
+        /* Placeholder styling */
+        .choices__placeholder {
+            color: #6c757d !important;
+            opacity: 1 !important;
+        }
+
+        /* Selected item styling */
+        .choices__list--single .choices__item {
+            color: #495057 !important;
+        }
+
+        /* Search input styling */
+        .choices__list--dropdown .choices__input {
+            background-color: transparent !important;
+            border: none !important;
+            border-bottom: 1px solid #dee2e6 !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            padding: 8px 20px !important;
+            font-size: 1.13rem !important;
+        }
+
+        .choices__list--dropdown .choices__input:focus {
+            outline: none !important;
+            border-bottom-color: #28a15a !important;
+            box-shadow: none !important;
+        }
+
+        /* No results styling */
+        .choices__list--dropdown .choices__item--no-results {
+            color: #6c757d !important;
+            font-style: italic !important;
+        }
+
+        .login-form .form-label {
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 10px;
+            font-size: 1.08rem;
+            letter-spacing: 0.2px;
+        }
+
+        .login-form .form-group {
+            position: relative;
+            margin-bottom: 0;
+        }
+
+        .login-form .form-group .forgot-password {
+            position: absolute;
+            top: 6px;
+            right: 15px;
+        }
+
+        .login-form .btn {
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 0;
+            margin-top: 22px;
+            padding: 16px 0;
+            font-size: 1.18rem;
+            width: 100%;
+        }
+
+        .login-form .btn.btn-primary {
+            background: #28a15a;
+            border-color: #28a15a;
+        }
+
+        .login-form .btn.btn-primary:hover, .login-form .btn.btn-primary:focus {
+            background: #21864a;
+            border-color: #21864a;
+        }
+
+        /* Carousel Styles */
+        .slider-feature-card {
+            background: #fff;
+            max-width: 280px;
+            margin: 0 auto;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 2px 25px -3px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+        }
+
+        .slider-feature-card img {
+            height: 80px;
+            margin: 30px 0;
+        }
+
+        .slider-feature-card h3,
+        .slider-feature-card p {
+            margin-bottom: 30px;
+        }
+
+        .slider-feature-card p {
+            font-size: 1.08rem;
+        }
+
+        .carousel-indicators {
+            bottom: -50px;
+        }
+
+        .carousel-indicators li {
+            cursor: pointer;
+        }
+
+        .carousel-inner {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        /* Responsive */
+        @media only screen and (max-width: 767px) {
+            .hide-on-mobile {
+                display: none;
+            }
+            .logo {
+                font-size: 28px;
+                margin-bottom: 10px;
+            }
+            .logo img {
+                max-height: 70px;
+            }
+            .login-content {
+                max-width: 100%;
+                padding: 0 10px;
+            }
+            .login-form {
+                padding: 0 2px;
+            }
+            .login-form .form-control {
+                font-size: 1.12rem;
+                padding: 14px 12px;
+                min-height: 44px;
+                height: 44px;
+                line-height: 1.5;
+            }
+            .login-form .form-select {
+                font-size: 1.12rem;
+                padding: 14px 12px;
+                min-height: 44px;
+                height: 44px;
+                line-height: 1.5;
+            }
+            .choices__inner {
+                font-size: 1.12rem !important;
+                padding: 14px 12px !important;
+                min-height: 44px !important;
+                height: 44px !important;
+                line-height: 1.5 !important;
+            }
+            .choices__input {
+                font-size: 1.12rem !important;
+            }
+            .choices__list--dropdown {
+                font-size: 1.12rem !important;
+            }
+            .choices__list--dropdown .choices__input {
+                font-size: 1.12rem !important;
+                padding: 6px 12px !important;
+            }
+            .login-form .form-label {
+                font-size: 1rem;
+                margin-bottom: 7px;
+            }
+            .col-md-6 {
+                margin-bottom: 10px;
+            }
+            .login-form .row {
+                margin-bottom: 12px;
+            }
+            .card {
+                padding: 18px 4vw 18px 4vw;
+            }
+        }
+        
+        @media only screen and (max-width: 576px) {
+            .logo img {
+                max-height: 60px;
+            }
+            .header-title {
+                font-size: 1.5rem;
+            }
+            .sub-header-title {
+                font-size: 1rem;
+                margin-bottom: 20px;
+            }
+            .login-content {
+                padding: 0 5px;
+            }
+            .card {
+                padding: 15px 3vw;
+            }
+            .login-form .form-control {
+                font-size: 1rem;
+                padding: 12px 10px;
+                min-height: 40px;
+                height: 40px;
+                line-height: 1.5;
+            }
+            .login-form .form-select {
+                font-size: 1rem;
+                padding: 12px 10px;
+                min-height: 40px;
+                height: 40px;
+                line-height: 1.5;
+            }
+            .choices__inner {
+                font-size: 1rem !important;
+                padding: 12px 10px !important;
+                min-height: 40px !important;
+                height: 40px !important;
+                line-height: 1.5 !important;
+            }
+            .choices__input {
+                font-size: 1rem !important;
+            }
+            .choices__list--dropdown {
+                font-size: 1rem !important;
+            }
+            .choices__list--dropdown .choices__input {
+                font-size: 1rem !important;
+                padding: 6px 10px !important;
+            }
+            .login-form .form-label {
+                font-size: 0.9rem;
+                margin-bottom: 5px;
+            }
+            .login-form .btn {
+                font-size: 1rem;
+                padding: 14px 0;
+            }
+        }
+        
+        @media only screen and (max-width: 480px) {
+            .logo img {
+                max-height: 50px;
+            }
+            .header-title {
+                font-size: 1.25rem;
+            }
+            .sub-header-title {
+                font-size: 0.9rem;
+                margin-bottom: 15px;
+            }
+            .card {
+                padding: 10px 2vw;
+            }
+            .login-form .form-control {
+                font-size: 0.9rem;
+                padding: 10px 8px;
+                min-height: 36px;
+                height: 36px;
+                line-height: 1.5;
+            }
+            .login-form .form-select {
+                font-size: 0.9rem;
+                padding: 10px 8px;
+                min-height: 36px;
+                height: 36px;
+                line-height: 1.5;
+            }
+            .choices__inner {
+                font-size: 0.9rem !important;
+                padding: 10px 8px !important;
+                min-height: 36px !important;
+                height: 36px !important;
+                line-height: 1.5 !important;
+            }
+            .choices__input {
+                font-size: 0.9rem !important;
+            }
+            .choices__list--dropdown {
+                font-size: 0.9rem !important;
+            }
+            .choices__list--dropdown .choices__input {
+                font-size: 0.9rem !important;
+                padding: 4px 8px !important;
+            }
+            .login-form .form-label {
+                font-size: 0.8rem;
+                margin-bottom: 4px;
+            }
+            .login-form .btn {
+                font-size: 0.9rem;
+                padding: 12px 0;
+            }
+            .alert {
+                padding: 0.75rem 3rem 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        .input-group-text {
+            background: #fff !important;
+            border-left: 0 !important;
+            border-radius: 0 10px 10px 0 !important;
+            transition: background 0.2s;
+        }
+        .input-group .form-control {
+            border-right: 0 !important;
+        }
+        .input-group-text i {
+            color: #888;
+            font-size: 1.1rem;
+        }
+        .input-group-text:hover, .input-group-text:focus {
+            background: #f3f3f3 !important;
+            cursor: pointer;
+        }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220,53,69,.15) !important;
+        }
+        
+        /* Error state untuk Choices.js */
+        .choices.is-invalid .choices__inner {
+            border-color: #dc3545 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220,53,69,.15) !important;
+        }
+        .invalid-feedback {
+            display: flex;
+            align-items: center;
+            color: #dc3545;
+            font-size: 0.95rem;
+            margin-top: 6px;
+        }
+        .invalid-feedback i {
+            margin-right: 6px;
+        }
+
+        .alert {
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            padding: 1rem 4rem 1rem 1.25rem;
+            font-size: 1.08rem;
+            border: none;
+            position: relative;
+            display: block;
+        }
+        .alert-success {
+            background: linear-gradient(135deg, #d1f7d6 0%, #e6fbe9 100%);
+            color: #256029;
+        }
+        .alert-danger {
+            background: linear-gradient(135deg, #f8d7da 0%, #fbeaea 100%);
+            color: #842029;
+        }
+        .alert-warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #fffbe6 100%);
+            color: #856404;
+        }
+        .alert .btn-close {
+            position: absolute;
+            top: 50%;
+            right: 1.2rem;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.04);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+            border: none;
+            font-size: 1.2rem;
+            transition: background 0.2s, opacity 0.2s;
+        }
+        .alert .btn-close:hover {
+            background: rgba(0,0,0,0.12);
+            opacity: 1;
+        }
+        .alert .btn-close i {
+            font-size: 1.3rem;
+            color: #555;
+            line-height: 1;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-box">
+        <div class="login-content">
+            <div class="card">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='lodaf/unjaya.png') }}" alt="Logo">
+                </div>
+                <h3 class="header-title">PENDAFTARAN ACHMAD YANI MUDAPRENEUR</h3>
+                <div class="sub-header-title">Universitas Jenderal Achmad Yani Yogyakarta</div>
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                  {% if messages %}
+                    {% for category, message in messages %}
+                      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                          <i class="fas fa-xmark"></i>
+                        </button>
+                      </div>
+                    {% endfor %}
+                  {% endif %}
+                {% endwith %}
+                <form class="login-form" method="POST","GET">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="perguruan-tinggi" class="form-label">Perguruan Tinggi</label>
+                                <input type="text" class="form-control" id="perguruan-tinggi" name="perguruan_tinggi" value="Universitas Jenderal Achmad Yani Yogyakarta" readonly style="background-color: #f8f9fa; cursor: not-allowed;">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="program-studi" class="form-label">Program Studi</label>
+                                <select class="choices" id="program-studi" name="program_studi" required>
+                                    <option value="">Pilih Program Studi</option>
+                                    {% for prodi in program_studi_list %}
+                                        <option value="{{ prodi.nama_program_studi }}">{{ prodi.nama_program_studi }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nim" class="form-label">NIM</label>
+                                <input type="text" class="form-control" id="nim" name="nim" placeholder="Masukkan NIM" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="nama-ketua" class="form-label">Nama Lengkap (Ketua)</label>
+                                <input type="text" class="form-control" id="nama-ketua" name="nama_ketua" placeholder="Masukkan nama lengkap ketua" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="no-telp" class="form-label">No Telepon</label>
+                                <input type="tel" class="form-control" id="no-telp" name="no_telp" placeholder="Masukkan no telepon" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="Masukkan email" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required>
+                                    <span class="input-group-text" style="cursor:pointer; background:transparent; border-left:0;">
+                                        <i class="fas fa-eye" id="passwordIcon"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="ulangi-password" class="form-label">Ulangi Password</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="ulangi-password" name="ulangi_password" placeholder="Ulangi password" required>
+                                    <span class="input-group-text" style="cursor:pointer; background:transparent; border-left:0;">
+                                        <i class="fas fa-eye" id="ulangiPasswordIcon"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block">Daftar Sekarang</button>
+                    </div>
+                    <div class="form-group">
+                        <div class="text-center">Sudah punya akun? <a href="{{ url_for('index') }}">Masuk Disini Ya</a></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"></script>
+    <!-- Choices.js -->
+    <script src="{{ url_for('static', filename='assets/vendors/choices.js/choices.min.js') }}"></script>
+    <script>
+        // Initialize Choices.js for program studi dropdown
+        const programStudiChoices = new Choices('#program-studi', {
+            searchEnabled: true,
+            searchPlaceholderValue: 'Cari program studi...',
+            placeholder: true,
+            placeholderValue: 'Pilih Program Studi',
+            removeItemButton: false,
+            shouldSort: true,
+            position: 'bottom',
+            maxItemCount: 1,
+            classNames: {
+                containerOuter: 'choices',
+                containerInner: 'choices__inner',
+                input: 'choices__input',
+                inputCloned: 'choices__input--cloned',
+                list: 'choices__list',
+                listItems: 'choices__list--multiple',
+                listSingle: 'choices__list--single',
+                listDropdown: 'choices__list--dropdown',
+                item: 'choices__item',
+                placeholder: 'choices__placeholder',
+                group: 'choices__group',
+                groupHeading: 'choices__heading',
+                label: 'choices__label',
+                activeState: 'is-active',
+                focusState: 'is-focused',
+                openState: 'is-open',
+                disabledState: 'is-disabled',
+                flippedState: 'is-flipped',
+                loadingState: 'is-loading',
+                noResults: 'has-no-results',
+                noChoices: 'has-no-choices'
+            }
+        });
+
+        // Toggle password visibility
+        document.querySelector('#passwordIcon').parentElement.addEventListener('click', function() {
+            const passwordInput = document.getElementById('password');
+            const passwordIcon = document.getElementById('passwordIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                passwordIcon.classList.remove('fa-eye');
+                passwordIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                passwordIcon.classList.remove('fa-eye-slash');
+                passwordIcon.classList.add('fa-eye');
+            }
+        });
+        document.querySelector('#ulangiPasswordIcon').parentElement.addEventListener('click', function() {
+            const ulangiPasswordInput = document.getElementById('ulangi-password');
+            const ulangiPasswordIcon = document.getElementById('ulangiPasswordIcon');
+            if (ulangiPasswordInput.type === 'password') {
+                ulangiPasswordInput.type = 'text';
+                ulangiPasswordIcon.classList.remove('fa-eye');
+                ulangiPasswordIcon.classList.add('fa-eye-slash');
+            } else {
+                ulangiPasswordInput.type = 'password';
+                ulangiPasswordIcon.classList.remove('fa-eye-slash');
+                ulangiPasswordIcon.classList.add('fa-eye');
+            }
+        });
+
+        // Real-time feedback saat mengetik
+        document.getElementById('ulangi-password').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const ulangiPasswordInput = this;
+            const ulangiPassword = ulangiPasswordInput.value;
+            let errorMsg = document.getElementById('password-error-msg');
+            if (password !== ulangiPassword) {
+                if (!errorMsg) {
+                    errorMsg = document.createElement('div');
+                    errorMsg.id = 'password-error-msg';
+                    errorMsg.className = 'invalid-feedback';
+                    errorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> <span></span>';
+                    ulangiPasswordInput.parentElement.appendChild(errorMsg);
+                }
+                errorMsg.querySelector('span').textContent = 'Password dan Ulangi Password harus sama!';
+                ulangiPasswordInput.classList.add('is-invalid');
+            } else {
+                if (errorMsg) {
+                    errorMsg.remove();
+                }
+                ulangiPasswordInput.classList.remove('is-invalid');
+            }
+        });
+
+        // Juga perbaiki pada submit
+        document.querySelector('.login-form').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const ulangiPasswordInput = document.getElementById('ulangi-password');
+            const ulangiPassword = ulangiPasswordInput.value;
+            const programStudi = programStudiChoices.getValue().value;
+            
+            // Validasi password
+            let errorMsg = document.getElementById('password-error-msg');
+            if (password !== ulangiPassword) {
+                if (!errorMsg) {
+                    errorMsg = document.createElement('div');
+                    errorMsg.id = 'password-error-msg';
+                    errorMsg.className = 'invalid-feedback';
+                    errorMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> <span></span>';
+                    ulangiPasswordInput.parentElement.appendChild(errorMsg);
+                }
+                errorMsg.querySelector('span').textContent = 'Password dan Ulangi Password harus sama!';
+                ulangiPasswordInput.classList.add('is-invalid');
+                e.preventDefault();
+                return;
+            } else {
+                if (errorMsg) {
+                    errorMsg.remove();
+                }
+                ulangiPasswordInput.classList.remove('is-invalid');
+            }
+            
+            // Validasi program studi
+            if (!programStudi) {
+                const programStudiContainer = document.querySelector('.choices');
+                let programStudiError = document.getElementById('program-studi-error-msg');
+                if (!programStudiError) {
+                    programStudiError = document.createElement('div');
+                    programStudiError.id = 'program-studi-error-msg';
+                    programStudiError.className = 'invalid-feedback';
+                    programStudiError.innerHTML = '<i class="fas fa-exclamation-circle"></i> <span>Program Studi harus dipilih!</span>';
+                    programStudiContainer.parentElement.appendChild(programStudiError);
+                }
+                programStudiContainer.classList.add('is-invalid');
+                e.preventDefault();
+                return;
+            } else {
+                const programStudiContainer = document.querySelector('.choices');
+                const programStudiError = document.getElementById('program-studi-error-msg');
+                if (programStudiError) {
+                    programStudiError.remove();
+                }
+                programStudiContainer.classList.remove('is-invalid');
+            }
+        });
+
+        // Event listener untuk program studi dropdown
+        programStudiChoices.passedElement.element.addEventListener('change', function() {
+            const programStudiError = document.getElementById('program-studi-error-msg');
+            if (programStudiError) {
+                programStudiError.remove();
+            }
+            document.querySelector('.choices').classList.remove('is-invalid');
+        });
+
+        // Fallback JS untuk menutup alert jika Bootstrap JS tidak bekerja
+        document.querySelectorAll('.alert .btn-close').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var alert = btn.closest('.alert');
+                if (alert) {
+                    alert.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

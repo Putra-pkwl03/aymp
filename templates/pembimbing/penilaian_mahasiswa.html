@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penilaian Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-pembimbing.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+    
+    <style>
+        /* Custom button styles for penilaian */
+        .btn-rounded-circle {
+            border-radius: 50% !important;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-rounded-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-rounded-pill {
+            border-radius: 50px !important;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-rounded-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                <span>Pendanaan Hibah</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_laporan_akhir') }}">Laporan Akhir</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Non Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('pembimbing.daftar_penilaian_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-pencil-square"></i>
+                                <span>Penilaian Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Penilaian Mahasiswa</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">
+                                Berikan penilaian terhadap mahasiswa bimbingan di AYMP UNJAYA.
+                            </p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.das_pembimbing') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.daftar_penilaian_mahasiswa') }}">Daftar Penilaian</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Penilaian Mahasiswa</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <!-- Info Mahasiswa -->
+                        <div class="card mb-4" style="border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border:none;">
+                            <div class="card-header" style="background:#f8f9fa;border-bottom:1px solid #e9ecef;padding:16px 20px;">
+                                <h5 class="mb-0" style="font-weight:600;font-size:1.1rem;color:#495057;">
+                                    <i class="bi bi-person-circle me-2 text-primary"></i>Informasi Mahasiswa
+                                </h5>
+                            </div>
+                            <div class="card-body" style="padding:20px;">
+                                <div id="infoMahasiswa">
+                                    <!-- Loading state -->
+                                    <div class="text-center py-4" id="loadingInfo">
+                                        <div class="spinner-border text-primary" role="status" style="width:2rem;height:2rem;">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2 text-muted mb-0">Memuat informasi mahasiswa...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Penilaian -->
+                        <div class="card" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h5 style="font-weight:700;font-size:1.25rem;color:#435ebe;">
+                                        <i class="bi bi-list-check me-2"></i>Form Penilaian
+                                    </h5>
+                                    <p class="text-muted mb-0">Berikan skor untuk setiap kriteria penilaian (hanya pertanyaan aktif)</p>
+                                </div>
+                                <div>
+                                    <button type="button" class="btn btn-success btn-rounded-pill" onclick="simpanPenilaian()" id="btnSimpanPenilaian">
+                                        <i class="bi bi-save me-2"></i>Simpan Penilaian
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="guardCard" class="alert alert-warning d-none" role="alert" style="border-radius: 12px;">
+                                <i class="bi bi-clock-history me-2"></i>
+                                <span id="guardMessage">Menunggu jadwal mulai penilaian...</span>
+                            </div>
+
+                            <form id="formPenilaian">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="tablePenilaian">
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>Pertanyaan</th>
+                                                <th>Bobot (SKS)</th>
+                                                <th>Skor (1 - <span id="skorMaksimal">100</span>)</th>
+                                                <th>Nilai</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Data pertanyaan akan diisi melalui AJAX -->
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-primary">
+                                                <th colspan="2">Total</th>
+                                                <th id="totalBobot">0</th>
+                                                <th id="totalSkor">0</th>
+                                                <th id="totalNilai">0</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+
+                                <div class="row mt-4">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="komentarPembimbing" class="form-label">Komentar Pembimbing</label>
+                                            <textarea class="form-control" id="komentarPembimbing" rows="4" placeholder="Berikan komentar atau saran untuk mahasiswa..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+    <script>
+        var nimMahasiswa = '';
+        var pertanyaanList = [];
+        var totalBobot = 0;
+        var jadwalPenilaian = null;
+        var jadwalIntervalStarted = false;
+
+        function parseDateFlexible(dateInput) {
+            if (!dateInput) return null;
+            if (dateInput instanceof Date) return isNaN(dateInput.getTime()) ? null : dateInput;
+            var str = String(dateInput).trim();
+
+            // Case 1: Date-only -> treat as LOCAL midnight to avoid UTC shift
+            var dateOnlyDash = /^(\d{4})-(\d{2})-(\d{2})$/;
+            var dateOnlySlash = /^(\d{4})\/(\d{2})\/(\d{2})$/;
+            var m1 = str.match(dateOnlyDash);
+            var m2 = str.match(dateOnlySlash);
+            if (m1 || m2) {
+                var y = parseInt((m1 || m2)[1], 10);
+                var mo = parseInt((m1 || m2)[2], 10) - 1;
+                var d = parseInt((m1 || m2)[3], 10);
+                var localMidnight = new Date(y, mo, d, 0, 0, 0, 0);
+                return isNaN(localMidnight.getTime()) ? null : localMidnight;
+            }
+
+            // Case 1b: ISO without timezone (YYYY-MM-DDTHH:mm[:ss]) -> parse as LOCAL explicitly
+            var isoLocal = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?$/;
+            var mIso = str.match(isoLocal);
+            if (mIso) {
+                var y2 = parseInt(mIso[1], 10);
+                var mo2 = parseInt(mIso[2], 10) - 1;
+                var d2 = parseInt(mIso[3], 10);
+                var hh = parseInt(mIso[4], 10);
+                var mm = parseInt(mIso[5], 10);
+                var ss = mIso[6] ? parseInt(mIso[6], 10) : 0;
+                var localDt = new Date(y2, mo2, d2, hh, mm, ss, 0);
+                return isNaN(localDt.getTime()) ? null : localDt;
+            }
+
+            // Case 2: "YYYY-MM-DD HH:mm[:ss]" -> normalize to local by inserting 'T'
+            if (/^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2})?$/.test(str)) {
+                str = str.replace(' ', 'T');
+            }
+
+            // Generic parse
+            var dt = new Date(str);
+            if (isNaN(dt.getTime())) {
+                // Safari-safe fallback: replace '-' with '/'
+                dt = new Date(str.replace(/-/g, '/'));
+            }
+            return isNaN(dt.getTime()) ? null : dt;
+        }
+
+        function disableFormInputsWithGuard(messageText) {
+            if (messageText) {
+                $('#guardMessage').text(messageText);
+            }
+            $('#guardCard').removeClass('d-none');
+            $('#btnSimpanPenilaian').prop('disabled', true);
+            // Disable semua input dalam form untuk mencegah interaksi accidental
+            $('#formPenilaian').find('input, textarea, button').prop('disabled', true);
+            // Use namespaced events so we can cleanly unbind later
+            $(document).on('focus.msjadwal mousedown.msjadwal keydown.msjadwal', '#formPenilaian input, #formPenilaian textarea, #formPenilaian button', function(e){
+                e.preventDefault();
+                return false;
+            });
+        }
+
+        function enableFormInputsAndHideGuard() {
+            $('#guardCard').addClass('d-none');
+            $('#btnSimpanPenilaian').prop('disabled', false);
+            // Re-enable semua input dalam form
+            $('#formPenilaian').find('input, textarea, button').prop('disabled', false);
+            $(document).off('focus.msjadwal mousedown.msjadwal keydown.msjadwal', '#formPenilaian input, #formPenilaian textarea, #formPenilaian button');
+        }
+
+        $(document).ready(function() {
+            // Ambil NIM dari URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            nimMahasiswa = urlParams.get('nim');
+            
+            if (!nimMahasiswa) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'NIM mahasiswa tidak ditemukan'
+                }).then(() => {
+                    window.location.href = '{{ url_for("pembimbing.daftar_penilaian_mahasiswa") }}';
+                });
+                return;
+            }
+
+            // Load guard jadwal penilaian, lalu data mahasiswa & pertanyaan
+            loadJadwalPenilaian().always(function(){
+                loadInfoMahasiswa();
+                loadPertanyaanPenilaian();
+            });
+
+            // Periodik cek jadwal tiap 60 detik agar otomatis lock/unlock sesuai waktu berjalan
+            if (!jadwalIntervalStarted) {
+                jadwalIntervalStarted = true;
+                setInterval(function(){
+                    loadJadwalPenilaian();
+                }, 60000);
+            }
+        });
+
+        function isWithinSchedule(startStr, endStr) {
+            // Tetap digunakan jika dipanggil tempat lain: gunakan parser fleksibel
+            const start = parseDateFlexible(startStr);
+            const end = parseDateFlexible(endStr);
+            if (!start && !end) return true;
+            const now = new Date();
+            if (start && now < start) return false;
+            if (end && now > end) return false;
+            return true;
+        }
+
+        function loadJadwalPenilaian() {
+            return $.get('{{ url_for('mahasiswa.get_pengaturan_jadwal_mhs') }}', { _: Date.now() }).done(function(resp){
+                if (!resp || !resp.success) {
+                    // Jika gagal, anggap tidak ada guard
+                    enableFormInputsAndHideGuard();
+                    return;
+                }
+                jadwalPenilaian = resp.data || {};
+                // Pastikan field bernama konsisten: coba beberapa kemungkinan kunci
+                const rawMulai = jadwalPenilaian.pembimbing_nilai_mulai || jadwalPenilaian.mulai_penilaian_pembimbing || jadwalPenilaian.mulai_penilaian || jadwalPenilaian.start;
+                const rawSelesai = jadwalPenilaian.pembimbing_nilai_selesai || jadwalPenilaian.selesai_penilaian_pembimbing || jadwalPenilaian.selesai_penilaian || jadwalPenilaian.end;
+                const mulai = parseDateFlexible(rawMulai);
+                const selesai = parseDateFlexible(rawSelesai);
+                const now = new Date();
+                let showGuard = false;
+                let message = '';
+                // Validasi: selesai tidak boleh sebelum mulai
+                if (mulai && selesai && selesai < mulai) {
+                    showGuard = true;
+                    message = 'Jadwal penilaian tidak valid: waktu selesai lebih awal dari waktu mulai. Mohon hubungi admin untuk memperbaiki jadwal.';
+                } else if (mulai && now < mulai) {
+                    showGuard = true;
+                    message = `Penilaian belum dibuka. Menunggu jadwal mulai: ${mulai.toLocaleString('id-ID')}`;
+                } else if (selesai && now > selesai) {
+                    showGuard = true;
+                    message = `Masa penilaian telah berakhir pada ${selesai.toLocaleString('id-ID')}. Penilaian baru tidak dapat ditambahkan (nilai otomatis 0).`;
+                }
+                if (showGuard) {
+                    disableFormInputsWithGuard(message);
+                } else {
+                    enableFormInputsAndHideGuard();
+                }
+                // Debugging info ke console agar mudah mengecek
+                try {
+                    console.debug('[Jadwal Penilaian] now=', now, 'mulai=', mulai, 'selesai=', selesai, 'guard=', showGuard);
+                } catch (e) {}
+            }).fail(function(){
+                // Jika API gagal, jangan blok input
+                enableFormInputsAndHideGuard();
+            });
+        }
+
+        function loadInfoMahasiswa() {
+            $.ajax({
+                url: '{{ url_for("pembimbing.get_info_mahasiswa") }}',
+                type: 'GET',
+                data: { nim: nimMahasiswa },
+                success: function(response) {
+                    // Hide loading
+                    $('#loadingInfo').hide();
+                    
+                    if (response.success) {
+                        const data = response.data;
+                        $('#infoMahasiswa').html(`
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center p-3" style="background:#f8f9fa;border-radius:8px;border-left:4px solid #007bff;">
+                                        <div class="me-3">
+                                            <i class="bi bi-person-badge text-primary" style="font-size:1.2rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted" style="font-size:0.85rem;font-weight:500;">NIM</div>
+                                            <div class="fw-semibold" style="color:#495057;">${data.nim}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center p-3" style="background:#f8f9fa;border-radius:8px;border-left:4px solid #28a745;">
+                                        <div class="me-3">
+                                            <i class="bi bi-person text-success" style="font-size:1.2rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted" style="font-size:0.85rem;font-weight:500;">Nama Mahasiswa</div>
+                                            <div class="fw-semibold" style="color:#495057;">${data.nama}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center p-3" style="background:#f8f9fa;border-radius:8px;border-left:4px solid #ffc107;">
+                                        <div class="me-3">
+                                            <i class="bi bi-lightbulb text-warning" style="font-size:1.2rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted" style="font-size:0.85rem;font-weight:500;">Judul Usaha</div>
+                                            <div class="fw-semibold" style="color:#495057;">${data.judul_usaha}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center p-3" style="background:#f8f9fa;border-radius:8px;border-left:4px solid #17a2b8;">
+                                        <div class="me-3">
+                                            <i class="bi bi-mortarboard text-info" style="font-size:1.2rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted" style="font-size:0.85rem;font-weight:500;">Program Studi</div>
+                                            <div class="fw-semibold" style="color:#495057;">${data.program_studi}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    } else {
+                        // Show error state
+                        $('#infoMahasiswa').html(`
+                            <div class="text-center py-4">
+                                <i class="bi bi-exclamation-triangle text-warning" style="font-size:2rem;"></i>
+                                <p class="mt-2 text-muted mb-0">Gagal memuat informasi mahasiswa</p>
+                                <button class="btn btn-primary btn-sm mt-2" onclick="loadInfoMahasiswa()">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Coba Lagi
+                                </button>
+                            </div>
+                        `);
+                    }
+                },
+                error: function() {
+                    // Hide loading and show error
+                    $('#loadingInfo').hide();
+                    $('#infoMahasiswa').html(`
+                        <div class="text-center py-4">
+                            <i class="bi bi-exclamation-triangle text-danger" style="font-size:2rem;"></i>
+                            <p class="mt-2 text-muted mb-0">Terjadi kesalahan saat memuat data</p>
+                            <button class="btn btn-primary btn-sm mt-2" onclick="loadInfoMahasiswa()">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Coba Lagi
+                            </button>
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        function loadPertanyaanPenilaian() {
+            $.ajax({
+                url: '{{ url_for("pembimbing.get_pertanyaan_penilaian") }}',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        // Filter hanya pertanyaan dengan status aktif
+                        pertanyaanList = response.data.filter(function(item) {
+                            return item.status === 'Aktif';
+                        });
+                        
+                        console.log('Pertanyaan aktif yang akan ditampilkan:', pertanyaanList.length);
+                        
+                        if (pertanyaanList.length === 0) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Tidak Ada Pertanyaan',
+                                text: 'Belum ada pertanyaan penilaian yang aktif. Silakan hubungi admin untuk mengatur pertanyaan penilaian.'
+                            });
+                            return;
+                        }
+                        
+                        renderPertanyaanTable();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message || 'Gagal memuat pertanyaan penilaian'
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat memuat pertanyaan penilaian'
+                    });
+                }
+            });
+        }
+
+        function renderPertanyaanTable() {
+            const tbody = $('#tablePenilaian tbody');
+            tbody.empty();
+            totalBobot = 0;
+
+            pertanyaanList.forEach(function(item, index) {
+                totalBobot += parseFloat(item.bobot);
+                
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${item.pertanyaan}</td>
+                        <td>${item.bobot}</td>
+                        <td class="skor-cell" data-id="${item.id}">
+                            <div class="skor-input-container">
+                                <button type="button" class="btn btn-primary btn-sm btn-input-skor" data-id="${item.id}" data-skor-maks="${item.skor_maksimal}">
+                                    <i class="bi bi-plus-circle me-1"></i>Input Skor
+                                </button>
+                            </div>
+                        </td>
+                        <td class="nilai-admin">0</td>
+                    </tr>
+                `;
+                tbody.append(row);
+            });
+
+            $('#totalBobot').text(totalBobot.toFixed(2));
+            $('#skorMaksimal').text((pertanyaanList[0] && pertanyaanList[0].skor_maksimal) ? pertanyaanList[0].skor_maksimal : 100);
+            
+            // Tampilkan informasi jumlah pertanyaan
+            if (pertanyaanList.length > 0) {
+                $('.text-muted').text(`Berikan skor untuk setiap kriteria penilaian (${pertanyaanList.length} pertanyaan aktif)`);
+            }
+            
+            // Bind delegasi klik untuk tombol input skor agar tetap jalan meskipun tombol di-render dinamis
+            $(document).off('click', '.btn-input-skor').on('click', '.btn-input-skor', function(){
+                const idPertanyaan = $(this).data('id');
+                const skorMaks = $(this).data('skor-maks');
+                tampilkanInputSkor(idPertanyaan, skorMaks);
+            });
+
+            // Load data skor yang sudah tersimpan dan update tampilan
+            loadSkorTersimpan();
+            
+            // Hitung total awal
+            hitungTotal();
+        }
+
+        function hitungNilai(input) {
+            let skor = parseFloat($(input).val()) || 0;
+            const bobot = parseFloat($(input).data('bobot'));
+            const skorMaksimal = parseFloat($(input).data('skor-maksimal'));
+            
+            // Validasi skor tidak melebihi maksimal
+            if (skor > skorMaksimal) {
+                $(input).val(skorMaksimal);
+                skor = skorMaksimal;
+            }
+
+            // Hitung nilai terbobot
+            const nilaiAdmin = (skor / skorMaksimal) * bobot;
+            $(input).closest('tr').find('.nilai-admin').text(nilaiAdmin.toFixed(2));
+
+            // Update total secara real-time
+            hitungTotal();
+        }
+
+        function hitungTotal() {
+            let totalSkor = 0;
+            let totalNilai = 0;
+            let totalBobot = 0;
+
+            // Hitung dari semua pertanyaan
+            pertanyaanList.forEach(function(item) {
+                const skorCell = $(`.skor-cell[data-id="${item.id}"]`);
+                const skorInput = skorCell.find('.skor-input').val();
+                const span = skorCell.find('span');
+                
+                let skor = 0;
+                
+                // Cek apakah ada input yang sedang aktif
+                if (skorInput && skorInput !== '') {
+                    skor = parseFloat(skorInput);
+                } else if (span.length > 0) {
+                    // Cek dari span jika sudah tersimpan (hanya angka)
+                    const spanText = span.text();
+                    if (spanText && !isNaN(spanText)) {
+                        skor = parseFloat(spanText);
+                    }
+                }
+                
+                if (skor > 0) {
+                    const bobot = parseFloat(item.bobot);
+                    const skorMaksimal = parseFloat(item.skor_maksimal);
+                    const nilai = (skor / skorMaksimal) * bobot;
+                    
+                    totalSkor += skor;
+                    totalNilai += nilai;
+                    totalBobot += bobot;
+                }
+            });
+
+            // Hitung nilai akhir seperti IPK
+            const nilaiAkhir = totalBobot > 0 ? (totalNilai / totalBobot) * 100 : 0;
+            
+            $('#totalSkor').text(totalSkor);
+            $('#totalNilai').text(nilaiAkhir.toFixed(2) + '%');
+            
+            // Debug: log total untuk memastikan perhitungan benar
+            console.log('Total Skor:', totalSkor, 'Total Nilai:', totalNilai.toFixed(2), 'Total Bobot:', totalBobot, 'Nilai Akhir:', nilaiAkhir.toFixed(2) + '%');
+        }
+
+
+
+        function loadSkorTersimpan() {
+            $.ajax({
+                url: '{{ url_for("pembimbing.get_skor_tersimpan") }}',
+                type: 'GET',
+                data: { nim: nimMahasiswa },
+                success: function(response) {
+                    if (response.success && response.data && response.data.length > 0) {
+                        // Ada data skor tersimpan
+                        response.data.forEach(function(item) {
+                            const skorCell = $(`.skor-cell[data-id="${item.id_pertanyaan}"]`);
+                            if (skorCell.length > 0) {
+                                // Hitung dan tampilkan nilai
+                                const pertanyaan = pertanyaanList.find(p => p.id == item.id_pertanyaan);
+                                const bobot = parseFloat(pertanyaan.bobot);
+                                const skorMaksimal = parseFloat(pertanyaan.skor_maksimal);
+                                const nilaiAdmin = (item.skor / skorMaksimal) * bobot;
+                                skorCell.closest('tr').find('.nilai-admin').text(nilaiAdmin.toFixed(2));
+                                
+                                // Tampilkan skor yang sudah tersimpan (hanya angka)
+                                skorCell.find('.skor-input-container').html(`
+                                    <span style="font-size: 1rem; font-weight: 500; color: #495057;">${item.skor}</span>
+                                `);
+                                skorCell.find('.skor-input-container').show();
+                            }
+                        });
+                        
+                        // Update total
+                        hitungTotal();
+
+                        // Kunci form (penilaian hanya sekali)
+                        disableFormInputsWithGuard('Penilaian telah tersimpan. Input dikunci.');
+                    } else {
+                        // Tidak ada data skor tersimpan, tampilkan tombol input untuk semua pertanyaan
+                        pertanyaanList.forEach(function(item) {
+                            const skorCell = $(`.skor-cell[data-id="${item.id}"]`);
+                            if (skorCell.length > 0) {
+                                skorCell.find('.skor-input-container').show(); // Tampilkan tombol input
+                            }
+                        });
+                        
+                        // Update total untuk kondisi tidak ada skor
+                        hitungTotal();
+                    }
+                },
+                error: function() {
+                    console.log('Gagal memuat skor tersimpan');
+                    // Jika error, tampilkan tombol input untuk semua pertanyaan
+                    pertanyaanList.forEach(function(item) {
+                        const skorCell = $(`.skor-cell[data-id="${item.id}"]`);
+                        if (skorCell.length > 0) {
+                            skorCell.find('.skor-input-container').show();
+                        }
+                    });
+                    
+                    // Update total untuk kondisi error
+                    hitungTotal();
+                }
+            });
+        }
+
+        function tampilkanInputSkor(idPertanyaan, skorMaksimal) {
+            const skorCell = $(`.skor-cell[data-id="${idPertanyaan}"]`);
+            const inputContainer = skorCell.find('.skor-input-container');
+            
+            // Cek apakah sudah ada skor tersimpan
+            const span = inputContainer.find('span');
+            if (span.length > 0) {
+                // Jika sudah ada skor, tampilkan pesan tidak bisa diedit
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tidak Bisa Diedit!',
+                    text: 'Skor sudah tersimpan dan tidak bisa diubah. Silakan simpan penilaian untuk melanjutkan.',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            // Tampilkan input dinamis tanpa tombol
+            inputContainer.html(`
+                <input type="number" class="form-control skor-input" 
+                       data-id="${idPertanyaan}" 
+                       data-bobot="${pertanyaanList.find(p => p.id == idPertanyaan).bobot}"
+                       data-skor-maksimal="${skorMaksimal}"
+                       min="0" max="${skorMaksimal}" 
+                       placeholder="0-${skorMaksimal}"
+                       oninput="hitungNilai(this)"
+                       style="border: 1px solid #ced4da; border-radius: 4px;">
+            `);
+            
+            // Tampilkan input container
+            inputContainer.show();
+
+            // Fokus ke input skor agar cepat diisi
+            inputContainer.find('input.skor-input').trigger('focus');
+        }
+
+
+
+
+
+
+
+        function simpanPenilaian() {
+            // Cek jadwal: jika sudah lewat selesai, blok simpan
+            if (jadwalPenilaian && jadwalPenilaian.pembimbing_nilai_selesai) {
+                const selesai = parseDateFlexible(jadwalPenilaian.pembimbing_nilai_selesai);
+                if (selesai && new Date() > selesai) {
+                    Swal.fire({ icon: 'error', title: 'Tidak Bisa Menyimpan', text: 'Masa penilaian telah berakhir. Nilai otomatis 0.' });
+                    return;
+                }
+            }
+            const komentarPembimbing = $('#komentarPembimbing').val();
+            const totalNilai = parseFloat($('#totalNilai').text());
+
+            // Validasi semua skor sudah diisi
+            let semuaTerisi = true;
+            let detailPenilaian = [];
+            
+            pertanyaanList.forEach(function(item) {
+                const skorCell = $(`.skor-cell[data-id="${item.id}"]`);
+                const skorValue = skorCell.find('.skor-value').text();
+                const skorInput = skorCell.find('.skor-input').val();
+                
+                let skor = 0;
+                
+                // Cek apakah ada input yang sedang aktif
+                if (skorInput && skorInput !== '') {
+                    skor = parseFloat(skorInput);
+                } else if (skorValue && skorValue !== '0') {
+                    skor = parseFloat(skorValue);
+                } else {
+                    semuaTerisi = false;
+                }
+                
+                if (skor > 0) {
+                    const bobot = parseFloat(item.bobot);
+                    const skorMaksimal = parseFloat(item.skor_maksimal);
+                    const nilaiAdmin = (skor / skorMaksimal) * bobot;
+
+                    detailPenilaian.push({
+                        id_pertanyaan: item.id,
+                        skor_diberikan: skor,
+                        bobot_pertanyaan: bobot,
+                        skor_maksimal: skorMaksimal,
+                        nilai_terbobot: nilaiAdmin
+                    });
+                }
+            });
+
+            if (!semuaTerisi) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan!',
+                    text: 'Semua skor harus diisi sebelum menyimpan penilaian'
+                });
+                return;
+            }
+
+            // Tampilkan loading
+            const saveButton = $('button[onclick="simpanPenilaian()"]');
+            const originalContent = saveButton.html();
+            saveButton.html('<i class="bi bi-hourglass-split"></i> Menyimpan...').prop('disabled', true);
+
+            // Kirim data ke server
+            $.ajax({
+                url: '{{ url_for("pembimbing.simpan_penilaian_mahasiswa") }}',
+                type: 'POST',
+                data: {
+                    nim_mahasiswa: nimMahasiswa,
+                    komentar_pembimbing: komentarPembimbing,
+                    total_nilai: totalNilai,
+                    detail_penilaian: JSON.stringify(detailPenilaian)
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Tampilkan notifikasi sukses
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.message || 'Penilaian tersimpan.',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+
+                        // Refresh skor tersimpan untuk mengunci input per pertanyaan
+                        loadSkorTersimpan();
+
+                        // Kunci seluruh form setelah simpan pertama kali
+                        disableFormInputsWithGuard('Penilaian telah disimpan. Input dikunci.');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat menyimpan penilaian'
+                    });
+                },
+                complete: function() {
+                    // Kembalikan tombol ke kondisi semula
+                    saveButton.html(originalContent).prop('disabled', false);
+                }
+            });
+        }
+
+
+    </script>
+</body>
+
+</html>
