@@ -56,13 +56,19 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 mysql = MySQL(app)
 
 
-if not app.debug:
-    handler = logging.FileHandler('/home/putra/aymp/logs/flask-app.log')
-    handler.setLevel(logging.INFO)
-    formatter = logging.Formatter(
-        '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
-    handler.setFormatter(formatter)
-    app.logger.addHandler(handler)
+# Pastikan folder logs ada
+os.makedirs('/home/putra/aymp/logs', exist_ok=True)
+
+# Setup logging
+handler = logging.FileHandler('/home/putra/aymp/logs/flask-app.log')
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter(
+    '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+handler.setFormatter(formatter)
+app.logger.addHandler(handler)
+app.logger.setLevel(logging.INFO)
+
+app.logger.info("Flask app started")
 
 def format_tanggal_indonesia(dt):
     try:
