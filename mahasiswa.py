@@ -3839,7 +3839,7 @@ def biaya_operasional_mahasiswa():
     try:
         cursor = app_funcs["mysql"].connection.cursor(MySQLdb.cursors.DictCursor)
         
-        
+
         # Ambil data proposal yang lolos untuk mahasiswa ini
         cursor.execute('''
             SELECT p.id, p.judul_usaha, p.kategori, p.tahun_nib, p.status_admin
@@ -5256,6 +5256,9 @@ def tambah_proposal():
         app.logger.error("Error saat menyimpan proposal", exc_info=True)
         flash(f'Error saat menyimpan proposal: {str(e)}', 'danger')
         return redirect(url_for('mahasiswa.proposal'))
+
+
+        
 @mahasiswa_bp.route('/tambah_anggota', methods=['POST'])
 def tambah_anggota():
     app_funcs = get_app_functions()

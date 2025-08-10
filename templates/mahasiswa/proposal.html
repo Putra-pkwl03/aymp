@@ -2294,6 +2294,18 @@
     </div>
                 <!-- Modal Pengajuan Proposal -->
     <div class="modal fade" id="modalPengajuan" tabindex="-1" aria-labelledby="modalPengajuanLabel" aria-hidden="true">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div>
+      {% for category, message in messages %}
+        <div class="alert alert-{{ 'danger' if category == 'danger' else 'success' }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
