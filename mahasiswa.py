@@ -5206,10 +5206,18 @@ def tambah_proposal():
         perguruan_tinggi = mahasiswa_data['perguruan_tinggi']
         
         # Buat path upload
-        safe_judul = re.sub(r'[^\w\s-]', '', judul_usaha).strip().replace(' ', '_')
-        safe_nama_ketua = re.sub(r'[^\w\s-]', '', nama_ketua).strip().replace(' ', '_')
+        # safe_judul = re.sub(r'[^\w\s-]', '', judul_usaha).strip().replace(' ', '_')
+        # safe_nama_ketua = re.sub(r'[^\w\s-]', '', nama_ketua).strip().replace(' ', '_')
+        # upload_dir = os.path.join('static', 'uploads', 'Proposal', safe_judul)
+        # os.makedirs(upload_dir, exist_ok=True)
+        # filename = f"Proposal_{safe_judul}_{safe_nama_ketua}.{file_extension}"
+        # file_path = os.path.join(upload_dir, filename)
+
+        safe_judul = re.sub(r'[^\w\s-]', '', proposal_data['judul_usaha']).strip().replace(' ', '_')
+        safe_nama_ketua = re.sub(r'[^\w\s-]', '', mahasiswa_data['nama_ketua']).strip().replace(' ', '_')
         upload_dir = os.path.join('static', 'uploads', 'Proposal', safe_judul)
         os.makedirs(upload_dir, exist_ok=True)
+        file_extension = file.filename.rsplit('.', 1)[1].lower()
         filename = f"Proposal_{safe_judul}_{safe_nama_ketua}.{file_extension}"
         file_path = os.path.join(upload_dir, filename)
         
