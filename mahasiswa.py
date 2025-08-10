@@ -5119,40 +5119,39 @@ def profile_mahasiswa():
 @mahasiswa_bp.route('/tambah_proposal', methods=['POST'])
 def tambah_proposal():
     app_funcs = get_app_functions()
+
+    # Cek login
     if 'user_type' not in session or session['user_type'] != 'mahasiswa':
         flash('Anda harus login sebagai mahasiswa!', 'danger')
         return redirect(url_for('index'))
-    
-    # Cek status mahasiswa
+
+    # Cek koneksi DB
     if not hasattr(app_funcs["mysql"], 'connection') or app_funcs["mysql"].connection is None:
         flash('Koneksi ke database gagal. Cek konfigurasi database!', 'danger')
         return redirect(url_for('mahasiswa.proposal'))
-    
+
     try:
         cursor = app_funcs["mysql"].connection.cursor(MySQLdb.cursors.DictCursor)
-        
+
         # Cek status mahasiswa
-        cursor.execute('SELECT status FROM mahasiswa WHERE nim = %s', (session['nim'],))
+        cursor.execute('SELECT status, perguruan_tinggi FROM mahasiswa WHERE nim = %s', (session['nim'],))
         mahasiswa_data = cursor.fetchone()
-        
+
         if not mahasiswa_data:
             flash('Data mahasiswa tidak ditemukan!', 'danger')
             cursor.close()
             return redirect(url_for('mahasiswa.proposal'))
-        
-        if mahasiswa_data['status'] == 'proses':
-            flash('Akun Anda belum diverifikasi. Anda tidak dapat menambahkan proposal!', 'danger')
+
+        if mahasiswa_data['status'] in ['proses', 'tolak', 'selesai']:
+            pesan = {
+                'proses': 'Akun Anda belum diverifikasi. Anda tidak dapat menambahkan proposal!',
+                'tolak': 'Akun Anda ditolak. Anda tidak dapat menambahkan proposal!',
+                'selesai': 'Akun Anda sudah selesai. Anda tidak dapat membuat proposal baru lagi!'
+            }[mahasiswa_data['status']]
+            flash(pesan, 'danger')
             cursor.close()
             return redirect(url_for('mahasiswa.proposal'))
-        elif mahasiswa_data['status'] == 'tolak':
-            flash('Akun Anda ditolak. Anda tidak dapat menambahkan proposal!', 'danger')
-            cursor.close()
-            return redirect(url_for('mahasiswa.proposal'))
-        elif mahasiswa_data['status'] == 'selesai':
-            flash('Akun Anda sudah selesai. Anda tidak dapat membuat proposal baru lagi!', 'danger')
-            cursor.close()
-            return redirect(url_for('mahasiswa.proposal'))
-        
+
         # Ambil data dari form
         judul_usaha = request.form['judul_usaha'].strip().title()
         kategori = request.form['kategori'].strip().title()
@@ -5164,8 +5163,8 @@ def tambah_proposal():
         dosen_pembimbing = request.form['dosen_pembimbing'].strip().title()
         nid_dosen = request.form['nid_dosen'].strip()
         program_studi_dosen = request.form['program_studi_dosen'].strip().title()
-        
-        # Validasi kuota dosen pembimbing
+
+        # Validasi kuota dosen
         if dosen_pembimbing:
             cursor.execute('''
                 SELECT p.kuota_mahasiswa, COUNT(DISTINCT pr.nim) as jumlah_mahasiswa_bimbing
@@ -5174,7 +5173,6 @@ def tambah_proposal():
                 WHERE p.nama = %s AND p.status = 'aktif'
                 GROUP BY p.id, p.kuota_mahasiswa
             ''', (dosen_pembimbing,))
-            
             dosen_info = cursor.fetchone()
             if dosen_info:
                 sisa_kuota = dosen_info['kuota_mahasiswa'] - dosen_info['jumlah_mahasiswa_bimbing']
@@ -5182,53 +5180,36 @@ def tambah_proposal():
                     flash(f'Dosen pembimbing {dosen_pembimbing} sudah mencapai kuota maksimal!', 'danger')
                     cursor.close()
                     return redirect(url_for('mahasiswa.proposal'))
-        
+
         # Ambil file proposal
         file = request.files.get('file_proposal')
-        if file and file.filename and allowed_file(file.filename):
-            file_extension = file.filename.rsplit('.', 1)[1].lower()
-        else:
-            if file is None or file.filename == '':
-                flash('File proposal tidak dipilih!', 'danger')
-            else:
-                flash('Format file tidak diizinkan! Hanya PDF, DOC, atau DOCX.', 'danger')
+        if not file or file.filename == '':
+            flash('File proposal tidak dipilih!', 'danger')
             return redirect(url_for('mahasiswa.proposal'))
-        
-        # Ambil data mahasiswa dari session
+
+        if not allowed_file(file.filename):
+            flash('Format file tidak diizinkan! Hanya PDF, DOC, atau DOCX.', 'danger')
+            return redirect(url_for('mahasiswa.proposal'))
+
+        file_extension = file.filename.rsplit('.', 1)[1].lower()
+
+        # Ambil data dari session
         nim = session['nim']
         nama_ketua = session['nama']
-        
-        # Ambil data perguruan tinggi dari database
-        cursor.execute('SELECT perguruan_tinggi FROM mahasiswa WHERE nim = %s', (nim,))
-        mahasiswa_data = cursor.fetchone()
-        
-        if not mahasiswa_data:
-            flash('Data mahasiswa tidak ditemukan!', 'danger')
-            cursor.close()
-            return redirect(url_for('mahasiswa.proposal'))
-        
         perguruan_tinggi = mahasiswa_data['perguruan_tinggi']
-        
-        # Buat path upload
-        # safe_judul = re.sub(r'[^\w\s-]', '', judul_usaha).strip().replace(' ', '_')
-        # safe_nama_ketua = re.sub(r'[^\w\s-]', '', nama_ketua).strip().replace(' ', '_')
-        # upload_dir = os.path.join('static', 'uploads', 'Proposal', safe_judul)
-        # os.makedirs(upload_dir, exist_ok=True)
-        # filename = f"Proposal_{safe_judul}_{safe_nama_ketua}.{file_extension}"
-        # file_path = os.path.join(upload_dir, filename)
 
-        safe_judul = re.sub(r'[^\w\s-]', '', proposal_data['judul_usaha']).strip().replace(' ', '_')
-        safe_nama_ketua = re.sub(r'[^\w\s-]', '', mahasiswa_data['nama_ketua']).strip().replace(' ', '_')
+        # Buat folder upload
+        safe_judul = re.sub(r'[^\w\s-]', '', judul_usaha).strip().replace(' ', '_')
+        safe_nama_ketua = re.sub(r'[^\w\s-]', '', nama_ketua).strip().replace(' ', '_')
         upload_dir = os.path.join('static', 'uploads', 'Proposal', safe_judul)
         os.makedirs(upload_dir, exist_ok=True)
-        file_extension = file.filename.rsplit('.', 1)[1].lower()
+
+        # Simpan file
         filename = f"Proposal_{safe_judul}_{safe_nama_ketua}.{file_extension}"
         file_path = os.path.join(upload_dir, filename)
-        
-        # Simpan file
         file.save(file_path)
-        
-        # Simpan data ke database
+
+        # Simpan ke database
         cursor.execute('''
             INSERT INTO proposal (
                 nim, judul_usaha, kategori, tahapan_usaha, merk_produk, 
@@ -5241,16 +5222,11 @@ def tambah_proposal():
             nid_dosen, program_studi_dosen, file_path, 'draf', 
             request.form.get('tahun', '2024')
         ))
-        
+
         proposal_id = cursor.lastrowid
-        
-        if hasattr(app_funcs["mysql"], 'connection') and app_funcs["mysql"].connection is not None:
-            app_funcs["mysql"].connection.commit()
-        else:
-            flash('Koneksi ke database gagal saat commit.', 'danger')
-            return redirect(url_for('mahasiswa.proposal'))
-        
-        # Log aktivitas tambah proposal
+        app_funcs["mysql"].connection.commit()
+
+        # Log aktivitas
         mahasiswa_info = app_funcs['get_mahasiswa_info_from_session']()
         if mahasiswa_info:
             data_baru = {
@@ -5274,179 +5250,15 @@ def tambah_proposal():
                 None,
                 data_baru
             )
-        
+
         cursor.close()
-        
         flash('Proposal berhasil disimpan!', 'success')
         return redirect(url_for('mahasiswa.proposal'))
-        
+
     except Exception as e:
         flash(f'Error saat menyimpan proposal: {str(e)}', 'danger')
         return redirect(url_for('mahasiswa.proposal'))
-@mahasiswa_bp.route('/tambah_anggota', methods=['POST'])
-def tambah_anggota():
-    app_funcs = get_app_functions()
-    from flask import jsonify, request
-    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest' or request.accept_mimetypes['application/json'] > 0
-    if 'user_type' not in session or session['user_type'] != 'mahasiswa':
-        msg = 'Anda harus login sebagai mahasiswa!'
-        if is_ajax:
-            return jsonify(success=False, message=msg)
-        flash(msg, 'danger')
-        return redirect(url_for('index'))
-    if not hasattr(app_funcs["mysql"], 'connection') or app_funcs["mysql"].connection is None:
-        msg = 'Koneksi ke database gagal. Cek konfigurasi database!'
-        if is_ajax:
-            return jsonify(success=False, message=msg)
-        flash(msg, 'danger')
-        return redirect(url_for('mahasiswa.proposal'))
-    cursor = app_funcs["mysql"].connection.cursor(MySQLdb.cursors.DictCursor)
-    try:
-        cursor.execute('SELECT status FROM mahasiswa WHERE nim = %s', (session['nim'],))
-        mahasiswa_data = cursor.fetchone()
-        if not mahasiswa_data:
-            msg = 'Data mahasiswa tidak ditemukan!'
-            if is_ajax:
-                return jsonify(success=False, message=msg)
-            flash(msg, 'danger')
-            cursor.close()
-            return redirect(url_for('mahasiswa.proposal'))
-        if mahasiswa_data['status'] == 'proses':
-            msg = 'Akun Anda belum diverifikasi. Anda tidak dapat menambahkan anggota tim!'
-            if is_ajax:
-                return jsonify(success=False, message=msg)
-            flash(msg, 'danger')
-            cursor.close()
-            return redirect(url_for('mahasiswa.proposal'))
-        elif mahasiswa_data['status'] == 'tolak':
-            msg = 'Akun Anda ditolak. Anda tidak dapat menambahkan anggota tim!'
-            if is_ajax:
-                return jsonify(success=False, message=msg)
-            flash(msg, 'danger')
-            cursor.close()
-            return redirect(url_for('mahasiswa.proposal'))
-        elif mahasiswa_data['status'] == 'selesai':
-            msg = 'Akun Anda sudah selesai. Anda tidak dapat menambahkan anggota tim!'
-            if is_ajax:
-                return jsonify(success=False, message=msg)
-            flash(msg, 'danger')
-            cursor.close()
-            return redirect(url_for('mahasiswa.proposal'))
-        id_proposal = request.form['id_proposal']
-        cursor.execute('SELECT COUNT(*) as jumlah FROM anggota_tim WHERE id_proposal = %s', (id_proposal,))
-        jumlah_anggota_existing = cursor.fetchone()['jumlah']
-        anggota_data = []
-        i = 1
-        while f'nim_{i}' in request.form:
-            anggota = {
-                'perguruan_tinggi': request.form[f'perguruan_tinggi_{i}'].strip().title(),
-                'program_studi': request.form[f'program_studi_{i}'].strip().title(),
-                'nim': request.form[f'nim_{i}'].strip(),
-                'nama': request.form[f'nama_{i}'].strip().title(),
-                'email': request.form[f'email_{i}'].strip().lower(),
-                'no_telp': request.form[f'no_telp_{i}'].strip()
-            }
-            anggota_data.append(anggota)
-            i += 1
-        total_anggota = jumlah_anggota_existing + len(anggota_data)
-        
-        # Validasi minimal 3 anggota
-        if total_anggota < 3:
-            msg = f'Tim harus memiliki minimal 3 anggota. Saat ini hanya ada {total_anggota} anggota ({jumlah_anggota_existing} di database + {len(anggota_data)} yang akan ditambahkan).'
-            if is_ajax:
-                return jsonify(success=False, message=msg)
-            flash(msg, 'danger')
-            return redirect(url_for('mahasiswa.proposal'))
-        
-        # Validasi maksimal 4 anggota
-        if total_anggota > 4:
-            msg = f'Total anggota tim maksimal 4 orang. Saat ini sudah ada {jumlah_anggota_existing} anggota, Anda hanya bisa menambah {4 - jumlah_anggota_existing} anggota lagi.'
-            if is_ajax:
-                return jsonify(success=False, message=msg)
-            flash(msg, 'danger')
-            return redirect(url_for('mahasiswa.proposal'))
-        if not anggota_data:
-            msg = 'Tidak ada data anggota yang dikirim!'
-            if is_ajax:
-                return jsonify(success=False, message=msg)
-            flash(msg, 'danger')
-            return redirect(url_for('mahasiswa.proposal'))
-        for anggota in anggota_data:
-            if not all(anggota.values()):
-                msg = 'Semua field anggota harus diisi!'
-                if is_ajax:
-                    return jsonify(success=False, message=msg)
-                flash(msg, 'danger')
-                return redirect(url_for('mahasiswa.proposal'))
-        for anggota in anggota_data:
-            cursor.execute('SELECT * FROM anggota_tim WHERE nim = %s OR email = %s', (anggota['nim'], anggota['email']))
-            existing = cursor.fetchone()
-            if existing:
-                msg = f'NIM {anggota["nim"]} atau Email {anggota["email"]} sudah terdaftar!'
-                if is_ajax:
-                    return jsonify(success=False, message=msg)
-                flash(msg, 'danger')
-                return redirect(url_for('mahasiswa.proposal'))
-        success_count = 0
-        for anggota in anggota_data:
-            cursor.execute('''
-                INSERT INTO anggota_tim (
-                    id_proposal, perguruan_tinggi, program_studi, nim, nama, email, no_telp
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s)
-            ''', (
-                id_proposal, 
-                anggota['perguruan_tinggi'], 
-                anggota['program_studi'], 
-                anggota['nim'], 
-                anggota['nama'], 
-                anggota['email'], 
-                anggota['no_telp']
-            ))
-            success_count += 1
-        if hasattr(app_funcs["mysql"], 'connection') and app_funcs["mysql"].connection is not None:
-            app_funcs["mysql"].connection.commit()
-        else:
-            msg = 'Koneksi ke database gagal saat commit.'
-            if is_ajax:
-                return jsonify(success=False, message=msg)
-            flash(msg, 'danger')
-            return redirect(url_for('mahasiswa.proposal'))
-        
-        # Log aktivitas tambah anggota tim
-        mahasiswa_info = app_funcs['get_mahasiswa_info_from_session']()
-        if mahasiswa_info:
-            data_baru = {
-                'proposal_id': id_proposal,
-                'anggota_count': success_count,
-                'anggota_data': anggota_data
-            }
-            app_funcs['log_mahasiswa_activity'](
-                mahasiswa_info['id'], 
-                mahasiswa_info['nim'], 
-                mahasiswa_info['nama_ketua'], 
-                'tambah', 
-                'anggota_tim', 
-                f'proposal_id_{id_proposal}', 
-                f'Menambahkan {success_count} anggota tim',
-                None,
-                data_baru
-            )
-        
-        cursor.close()
-        if success_count == 1:
-            msg = 'Anggota tim berhasil ditambahkan!'
-        else:
-            msg = f'{success_count} anggota tim berhasil ditambahkan!'
-        if is_ajax:
-            return jsonify(success=True, message=msg)
-        flash(msg, 'success')
-        return redirect(url_for('mahasiswa.proposal'))
-    except Exception as e:
-        msg = f'Error saat menambah anggota: {str(e)}'
-        if is_ajax:
-            return jsonify(success=False, message=msg)
-        flash(msg, 'danger')
-        return redirect(url_for('mahasiswa.proposal'))
+
 @mahasiswa_bp.route('/hapus_proposal/<int:id_proposal>', methods=['POST'])
 def hapus_proposal(id_proposal):
     logger.info(f"Hapus proposal dipanggil untuk proposal_id: {id_proposal}")
