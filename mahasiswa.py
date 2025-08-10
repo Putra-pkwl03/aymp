@@ -16,6 +16,7 @@ from calendar import monthrange
 import shutil
 import traceback
 import logging
+import traceback
 
 # Setup logging untuk mahasiswa blueprint (tanpa file handler)
 logging.basicConfig(
@@ -5274,8 +5275,11 @@ def tambah_proposal():
         return redirect(url_for('mahasiswa.proposal'))
         
     except Exception as e:
+        import traceback
+        app.logger.error("Error saat menyimpan proposal", exc_info=True)
         flash(f'Error saat menyimpan proposal: {str(e)}', 'danger')
         return redirect(url_for('mahasiswa.proposal'))
+
 
 @mahasiswa_bp.route('/hapus_proposal/<int:id_proposal>', methods=['POST'])
 def hapus_proposal(id_proposal):
