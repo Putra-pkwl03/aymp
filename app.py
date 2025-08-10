@@ -19,6 +19,11 @@ from calendar import monthrange
 import math
 from utils import copy_word_header
 
+import logging
+
+
+
+
 app = Flask(__name__)
 
 app.secret_key = 'your_secret_key'
@@ -50,6 +55,20 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 mysql = MySQL(app)
 
+
+# Pastikan folder logs ada
+os.makedirs('/home/putra/aymp/logs', exist_ok=True)
+
+# Setup logging
+handler = logging.FileHandler('/home/putra/aymp/logs/flask-app.log')
+handler.setLevel(logging.INFO)
+formatter = logging.Formatter(
+    '%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]')
+handler.setFormatter(formatter)
+app.logger.addHandler(handler)
+app.logger.setLevel(logging.INFO)
+
+app.logger.info("Flask app started")
 
 def format_tanggal_indonesia(dt):
     try:

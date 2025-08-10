@@ -5112,6 +5112,7 @@ def profile_mahasiswa():
                              dosen_pembimbing_list=[])
 
 # Route untuk CRUD Proposal
+# Route untuk CRUD Proposal
 @mahasiswa_bp.route('/tambah_proposal', methods=['POST'])
 def tambah_proposal():
     app_funcs = get_app_functions()
@@ -5119,37 +5120,31 @@ def tambah_proposal():
         flash('Anda harus login sebagai mahasiswa!', 'danger')
         return redirect(url_for('index'))
     
-    # Cek status mahasiswa
     if not hasattr(app_funcs["mysql"], 'connection') or app_funcs["mysql"].connection is None:
         flash('Koneksi ke database gagal. Cek konfigurasi database!', 'danger')
         return redirect(url_for('mahasiswa.proposal'))
     
     try:
         cursor = app_funcs["mysql"].connection.cursor(MySQLdb.cursors.DictCursor)
-        
-        # Cek status mahasiswa
+
         cursor.execute('SELECT status FROM mahasiswa WHERE nim = %s', (session['nim'],))
         mahasiswa_data = cursor.fetchone()
-        
         if not mahasiswa_data:
             flash('Data mahasiswa tidak ditemukan!', 'danger')
             cursor.close()
             return redirect(url_for('mahasiswa.proposal'))
         
-        if mahasiswa_data['status'] == 'proses':
-            flash('Akun Anda belum diverifikasi. Anda tidak dapat menambahkan proposal!', 'danger')
-            cursor.close()
-            return redirect(url_for('mahasiswa.proposal'))
-        elif mahasiswa_data['status'] == 'tolak':
-            flash('Akun Anda ditolak. Anda tidak dapat menambahkan proposal!', 'danger')
-            cursor.close()
-            return redirect(url_for('mahasiswa.proposal'))
-        elif mahasiswa_data['status'] == 'selesai':
-            flash('Akun Anda sudah selesai. Anda tidak dapat membuat proposal baru lagi!', 'danger')
+        if mahasiswa_data['status'] in ['proses', 'tolak', 'selesai']:
+            pesan = {
+                'proses': 'Akun Anda belum diverifikasi. Anda tidak dapat menambahkan proposal!',
+                'tolak': 'Akun Anda ditolak. Anda tidak dapat menambahkan proposal!',
+                'selesai': 'Akun Anda sudah selesai. Anda tidak dapat membuat proposal baru lagi!'
+            }
+            flash(pesan[mahasiswa_data['status']], 'danger')
             cursor.close()
             return redirect(url_for('mahasiswa.proposal'))
         
-        # Ambil data dari form
+        # Ambil data form
         judul_usaha = request.form['judul_usaha'].strip().title()
         kategori = request.form['kategori'].strip().title()
         tahapan_usaha = request.form['tahapan_usaha'].strip().title()
@@ -5161,7 +5156,7 @@ def tambah_proposal():
         nid_dosen = request.form['nid_dosen'].strip()
         program_studi_dosen = request.form['program_studi_dosen'].strip().title()
         
-        # Validasi kuota dosen pembimbing
+        # Validasi kuota dosen
         if dosen_pembimbing:
             cursor.execute('''
                 SELECT p.kuota_mahasiswa, COUNT(DISTINCT pr.nim) as jumlah_mahasiswa_bimbing
@@ -5170,53 +5165,49 @@ def tambah_proposal():
                 WHERE p.nama = %s AND p.status = 'aktif'
                 GROUP BY p.id, p.kuota_mahasiswa
             ''', (dosen_pembimbing,))
-            
             dosen_info = cursor.fetchone()
-            if dosen_info:
-                sisa_kuota = dosen_info['kuota_mahasiswa'] - dosen_info['jumlah_mahasiswa_bimbing']
-                if sisa_kuota <= 0:
-                    flash(f'Dosen pembimbing {dosen_pembimbing} sudah mencapai kuota maksimal!', 'danger')
-                    cursor.close()
-                    return redirect(url_for('mahasiswa.proposal'))
+            if dosen_info and (dosen_info['kuota_mahasiswa'] - dosen_info['jumlah_mahasiswa_bimbing'] <= 0):
+                flash(f'Dosen pembimbing {dosen_pembimbing} sudah mencapai kuota maksimal!', 'danger')
+                cursor.close()
+                return redirect(url_for('mahasiswa.proposal'))
         
-        # Ambil file proposal
+        # Ambil file
         file = request.files.get('file_proposal')
-        if file and file.filename and allowed_file(file.filename):
-            file_extension = file.filename.rsplit('.', 1)[1].lower()
-        else:
-            if file is None or file.filename == '':
+        if not file or not file.filename or not allowed_file(file.filename):
+            if not file or file.filename == '':
                 flash('File proposal tidak dipilih!', 'danger')
             else:
                 flash('Format file tidak diizinkan! Hanya PDF, DOC, atau DOCX.', 'danger')
             return redirect(url_for('mahasiswa.proposal'))
         
-        # Ambil data mahasiswa dari session
+        file_extension = file.filename.rsplit('.', 1)[1].lower()
+        
+        # Data mahasiswa
         nim = session['nim']
         nama_ketua = session['nama']
-        
-        # Ambil data perguruan tinggi dari database
         cursor.execute('SELECT perguruan_tinggi FROM mahasiswa WHERE nim = %s', (nim,))
         mahasiswa_data = cursor.fetchone()
-        
         if not mahasiswa_data:
             flash('Data mahasiswa tidak ditemukan!', 'danger')
             cursor.close()
             return redirect(url_for('mahasiswa.proposal'))
-        
         perguruan_tinggi = mahasiswa_data['perguruan_tinggi']
         
-        # Buat path upload
+        # Buat path upload absolute
         safe_judul = re.sub(r'[^\w\s-]', '', judul_usaha).strip().replace(' ', '_')
         safe_nama_ketua = re.sub(r'[^\w\s-]', '', nama_ketua).strip().replace(' ', '_')
-        upload_dir = os.path.join('static', 'uploads', 'Proposal', safe_judul)
-        os.makedirs(upload_dir, exist_ok=True)
+        upload_dir = os.path.join(app.root_path, 'static', 'uploads', 'Proposal', safe_judul)
+        os.makedirs(upload_dir, exist_ok=True)  # Pastikan folder dibuat
         filename = f"Proposal_{safe_judul}_{safe_nama_ketua}.{file_extension}"
         file_path = os.path.join(upload_dir, filename)
         
         # Simpan file
         file.save(file_path)
         
-        # Simpan data ke database
+        # Path untuk disimpan di DB relatif ke static
+        db_file_path = os.path.join('static', 'uploads', 'Proposal', safe_judul, filename)
+        
+        # Simpan DB
         cursor.execute('''
             INSERT INTO proposal (
                 nim, judul_usaha, kategori, tahapan_usaha, merk_produk, 
@@ -5226,31 +5217,15 @@ def tambah_proposal():
         ''', (
             nim, judul_usaha, kategori, tahapan_usaha, merk_produk,
             nib, tahun_nib, platform_penjualan, dosen_pembimbing,
-            nid_dosen, program_studi_dosen, file_path, 'draf', 
+            nid_dosen, program_studi_dosen, db_file_path, 'draf', 
             request.form.get('tahun', '2024')
         ))
         
         proposal_id = cursor.lastrowid
+        app_funcs["mysql"].connection.commit()
         
-        if hasattr(app_funcs["mysql"], 'connection') and app_funcs["mysql"].connection is not None:
-            app_funcs["mysql"].connection.commit()
-        else:
-            flash('Koneksi ke database gagal saat commit.', 'danger')
-            return redirect(url_for('mahasiswa.proposal'))
-        
-        # Log aktivitas tambah proposal
         mahasiswa_info = app_funcs['get_mahasiswa_info_from_session']()
         if mahasiswa_info:
-            data_baru = {
-                'id': proposal_id,
-                'judul_usaha': judul_usaha,
-                'kategori': kategori,
-                'tahapan_usaha': tahapan_usaha,
-                'merk_produk': merk_produk,
-                'dosen_pembimbing': dosen_pembimbing,
-                'file_path': file_path,
-                'status': 'draf'
-            }
             app_funcs['log_mahasiswa_activity'](
                 mahasiswa_info['id'], 
                 mahasiswa_info['nim'], 
@@ -5260,20 +5235,26 @@ def tambah_proposal():
                 f'id_{proposal_id}', 
                 f'Menambahkan proposal: {judul_usaha}',
                 None,
-                data_baru
+                {
+                    'id': proposal_id,
+                    'judul_usaha': judul_usaha,
+                    'kategori': kategori,
+                    'tahapan_usaha': tahapan_usaha,
+                    'merk_produk': merk_produk,
+                    'dosen_pembimbing': dosen_pembimbing,
+                    'file_path': db_file_path,
+                    'status': 'draf'
+                }
             )
         
         cursor.close()
-        
         flash('Proposal berhasil disimpan!', 'success')
         return redirect(url_for('mahasiswa.proposal'))
-        
+    
     except Exception as e:
+        app.logger.error("Error saat menyimpan proposal", exc_info=True)
         flash(f'Error saat menyimpan proposal: {str(e)}', 'danger')
         return redirect(url_for('mahasiswa.proposal'))
-
-
-        
 @mahasiswa_bp.route('/tambah_anggota', methods=['POST'])
 def tambah_anggota():
     app_funcs = get_app_functions()
