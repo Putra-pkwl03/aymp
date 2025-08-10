@@ -62,6 +62,7 @@ def get_app_functions():
 mahasiswa_bp = Blueprint('mahasiswa', __name__)
 
 
+
 @mahasiswa_bp.route('/edit_proposal/<int:proposal_id>', methods=['POST'])
 def edit_proposal(proposal_id):
     logger.info(f"Edit proposal dipanggil untuk proposal_id: {proposal_id}")
@@ -71,21 +72,24 @@ def edit_proposal(proposal_id):
     try:
         app_funcs = get_app_functions()
         cursor = app_funcs['mysql'].connection.cursor(MySQLdb.cursors.DictCursor)
+
         # Ambil data proposal lama
         cursor.execute('SELECT file_path FROM proposal WHERE id=%s', (proposal_id,))
         old_data = cursor.fetchone()
         old_file_path = old_data['file_path'] if old_data else None
+        logger.info(f"Old file path: {old_file_path}")
 
         # Ambil data proposal lama untuk tahapan usaha (readonly)
         cursor.execute('SELECT tahapan_usaha FROM proposal WHERE id=%s', (proposal_id,))
         old_proposal_data = cursor.fetchone()
         if not old_proposal_data:
+            logger.error("Data proposal tidak ditemukan!")
             return jsonify({'success': False, 'message': 'Data proposal tidak ditemukan!'})
-        
-                # Ambil data dari form
+
+        # Ambil data dari form
         judul_usaha = request.form.get('edit_judul_usaha', '').strip()
         kategori = request.form.get('edit_kategori', '').strip()
-        tahapan_usaha = old_proposal_data['tahapan_usaha']  # Gunakan data lama (readonly)
+        tahapan_usaha = old_proposal_data['tahapan_usaha']
         merk_produk = request.form.get('edit_merk_produk', '').strip()
         nib = request.form.get('edit_nib', '').strip()
         tahun_nib = request.form.get('edit_tahun_nib', '').strip()
@@ -95,63 +99,62 @@ def edit_proposal(proposal_id):
         nid_dosen = request.form.get('edit_nid_dosen', '').strip()
         program_studi_dosen = request.form.get('edit_program_studi_dosen', '').strip()
 
-        # Validasi field yang required
-        if not judul_usaha:
-            return jsonify({'success': False, 'message': 'Judul usaha harus diisi!'})
-        if not kategori:
-            return jsonify({'success': False, 'message': 'Kategori harus dipilih!'})
-        if not merk_produk:
-            return jsonify({'success': False, 'message': 'Merk/nama produk harus diisi!'})
-        if not tahun:
-            return jsonify({'success': False, 'message': 'Tahun harus diisi!'})
-        if not dosen_pembimbing:
-            return jsonify({'success': False, 'message': 'Dosen pembimbing harus dipilih!'})
+        # Validasi field
+        if not judul_usaha or not kategori or not merk_produk or not tahun or not dosen_pembimbing:
+            logger.error("Validasi gagal: ada field wajib yang kosong")
+            return jsonify({'success': False, 'message': 'Field wajib harus diisi!'})
 
-        # Handle file upload
         file_path = old_file_path
         file = request.files.get('edit_file_proposal')
         if file and file.filename:
-            # Validasi ekstensi dan ukuran
             allowed_ext = ['.pdf', '.doc', '.docx']
             ext = os.path.splitext(file.filename)[1].lower()
             if ext not in allowed_ext:
+                logger.error(f"Ekstensi file tidak valid: {ext}")
                 return jsonify({'success': False, 'message': 'File harus PDF, DOC, atau DOCX.'})
             file.seek(0, os.SEEK_END)
-            if file.tell() > 16 * 1024 * 1024:
+            size = file.tell()
+            if size > 16 * 1024 * 1024:
+                logger.error(f"Ukuran file terlalu besar: {size} bytes")
                 return jsonify({'success': False, 'message': 'Ukuran file maksimal 16MB.'})
             file.seek(0)
-            
-            # Ambil data proposal untuk membuat path yang standar
+
+            # Ambil data proposal untuk buat path upload
             cursor.execute('SELECT nim, judul_usaha FROM proposal WHERE id = %s', (proposal_id,))
             proposal_data = cursor.fetchone()
-            
             if not proposal_data:
+                logger.error("Data proposal untuk upload tidak ditemukan")
                 return jsonify({'success': False, 'message': 'Data proposal tidak ditemukan!'})
-            
-            # Ambil data mahasiswa untuk perguruan tinggi dan nama
+
             cursor.execute('SELECT perguruan_tinggi, nama_ketua FROM mahasiswa WHERE nim = %s', (proposal_data['nim'],))
             mahasiswa_data = cursor.fetchone()
-            
             if not mahasiswa_data:
+                logger.error("Data mahasiswa untuk upload tidak ditemukan")
                 return jsonify({'success': False, 'message': 'Data mahasiswa tidak ditemukan!'})
-            
+
             # Hapus file lama jika ada
             if old_file_path and os.path.exists(old_file_path):
+                logger.info(f"Menghapus file lama di {old_file_path}")
                 os.remove(old_file_path)
-            
-            # Buat path upload yang sama seperti tambah_proposal
+
             safe_judul = re.sub(r'[^\w\s-]', '', proposal_data['judul_usaha']).strip().replace(' ', '_')
             safe_nama_ketua = re.sub(r'[^\w\s-]', '', mahasiswa_data['nama_ketua']).strip().replace(' ', '_')
             upload_dir = os.path.join('static', 'uploads', 'Proposal', safe_judul)
+            logger.info(f"Upload directory: {upload_dir}")
             os.makedirs(upload_dir, exist_ok=True)
-            file_extension = file.filename.rsplit('.', 1)[1].lower()
-            filename = f"Proposal_{safe_judul}_{safe_nama_ketua}.{file_extension}"
-            file_path = os.path.join(upload_dir, filename)
-            
-            # Simpan file baru
-            file.save(file_path)
 
-        # Update proposal di database
+            filename = f"Proposal_{safe_judul}_{safe_nama_ketua}{ext}"
+            file_path = os.path.join(upload_dir, filename)
+            logger.info(f"Simpan file ke: {file_path}")
+
+            try:
+                file.save(file_path)
+                logger.info("File berhasil disimpan")
+            except Exception as e:
+                logger.error(f"Gagal simpan file: {str(e)}")
+                return jsonify({'success': False, 'message': 'Gagal simpan file'})
+
+        # Update database
         cursor.execute('''
             UPDATE proposal SET
                 judul_usaha=%s,
@@ -183,6 +186,7 @@ def edit_proposal(proposal_id):
         print(f"ERROR dalam edit_proposal: {str(e)}")
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)})
+
 
 @mahasiswa_bp.route('/pengajuan_anggaran_awal_mahasiswa')
 def pengajuan_anggaran_awal_mahasiswa():
