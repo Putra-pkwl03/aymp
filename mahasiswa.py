@@ -3839,6 +3839,7 @@ def biaya_operasional_mahasiswa():
     try:
         cursor = app_funcs["mysql"].connection.cursor(MySQLdb.cursors.DictCursor)
         
+        
         # Ambil data proposal yang lolos untuk mahasiswa ini
         cursor.execute('''
             SELECT p.id, p.judul_usaha, p.kategori, p.tahun_nib, p.status_admin
