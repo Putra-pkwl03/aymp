@@ -5271,6 +5271,9 @@ def tambah_proposal():
     except Exception as e:
         flash(f'Error saat menyimpan proposal: {str(e)}', 'danger')
         return redirect(url_for('mahasiswa.proposal'))
+
+
+        
 @mahasiswa_bp.route('/tambah_anggota', methods=['POST'])
 def tambah_anggota():
     app_funcs = get_app_functions()
