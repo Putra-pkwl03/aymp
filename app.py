@@ -61,7 +61,7 @@ except ImportError:
 
 app = Flask(__name__)
 
-app.secret_key = 'your_secret_key'
+app.secret_key = 'aymp321'
 
 # Custom filter untuk nl2br
 @app.template_filter('nl2br')
@@ -71,9 +71,10 @@ def nl2br_filter(text):
     return text.replace('\n', '<br>')
 
 app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''  # Ganti jika ada password
-app.config['MYSQL_DB'] = 'AYMP'
+app.config['MYSQL_USER'] = 'putaaymp'
+app.config['MYSQL_PASSWORD'] = 'YMPaymp321'
+app.config['MYSQL_DB'] = 'aymp' 
+
 
 # Konfigurasi upload file
 # Konfigurasi upload yang lebih lengkap
