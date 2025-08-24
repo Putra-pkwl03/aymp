@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Bimbingan Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <!-- <link rel="stylesheet" href="assets/vendors/jquery-datatables/jquery.dataTables.min.css"> -->
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/toastify/toastify.css') }}">
+    <!-- Choices.js CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/choices.js/choices.min.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-mahasiswa.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    
+    <!-- Quill Editor CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/toastify/toastify.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/deprecation-fix.js') }}"></script>
+    
+    <style>
+        .ql-editor {
+            min-height: 200px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .ql-toolbar {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .ql-container {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .bimbingan-card {
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+        .bimbingan-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.375rem 0.75rem;
+        }
+        .hasil-bimbingan-content {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border-left: 4px solid #435ebe;
+        }
+        .modal-dialog {
+            max-width: 800px;
+        }
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        .form-control:focus {
+            border-color: #435ebe;
+            box-shadow: 0 0 0 0.2rem rgba(67, 94, 190, 0.25);
+        }
+        .btn-primary {
+            background-color: #435ebe;
+            border-color: #435ebe;
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(67, 94, 190, 0.2);
+        }
+        .btn-primary:hover {
+            background-color: #2c3e50;
+            border-color: #2c3e50;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 94, 190, 0.3);
+        }
+        .btn-primary:disabled {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            padding: 12px 24px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+        .info-box {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #bbdefb;
+        }
+        .info-box h5 {
+            color: #1565c0;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .info-box p {
+            margin-bottom: 0;
+            color: #1976d2;
+        }
+        .hasil-bimbingan-preview {
+            max-height: 100px;
+            overflow: hidden;
+            position: relative;
+        }
+        .hasil-bimbingan-preview::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 20px;
+            background: linear-gradient(transparent, #f8f9fa);
+        }
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-circle.btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-circle.btn-info:hover {
+            background: #138496;
+            color: white;
+        }
+        .ql-editor.ql-disabled {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+        .btn-group-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .reset-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid #c3e6cb;
+            font-size: 14px;
+            display: none;
+            animation: fadeInOut 3s ease-in-out;
+        }
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-10px); }
+            20% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+        .btn-loading {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .fa-spin {
+            animation: fa-spin 1s infinite linear;
+        }
+        @keyframes fa-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}"><img
+                                    src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo"
+                                    srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        {% if has_lolos_proposal %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin = 'lolos' - lengkap -->
+                            <li class="sidebar-item has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                                <ul class="submenu">
+                                    <li class="submenu-item">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                    <li class="submenu-item">
+                                        <a href="{{ url_for('mahasiswa.laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                    </li>
+                                    <li class="submenu-item">
+                                        <a href="{{ url_for('mahasiswa.laporan_akhir') }}">Laporan Akhir</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-item has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span>Produksi</span>
+                                </a>
+                                <ul class="submenu">
+                                    <li class="submenu-item">
+                                        <a href="{{ url_for('mahasiswa.pengelolaan_bahan_baku_mahasiswa') }}">Bahan Baku</a>
+                                    </li>
+                                    <li class="submenu-item">
+                                        <a href="{{ url_for('mahasiswa.aktivitas_produksi_mahasiswa') }}">Produksi</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li class="sidebar-item">
+                                <a href="{{ url_for('mahasiswa.pembelian_alat_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-tools"></i>
+                                    <span>Alat Produksi</span>
+                                </a>    
+                            </li>
+                            <li class="sidebar-item">
+                                <a href="{{ url_for('mahasiswa.biaya_operasional_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-calculator"></i>
+                                    <span>Biaya Operasional</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a href="{{ url_for('mahasiswa.biaya_non_operasional_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-wallet2"></i>
+                                    <span>Biaya Lain-lain</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item">
+                                <a href="{{ url_for('mahasiswa.laporan_penjualan_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-receipt"></i>
+                                    <span>Laporan Penjualan</span>
+                                </a>
+                                
+                            </li>
+                            
+                            <li class="sidebar-item has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-graph-up"></i>
+                                    <span>Pelaporan Keuangan</span>
+                                </a>
+                                <ul class="submenu">
+                                    <li class="submenu-item">
+                                        <a href="{{ url_for('mahasiswa.laporan_laba_rugi_mahasiswa') }}">Laporan Laba Rugi</a>
+                                    </li>
+                                    <li class="submenu-item">
+                                        <a href="{{ url_for('mahasiswa.laporan_arus_kas_mahasiswa') }}">Laporan Arus Kas</a> 
+                                    </li>
+                                    <li class="submenu-item">
+                                        <a href="{{ url_for('mahasiswa.laporan_neraca_mahasiswa') }}">Laporan Neraca</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin != 'lolos' atau tanpa proposal - terbatas -->
+                            <li class="sidebar-item has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                                <ul class="submenu">
+                                    <li class="submenu-item">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('mahasiswa.bimbingan') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.profile_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-person-circle"></i>
+                                <span>Profile Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-star-fill"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Halaman Bimbingan</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Catat hasil bimbingan dan konsultasi dengan dosen pembimbing Anda.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Bimbingan</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Tables start -->
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        
+                        <!-- Info Box -->
+                        <div class="info-box">
+                            <h5><i class="bi bi-info-circle"></i> Informasi Bimbingan</h5>
+                            <p>Halaman ini digunakan untuk mencatat hasil bimbingan dan konsultasi dengan dosen pembimbing. Anda dapat menuliskan hasil diskusi, saran, dan hal-hal yang telah dibahas dalam sesi bimbingan.</p>
+                        </div>
+
+                        <!-- Info Batasan Bimbingan -->
+                        <div class="alert alert-warning" role="alert" id="infoBatasanBimbingan" style="display: none;">
+                            <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Batasan Bimbingan</h6>
+                            <p class="mb-0" id="pesanBatasanBimbingan">Anda telah mencapai batas maksimal bimbingan hari ini.</p>
+                        </div>
+
+                        <!-- Info Sisa Bimbingan -->
+                        <div class="alert alert-info" role="alert" id="infoSisaBimbingan" style="display: none;">
+                            <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Sisa Bimbingan Hari Ini</h6>
+                            <p class="mb-0">Anda masih dapat melakukan <strong id="sisaBimbingan">0</strong> bimbingan lagi hari ini.</p>
+                        </div>
+
+                        {% if not has_lolos_proposal %}
+                        <div class="alert alert-warning" role="alert">
+                            <h6 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Perhatian!</h6>
+                            <p class="mb-0">Anda harus memiliki proposal yang sudah disetujui (status "lolos") untuk dapat mencatat hasil bimbingan. Silakan ajukan proposal terlebih dahulu.</p>
+                        </div>
+                        {% endif %}
+
+                        {% if is_status_selesai %}
+                        <div class="alert alert-info" role="alert">
+                            <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Status Program Selesai</h6>
+                            <p class="mb-0">Anda telah menyelesaikan program AYMP. Anda hanya dapat melihat riwayat bimbingan yang telah dicatat sebelumnya. Form input bimbingan telah dinonaktifkan.</p>
+                        </div>
+                        {% endif %}
+
+                        {% if has_lolos_proposal and not is_status_selesai %}
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card bimbingan-card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="bi bi-chat-dots text-primary"></i>
+                                            Form Hasil Bimbingan
+                                        </h4>
+                                        <p class="card-subtitle">Catat hasil bimbingan dan konsultasi dengan dosen pembimbing Anda</p>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="formBimbingan">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group mb-3">
+                                                        <label for="judul_bimbingan" class="form-label">
+                                                            <i class="bi bi-type-bold text-primary"></i>
+                                                            Judul/Topik Bimbingan <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input type="text" class="form-control" id="judul_bimbingan" name="judul_bimbingan" 
+                                                               placeholder="Masukkan judul atau topik bimbingan" required>
+                                                        <div class="form-text">Contoh: Konsultasi pengelolaan bahan baku, Review laporan kemajuan, dll.</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-group mb-3">
+                                                        <label for="editor" class="form-label">
+                                                            <i class="bi bi-pencil-square text-primary"></i>
+                                                            Hasil Bimbingan <span class="text-danger">*</span>
+                                                        </label>
+                                                        <div id="editor" style="height: 250px;"></div>
+                                                        <input type="hidden" id="hasil_bimbingan" name="hasil_bimbingan">
+                                                        <div class="form-text">Tulis hasil bimbingan secara detail, termasuk saran, diskusi, dan hal-hal yang telah dibahas.</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row">
+                                                <div class="col-12">
+                                                    <div class="btn-group-actions">
+                                                        <button type="submit" class="btn btn-primary" id="btnSimpan">
+                                                            <i class="bi bi-save"></i> Simpan Hasil Bimbingan
+                                                        </button>
+                                                        <button type="button" class="btn btn-secondary" id="btnReset">
+                                                            <i class="bi bi-arrow-clockwise"></i> Reset Form
+                                                        </button>
+                                                        <div class="reset-message" id="resetMessage">
+                                                            <i class="bi bi-check-circle"></i> Form berhasil direset!
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Riwayat Bimbingan -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card bimbingan-card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="bi bi-clock-history text-success"></i>
+                                            Riwayat Hasil Bimbingan
+                                            {% if is_status_selesai %}
+                                                <span class="badge bg-info ms-2">Mode Read-Only</span>
+                                            {% endif %}
+                                        </h4>
+                                        <p class="card-subtitle">
+                                            {% if is_status_selesai %}
+                                                Riwayat hasil bimbingan yang telah dicatat (hanya dapat dilihat)
+                                            {% else %}
+                                                Riwayat hasil bimbingan yang telah dicatat
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-hover" id="tableBimbingan">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="5%">No</th>
+                                                        <th width="15%">Tanggal</th>
+                                                        <th width="35%">Judul/Topik Bimbingan</th>
+                                                        <th width="15%">Dosen Pembimbing</th>
+                                                        <th width="20%">Hasil Bimbingan</th>
+                                                        <th width="10%">Aksi</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% if riwayat_bimbingan %}
+                                                        {% for bimbingan in riwayat_bimbingan %}
+                                                        <tr>
+                                                            <td>{{ loop.index }}</td>
+                                                            <td>
+                                                                <small class="text-muted">
+                                                                    {{ bimbingan.tanggal_buat.strftime('%d/%m/%Y') if bimbingan.tanggal_buat else '-' }}
+                                                                </small>
+                                                                <br>
+                                                                <small class="text-muted">
+                                                                    {{ bimbingan.tanggal_buat.strftime('%H:%M') if bimbingan.tanggal_buat else '-' }}
+                                                                </small>
+                                                            </td>
+                                                            <td>
+                                                                <strong>{{ bimbingan.judul_bimbingan }}</strong>
+                                                                <br>
+                                                                <small class="text-muted">{{ bimbingan.judul_usaha }}</small>
+                                                            </td>
+                                                            <td>{{ bimbingan.dosen_pembimbing }}</td>
+                                                            <td>
+                                                                <div class="hasil-bimbingan-preview">
+                                                                    {{ bimbingan.hasil_bimbingan|safe|striptags|truncate(100) }}
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <button class="btn btn-circle btn-info" onclick="lihatDetail({{ bimbingan.id }})" title="Lihat Detail">
+                                                                    <i class="bi bi-eye"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <tr>
+                                                            <td colspan="6" class="text-center py-4">
+                                                                <div class="text-muted">
+                                                                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                                                    <p class="mt-2 mb-0">Belum ada hasil bimbingan</p>
+                                                                    {% if has_lolos_proposal %}
+                                                                        <small>Silakan catat hasil bimbingan pertama Anda</small>
+                                                                    {% else %}
+                                                                        <small>Anda perlu memiliki proposal yang disetujui untuk mencatat hasil bimbingan</small>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Basic Tables end -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Detail Bimbingan -->
+    <div class="modal fade" id="modalDetailBimbingan" tabindex="-1" aria-labelledby="modalDetailBimbinganLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDetailBimbinganLabel">
+                        <i class="bi bi-chat-dots text-primary"></i>
+                        Detail Hasil Bimbingan
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="modalDetailBody">
+                    <!-- Content will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Tutup Modal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}">
+    </script>
+    <script
+        src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <!-- Choices.js -->
+    <script src="{{ url_for('static', filename='assets/vendors/choices.js/choices.min.js') }}"></script>
+
+    <!-- Quill Editor -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+    <script>
+        // Inisialisasi Quill Editor dengan konfigurasi untuk menghindari deprecated events
+        var quill = new Quill('#editor', {
+            theme: 'snow',
+            bounds: '#editor',
+            scrollingContainer: '#editor',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['link', 'image'],
+                    ['clean']
+                ],
+                clipboard: {
+                    matchVisual: false
+                }
+            },
+            placeholder: 'Tulis hasil bimbingan secara detail, termasuk saran, diskusi, dan hal-hal yang telah dibahas...'
+        });
+
+        // DataTable untuk riwayat bimbingan
+        $(document).ready(function() {
+            $('#tableBimbingan').DataTable({
+                language: {
+                    "sProcessing":   "Sedang memproses...",
+                    "sLengthMenu":   "Tampilkan _MENU_ data",
+                    "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                    "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                    "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Cari:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "Pertama",
+                        "sPrevious": "Sebelumnya",
+                        "sNext":     "Selanjutnya",
+                        "sLast":     "Terakhir"
+                    }
+                },
+                responsive: true,
+                pageLength: 10,
+                order: [[1, 'desc']],
+                columnDefs: [
+                    {
+                        targets: [0, 5], // No dan Aksi
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                drawCallback: function(settings) {
+                    // Jika tidak ada data, sembunyikan pagination dan info
+                    if (settings._iRecordsTotal === 0) {
+                        $(this).closest('.dataTables_wrapper').find('.dataTables_paginate, .dataTables_info').hide();
+                    } else {
+                        $(this).closest('.dataTables_wrapper').find('.dataTables_paginate, .dataTables_info').show();
+                    }
+                }
+            });
+        });
+
+        // Handle form submission
+        $('#formBimbingan').on('submit', function(e) {
+            e.preventDefault();
+            
+            // ✅ PERBAIKAN: Cek status selesai di frontend
+            {% if is_status_selesai %}
+            Swal.fire({
+                icon: 'warning',
+                title: 'Akses Dibatasi!',
+                text: 'Mahasiswa dengan status selesai tidak dapat melakukan bimbingan. Anda hanya dapat melihat riwayat bimbingan.',
+                confirmButtonText: 'Mengerti'
+            });
+            return;
+            {% endif %}
+            
+            // Ambil konten dari Quill editor
+            var content = quill.root.innerHTML;
+            $('#hasil_bimbingan').val(content);
+            
+            // Validasi
+            var judul = $('#judul_bimbingan').val().trim();
+            if (!judul) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Judul bimbingan harus diisi!'
+                });
+                $('#judul_bimbingan').focus();
+                return;
+            }
+            
+            if (content === '<p><br></p>' || content === '' || content === '<p></p>') {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Hasil bimbingan harus diisi!'
+                });
+                quill.focus();
+                return;
+            }
+            
+            // Tampilkan loading dengan styling yang lebih baik
+            const btnSimpan = $('#btnSimpan');
+            btnSimpan.prop('disabled', true)
+                     .html('<i class="bi bi-hourglass-split fa-spin"></i> Menyimpan...')
+                     .addClass('btn-loading');
+            
+            // Kirim data
+            $.ajax({
+                url: '{{ url_for("mahasiswa.simpan_pertanyaan_bimbingan") }}',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(function() {
+                            // Refresh batasan bimbingan setelah berhasil menyimpan
+                            cekBatasanBimbingan();
+                            // Reset form
+                            $('#judul_bimbingan').val('');
+                            quill.setText('');
+                            // Refresh halaman untuk menampilkan data terbaru
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', xhr.responseText);
+                    let errorMessage = 'Terjadi kesalahan saat menyimpan hasil bimbingan!';
+                    
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        }
+                    } catch (e) {
+                        // Jika response bukan JSON, gunakan pesan default
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: errorMessage
+                    });
+                },
+                complete: function() {
+                    const btnSimpan = $('#btnSimpan');
+                    btnSimpan.prop('disabled', false)
+                             .html('<i class="bi bi-save"></i> Simpan Hasil Bimbingan')
+                             .removeClass('btn-loading');
+                }
+            });
+        });
+
+        // Reset form
+        $('#btnReset').on('click', function() {
+            // Reset form langsung tanpa konfirmasi
+            $('#judul_bimbingan').val('');
+            quill.setText('');
+            
+            // Tampilkan pesan reset yang nyaman
+            const resetMessage = $('#resetMessage');
+            resetMessage.show();
+            
+            // Sembunyikan pesan setelah 3 detik
+            setTimeout(function() {
+                resetMessage.hide();
+            }, 3000);
+            
+            // Focus ke judul bimbingan
+            $('#judul_bimbingan').focus();
+        });
+
+        // Cek apakah mahasiswa memiliki proposal yang lolos atau status selesai
+        {% if not has_lolos_proposal or is_status_selesai %}
+        // Disable form jika tidak memiliki proposal yang lolos atau status selesai
+        $('#formBimbingan input, #formBimbingan textarea, #formBimbingan button[type="submit"]').prop('disabled', true);
+        quill.disable();
+        {% endif %}
+
+        // Cek batasan bimbingan
+        function cekBatasanBimbingan() {
+            $.ajax({
+                url: '{{ url_for("mahasiswa.cek_batasan_bimbingan") }}',
+                type: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        const data = response.data;
+                        if (data.status_aktif === 'aktif') {
+                            if (data.bimbingan_hari_ini >= data.maksimal_bimbingan_per_hari) {
+                                // Sudah mencapai batas maksimal
+                                $('#pesanBatasanBimbingan').text(data.pesan_batasan);
+                                $('#infoBatasanBimbingan').show();
+                                $('#infoSisaBimbingan').hide();
+                                $('#formBimbingan input, #formBimbingan textarea, #formBimbingan button[type="submit"]').prop('disabled', true);
+                                quill.disable();
+                            } else {
+                                // Masih ada sisa bimbingan
+                                const sisa = data.maksimal_bimbingan_per_hari - data.bimbingan_hari_ini;
+                                $('#sisaBimbingan').text(sisa);
+                                $('#infoBatasanBimbingan').hide();
+                                $('#infoSisaBimbingan').show();
+                                $('#formBimbingan input, #formBimbingan textarea, #formBimbingan button[type="submit"]').prop('disabled', false);
+                                quill.enable();
+                            }
+                        } else {
+                            // Pengaturan nonaktif
+                            $('#infoBatasanBimbingan').hide();
+                            $('#infoSisaBimbingan').hide();
+                            $('#formBimbingan input, #formBimbingan textarea, #formBimbingan button[type="submit"]').prop('disabled', false);
+                            quill.enable();
+                        }
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error checking bimbingan limit:', xhr.responseText);
+                }
+            });
+        }
+
+        // Cek batasan bimbingan saat halaman dimuat
+        cekBatasanBimbingan();
+
+        // Lihat detail bimbingan
+        function lihatDetail(id) {
+            // Tampilkan loading
+            $('#modalDetailBody').html('<div class="text-center"><i class="bi bi-hourglass-split fa-spin"></i> Memuat data...</div>');
+            $('#modalDetailBimbingan').modal('show');
+            
+            $.ajax({
+                url: '{{ url_for("mahasiswa.detail_bimbingan") }}',
+                type: 'GET',
+                data: { id: id },
+                success: function(response) {
+                    if (response.success) {
+                        $('#modalDetailBody').html(response.html);
+                    } else {
+                        $('#modalDetailBody').html(`
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                ${response.message}
+                            </div>
+                        `);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', xhr.responseText);
+                    let errorMessage = 'Terjadi kesalahan saat memuat detail!';
+                    
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.message) {
+                            errorMessage = response.message;
+                        }
+                    } catch (e) {
+                        // Jika response bukan JSON, gunakan pesan default
+                    }
+                    
+                    $('#modalDetailBody').html(`
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            ${errorMessage}
+                        </div>
+                    `);
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>

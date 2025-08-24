@@ -1,0 +1,2410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penilaian Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-pembimbing.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+    
+    <style>
+        /* Custom button styles for penilaian */
+        .btn-rounded-circle {
+            border-radius: 50% !important;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-rounded-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-rounded-pill {
+            border-radius: 50px !important;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-rounded-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Table responsive untuk skor per sesi */
+        #tablePenilaian {
+            min-width: 1000px;
+        }
+        
+        .table-responsive {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .skor-cell-1, .skor-cell-2, .skor-cell-3, .skor-cell-4, .skor-cell-5 {
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .badge {
+            font-size: 0.9rem;
+            padding: 0.4em 0.6em;
+        }
+        
+        /* Footer alignment */
+        #tablePenilaian tfoot th {
+            text-align: center;
+            vertical-align: middle;
+        }
+        
+        #tablePenilaian tfoot th:first-child {
+            text-align: left;
+        }
+        
+        #tablePenilaian tfoot th:last-child,
+        #tablePenilaian tfoot th:nth-last-child(2) {
+            text-align: center;
+        }
+        
+        /* Footer session columns alignment */
+        #tablePenilaian tfoot .total-skor-sesi-1,
+        #tablePenilaian tfoot .total-skor-sesi-2,
+        #tablePenilaian tfoot .total-skor-sesi-3,
+        #tablePenilaian tfoot .total-skor-sesi-4,
+        #tablePenilaian tfoot .total-skor-sesi-5 {
+            min-width: 100px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+            background-color: #f8f9fa;
+        }
+        
+        /* Ensure footer columns match header columns */
+        #tablePenilaian tfoot th[colspan] {
+            border: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-cash-stack"></i>
+                                <span>Pendanaan Hibah</span>
+                            </a>
+                            <ul class="submenu">
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('pembimbing.pembimbing_proposal') }}">Pengajuan Proposal</a>
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('pembimbing.pembimbing_laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('pembimbing.pembimbing_laporan_akhir') }}">Laporan Akhir</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu">
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('pembimbing.daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('pembimbing.daftar_penilaian_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-pencil-square"></i>
+                                <span>Penilaian Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Penilaian Mahasiswa</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">
+                                Berikan penilaian terhadap mahasiswa bimbingan di AYMP UNJAYA.
+                            </p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.das_pembimbing') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.daftar_penilaian_mahasiswa') }}">Daftar Penilaian</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Penilaian Mahasiswa</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <!-- Info Mahasiswa -->
+                        <div class="card mb-4" style="border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border:none;">
+                            <div class="card-header" style="background:#f8f9fa;border-bottom:1px solid #e9ecef;padding:16px 20px;">
+                                <h5 class="mb-0" style="font-weight:600;font-size:1.1rem;color:#495057;">
+                                    <i class="bi bi-person-circle me-2 text-primary"></i>Informasi Mahasiswa
+                                </h5>
+                            </div>
+                            <div class="card-body" style="padding:20px;">
+                                <div id="infoMahasiswa">
+                                    <!-- Loading state -->
+                                    <div class="text-center py-4" id="loadingInfo">
+                                        <div class="spinner-border text-primary" role="status" style="width:2rem;height:2rem;">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="mt-2 text-muted mb-0">Memuat informasi mahasiswa...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Penilaian -->
+                        <div class="card" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h5 style="font-weight:700;font-size:1.25rem;color:#435ebe;">
+                                        <i class="bi bi-list-check me-2"></i>Form Penilaian
+                                    </h5>
+                                    <p class="text-muted mb-0">Berikan skor untuk setiap kriteria penilaian (hanya pertanyaan aktif)</p>
+                                </div>
+                                <div>
+                                    <button type="button" id="btnSimpanPenilaian" class="btn btn-success btn-rounded-pill me-2" onclick="simpanPenilaianSesi()" style="display: none;">
+                                        <i class="bi bi-check-circle me-2"></i>Simpan Penilaian Sesi
+                                    </button>
+
+                                </div>
+                            </div>
+
+                            <div id="guardCard" class="alert alert-warning d-none" role="alert" style="border-radius: 12px;">
+                                <i class="bi bi-clock-history me-2"></i>
+                                <span id="guardMessage">Menunggu jadwal mulai penilaian...</span>
+                            </div>
+                            
+                            <!-- Info Penting: Jadwal Wajib -->
+                            <div class="alert alert-info" role="alert" style="border-radius: 12px; border-left: 4px solid #17a2b8;">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-info-circle me-2" style="font-size: 1.2rem;"></i>
+                                    <div>
+                                        <strong>Penting:</strong> Sistem penilaian memerlukan jadwal yang valid untuk beroperasi. 
+                                        Jika tidak ada jadwal atau jadwal tidak valid, mohon hubungi admin untuk mengatur jadwal penilaian.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Info Jadwal dan Sesi Aktif -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="card border-info">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-info"><i class="bi bi-clock me-2"></i>Info Jadwal</h6>
+                                            <div id="jadwalInfo">
+                                                <small class="text-muted">Memuat info jadwal...</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-success">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-success"><i class="bi bi-list-ol me-2"></i><span id="sesiLabel">Sesi</span> Aktif</h6>
+                                            <div id="sesiInfo">
+                                                <span class="badge bg-success" id="currentSesi">Sesi 1</span>
+                                                <small class="text-muted d-block"><span id="sesiDesc">Sesi</span> penilaian yang sedang berlangsung</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form id="formPenilaian">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="tablePenilaian">
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2">No</th>
+                                                <th rowspan="2">Pertanyaan</th>
+                                                <th rowspan="2">Bobot</th>
+                                                <th rowspan="2">Skor Max</th>
+                                                <th colspan="99" id="skorHeaderContainer" class="text-center">Skor Per <span id="skorHeaderLabel">Sesi</span></th>
+                                                <th rowspan="2">Rata-rata</th>
+                                                <th rowspan="2">Nilai</th>
+                                            </tr>
+                                            <tr id="skorSubHeaderRow">
+                                                <!-- Kolom skor per sesi akan diisi dinamis -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Data pertanyaan akan diisi melalui AJAX -->
+                                        </tbody>
+                                        <tfoot>
+                                            <tr class="table-primary">
+                                                <th colspan="4">Total</th>
+                                                <th colspan="3" id="totalSkorContainer" class="text-center">
+                                                    <!-- Total per sesi akan diisi dinamis -->
+                                                </th>
+                                                <th id="totalRataRata">0</th>
+                                                <th id="totalNilaiAkhir">0</th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+
+                                
+                            </form>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+    <script>
+        var nimMahasiswa = '';
+        var pertanyaanList = [];
+        var totalBobot = 0;
+        var jadwalPenilaian = null;
+        var jadwalIntervalStarted = false;
+        var scheduleActive = true;
+        var metadataPerSesi = {}; // ✅ PERBAIKAN: Tambahkan variabel untuk metadata per sesi
+
+        function parseDateFlexible(dateInput) {
+            if (!dateInput) return null;
+            if (dateInput instanceof Date) return isNaN(dateInput.getTime()) ? null : dateInput;
+            var str = String(dateInput).trim();
+
+            // Case 1: Date-only -> treat as LOCAL midnight to avoid UTC shift
+            var dateOnlyDash = /^(\d{4})-(\d{2})-(\d{2})$/;
+            var dateOnlySlash = /^(\d{4})\/(\d{2})\/(\d{2})$/;
+            var m1 = str.match(dateOnlyDash);
+            var m2 = str.match(dateOnlySlash);
+            if (m1 || m2) {
+                var y = parseInt((m1 || m2)[1], 10);
+                var mo = parseInt((m1 || m2)[2], 10) - 1;
+                var d = parseInt((m1 || m2)[3], 10);
+                var localMidnight = new Date(y, mo, d, 0, 0, 0, 0);
+                return isNaN(localMidnight.getTime()) ? null : localMidnight;
+            }
+
+            // Case 1b: ISO without timezone (YYYY-MM-DDTHH:mm[:ss]) -> parse as LOCAL explicitly
+            var isoLocal = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?$/;
+            var mIso = str.match(isoLocal);
+            if (mIso) {
+                var y2 = parseInt(mIso[1], 10);
+                var mo2 = parseInt(mIso[2], 10) - 1;
+                var d2 = parseInt(mIso[3], 10);
+                var hh = parseInt(mIso[4], 10);
+                var mm = parseInt(mIso[5], 10);
+                var ss = mIso[6] ? parseInt(mIso[6], 10) : 0;
+                var localDt = new Date(y2, mo2, d2, hh, mm, ss, 0);
+                return isNaN(localDt.getTime()) ? null : localDt;
+            }
+
+            // Case 2: "YYYY-MM-DD HH:mm[:ss]" -> normalize to local by inserting 'T'
+            if (/^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}(:\d{2})?$/.test(str)) {
+                str = str.replace(' ', 'T');
+            }
+
+            // Generic parse
+            var dt = new Date(str);
+            if (isNaN(dt.getTime())) {
+                // Safari-safe fallback: replace '-' with '/'
+                dt = new Date(str.replace(/-/g, '/'));
+            }
+            return isNaN(dt.getTime()) ? null : dt;
+        }
+
+        function disableFormInputsWithGuard(messageText) {
+            if (messageText) {
+                $('#guardMessage').text(messageText);
+            }
+            $('#guardCard').removeClass('d-none');
+            $('#btnSimpanPenilaian').prop('disabled', true);
+            // Disable semua input dalam form untuk mencegah interaksi accidental
+            $('#formPenilaian').find('input, textarea, button').prop('disabled', true);
+            // Use namespaced events so we can cleanly unbind later
+            $(document).on('focus.msjadwal mousedown.msjadwal keydown.msjadwal', '#formPenilaian input, #formPenilaian textarea, #formPenilaian button', function(e){
+                e.preventDefault();
+                return false;
+            });
+        }
+
+        function enableFormInputsAndHideGuard() {
+            $('#guardCard').addClass('d-none');
+            $('#btnSimpanPenilaian').prop('disabled', false);
+            // Re-enable semua input dalam form
+            $('#formPenilaian').find('input, textarea, button').prop('disabled', false);
+            $(document).off('focus.msjadwal mousedown.msjadwal keydown.msjadwal', '#formPenilaian input, #formPenilaian textarea, #formPenilaian button');
+        }
+
+        $(document).ready(function() {
+            // Reset auto-fill flag saat halaman baru dibuka
+            delete window.autoFillExecuted;
+            delete window.lastJadwalInfo;
+            
+            // NEW: Clear countdown timer jika ada
+            if (window.countdownTimerInterval) {
+                clearInterval(window.countdownTimerInterval);
+                window.countdownTimerInterval = null;
+            }
+            
+            // Ambil NIM dari URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            nimMahasiswa = urlParams.get('nim');
+            
+            if (!nimMahasiswa) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'NIM mahasiswa tidak ditemukan'
+                }).then(() => {
+                    window.location.href = '{{ url_for("pembimbing.daftar_penilaian_mahasiswa") }}';
+                });
+                return;
+            }
+
+            // Load guard jadwal penilaian terlebih dahulu
+            loadJadwalPenilaian().done(function(){
+                // Hanya load data lain jika jadwal valid dan dalam waktu yang tepat
+                if (jadwalPenilaian && Object.keys(jadwalPenilaian).length > 0) {
+                    loadInfoMahasiswa();
+                    loadPertanyaanPenilaian();
+                } else {
+                    // Jika tidak ada jadwal valid, tampilkan pesan error
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Jadwal Tidak Ditemukan',
+                        text: 'Sistem memerlukan jadwal penilaian yang valid untuk beroperasi. Mohon hubungi admin.',
+                        confirmButtonText: 'Kembali ke Dashboard',
+                        allowOutsideClick: false
+                    }).then(() => {
+                        window.location.href = '{{ url_for("pembimbing.das_pembimbing") }}';
+                    });
+                }
+            }).fail(function(){
+                // Jika gagal load jadwal, tampilkan error dan redirect
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Memuat Jadwal',
+                    text: 'Tidak dapat menghubungi server untuk mendapatkan jadwal penilaian. Mohon hubungi admin.',
+                    confirmButtonText: 'Kembali ke Dashboard',
+                    allowOutsideClick: false
+                }).then(() => {
+                    window.location.href = '{{ url_for("pembimbing.das_pembimbing") }}';
+                });
+            });
+
+            // Periodik cek jadwal tiap 60 detik agar otomatis lock/unlock sesuai waktu berjalan
+            if (!jadwalIntervalStarted) {
+                jadwalIntervalStarted = true;
+                setInterval(function(){
+                    loadJadwalPenilaian();
+                }, 60000);
+            }
+        });
+
+        function isWithinSchedule(startStr, endStr) {
+            // Validasi ketat: harus ada jadwal yang valid
+            const start = parseDateFlexible(startStr);
+            const end = parseDateFlexible(endStr);
+            
+            // Jika tidak ada jadwal, return false (tidak dalam jadwal)
+            if (!start || !end) return false;
+            
+            const now = new Date();
+            if (now < start) return false;
+            if (now > end) return false;
+            return true;
+        }
+
+        function loadJadwalPenilaian() {
+            return $.get('{{ url_for('mahasiswa.get_pengaturan_jadwal_mhs') }}', { _: Date.now() }).done(function(resp){
+                if (!resp || !resp.success) {
+                    // Jika gagal, blok akses dan minta hubungi admin
+                    disableFormInputsWithGuard('Jadwal penilaian tidak ditemukan atau tidak valid. Mohon hubungi admin untuk mengatur jadwal penilaian.');
+                    return;
+                }
+                jadwalPenilaian = resp.data || {};
+                
+                // Validasi: harus ada data jadwal minimal
+                if (!jadwalPenilaian || Object.keys(jadwalPenilaian).length === 0) {
+                    disableFormInputsWithGuard('Jadwal penilaian kosong. Mohon hubungi admin untuk mengatur jadwal penilaian.');
+                    return;
+                }
+                
+                // Pastikan field bernama konsisten: coba beberapa kemungkinan kunci
+                const rawMulai = jadwalPenilaian.pembimbing_nilai_mulai || jadwalPenilaian.mulai_penilaian_pembimbing || jadwalPenilaian.mulai_penilaian || jadwalPenilaian.start;
+                const rawSelesai = jadwalPenilaian.pembimbing_nilai_selesai || jadwalPenilaian.selesai_penilaian_pembimbing || jadwalPenilaian.selesai_penilaian || jadwalPenilaian.end;
+                
+                // Validasi: harus ada waktu mulai dan selesai
+                if (!rawMulai || !rawSelesai) {
+                    disableFormInputsWithGuard('Jadwal penilaian tidak lengkap. Waktu mulai dan selesai harus diatur. Mohon hubungi admin.');
+                    return;
+                }
+                
+                const mulai = parseDateFlexible(rawMulai);
+                const selesai = parseDateFlexible(rawSelesai);
+                
+                // Validasi: parsing tanggal harus berhasil
+                if (!mulai || !selesai) {
+                    disableFormInputsWithGuard('Format jadwal penilaian tidak valid. Mohon hubungi admin untuk memperbaiki format tanggal.');
+                    return;
+                }
+                
+                const now = new Date();
+                let showGuard = false;
+                let message = '';
+                
+                // Validasi: selesai tidak boleh sebelum mulai
+                if (selesai < mulai) {
+                    showGuard = true;
+                    message = 'Jadwal penilaian tidak valid: waktu selesai lebih awal dari waktu mulai. Mohon hubungi admin untuk memperbaiki jadwal.';
+                } else if (now < mulai) {
+                    showGuard = true;
+                    message = `Penilaian belum dibuka. Menunggu jadwal mulai: ${mulai.toLocaleString('id-ID')}`;
+                } else if (now > selesai) {
+                    showGuard = true;
+                    message = `Masa penilaian telah berakhir pada ${selesai.toLocaleString('id-ID')}. Penilaian baru tidak dapat ditambahkan (nilai otomatis 0).`;
+                }
+                
+                if (showGuard) {
+                    disableFormInputsWithGuard(message);
+                } else {
+                    enableFormInputsAndHideGuard();
+                }
+                
+                // Debugging info ke console agar mudah mengecek
+                try {
+                    console.debug('[Jadwal Penilaian] now=', now, 'mulai=', mulai, 'selesai=', selesai, 'guard=', showGuard);
+                } catch (e) {}
+            }).fail(function(){
+                // Jika API gagal, blok akses dan minta hubungi admin
+                disableFormInputsWithGuard('Gagal menghubungi server untuk mendapatkan jadwal penilaian. Mohon hubungi admin atau coba lagi nanti.');
+            });
+        }
+
+        function loadInfoMahasiswa() {
+            // Reset auto-fill flag ketika load info mahasiswa baru
+            delete window.autoFillExecuted;
+            delete window.lastJadwalInfo;
+            
+            // NEW: Clear countdown timer jika ada
+            if (window.countdownTimerInterval) {
+                clearInterval(window.countdownTimerInterval);
+                window.countdownTimerInterval = null;
+            }
+            
+            $.ajax({
+                url: '{{ url_for("pembimbing.get_info_mahasiswa") }}',
+                type: 'GET',
+                data: { nim: nimMahasiswa },
+                success: function(response) {
+                    // Hide loading
+                    $('#loadingInfo').hide();
+                    
+                    if (response.success) {
+                        const data = response.data;
+                        $('#infoMahasiswa').html(`
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center p-3" style="background:#f8f9fa;border-radius:8px;border-left:4px solid #007bff;">
+                                        <div class="me-3">
+                                            <i class="bi bi-person-badge text-primary" style="font-size:1.2rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted" style="font-size:0.85rem;font-weight:500;">NIM</div>
+                                            <div class="fw-semibold" style="color:#495057;">${data.nim}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center p-3" style="background:#f8f9fa;border-radius:8px;border-left:4px solid #28a745;">
+                                        <div class="me-3">
+                                            <i class="bi bi-person text-success" style="font-size:1.2rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted" style="font-size:0.85rem;font-weight:500;">Nama Mahasiswa</div>
+                                            <div class="fw-semibold" style="color:#495057;">${data.nama}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center p-3" style="background:#f8f9fa;border-radius:8px;border-left:4px solid #ffc107;">
+                                        <div class="me-3">
+                                            <i class="bi bi-lightbulb text-warning" style="font-size:1.2rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted" style="font-size:0.85rem;font-weight:500;">Judul Usaha</div>
+                                            <div class="fw-semibold" style="color:#495057;">${data.judul_usaha}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-center p-3" style="background:#f8f9fa;border-radius:8px;border-left:4px solid #17a2b8;">
+                                        <div class="me-3">
+                                            <i class="bi bi-mortarboard text-info" style="font-size:1.2rem;"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-muted" style="font-size:0.85rem;font-weight:500;">Program Studi</div>
+                                            <div class="fw-semibold" style="color:#495057;">${data.program_studi}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    } else {
+                        // Show error state
+                        $('#infoMahasiswa').html(`
+                            <div class="text-center py-4">
+                                <i class="bi bi-exclamation-triangle text-warning" style="font-size:2rem;"></i>
+                                <p class="mt-2 text-muted mb-0">Gagal memuat informasi mahasiswa</p>
+                                <button class="btn btn-primary btn-sm mt-2" onclick="loadInfoMahasiswa()">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Coba Lagi
+                                </button>
+                            </div>
+                        `);
+                    }
+                },
+                error: function() {
+                    // Hide loading and show error
+                    $('#loadingInfo').hide();
+                    $('#infoMahasiswa').html(`
+                        <div class="text-center py-4">
+                            <i class="bi bi-exclamation-triangle text-danger" style="font-size:2rem;"></i>
+                            <p class="mt-2 text-muted mb-0">Terjadi kesalahan saat memuat data</p>
+                            <button class="btn btn-primary btn-sm mt-2" onclick="loadInfoMahasiswa()">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Coba Lagi
+                            </button>
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        // Variable global untuk menyimpan data sesi
+        let currentSesi = 1;
+        let skorPerSesi = {};
+        
+        // Helper function untuk mendapatkan label interval yang konsisten
+        function getIntervalLabel() {
+            // Perbaikan: Gunakan interval_tipe alih-alih interval
+            if (jadwalInfo.interval_tipe === 'setiap_jam' || (jadwalInfo.interval_tipe && jadwalInfo.interval_tipe.includes('jam'))) {
+                return 'Jam';
+            } else if (jadwalInfo.interval_tipe === 'harian' || (jadwalInfo.interval_tipe && jadwalInfo.interval_tipe.includes('hari'))) {
+                return 'Hari';
+            } else if (jadwalInfo.interval_tipe === 'mingguan' || (jadwalInfo.interval_tipe && jadwalInfo.interval_tipe.includes('minggu'))) {
+                return 'Minggu';
+            } else if (jadwalInfo.interval_tipe === 'bulanan' || (jadwalInfo.interval_tipe && jadwalInfo.interval_tipe.includes('bulan'))) {
+                return 'Bulan';
+            }
+            return 'Sesi';
+        }
+        
+        // ✅ PERBAIKAN: Helper function untuk mendapatkan label kolom berdasarkan metadata dari admin
+        function getColumnLabel(index) {
+            // Prioritas 1: Gunakan metadata per sesi dari backend (data yang tersimpan di database)
+            if (metadataPerSesi && metadataPerSesi[index] && metadataPerSesi[index].nama_kolom) {
+                console.log(`DEBUG: Menggunakan metadata per sesi untuk index ${index}:`, metadataPerSesi[index].nama_kolom);
+                return metadataPerSesi[index].nama_kolom;
+            }
+            
+            // Prioritas 2: Gunakan metadata kolom dari admin jika tersedia DAN sesuai dengan interval
+            if (jadwalInfo.metadata_kolom && jadwalInfo.metadata_kolom.length > 0) {
+                const metadata = jadwalInfo.metadata_kolom.find(m => m.urutan_kolom === index);
+                if (metadata) {
+                    // ✅ PERBAIKAN: Validasi metadata sesuai dengan interval tipe
+                    const metadataName = metadata.nama_kolom;
+                    const intervalTipe = jadwalInfo.interval_tipe;
+                    
+                    // Cek apakah metadata sesuai dengan interval tipe
+                    let isValidMetadata = false;
+                    
+                    if (intervalTipe === 'setiap_jam' && metadataName.startsWith('Jam ')) {
+                        isValidMetadata = true;
+                    } else if (intervalTipe === 'harian' && (metadataName.includes('Senin') || metadataName.includes('Selasa') || metadataName.includes('Rabu') || metadataName.includes('Kamis') || metadataName.includes('Jumat') || metadataName.includes('Sabtu') || metadataName.includes('Minggu'))) {
+                        isValidMetadata = true;
+                    } else if (intervalTipe === 'mingguan' && metadataName.startsWith('Minggu ')) {
+                        isValidMetadata = true;
+                    } else if (intervalTipe === 'bulanan' && (metadataName.startsWith('Bulan ') || metadataName.includes('Agustus') || metadataName.includes('September') || metadataName.includes('Oktober') || metadataName.includes('November') || metadataName.includes('Desember') || metadataName.includes('Januari') || metadataName.includes('Februari') || metadataName.includes('Maret') || metadataName.includes('April') || metadataName.includes('Mei') || metadataName.includes('Juni') || metadataName.includes('Juli'))) {
+                        isValidMetadata = true;
+                    }
+                    
+                    if (isValidMetadata) {
+                        return metadataName;
+                    } else {
+                        console.log(`DEBUG: Metadata tidak sesuai interval - interval: ${intervalTipe}, metadata: ${metadataName}, menggunakan fallback`);
+                        // ✅ PERBAIKAN: Langsung return fallback tanpa melanjutkan ke metadata lain
+                        return `${getIntervalLabel()} ${index}`;
+                    }
+                }
+            }
+            
+            // Prioritas 3: Fallback ke jam_list untuk backward compatibility
+            if (jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list && jadwalInfo.jam_list[index - 1]) {
+                return `Jam ${jadwalInfo.jam_list[index - 1]}`;
+            }
+            
+            // Prioritas 4: Fallback ke label generik yang sesuai interval
+            return `${getIntervalLabel()} ${index}`;
+        }
+        let jadwalInfo = {};
+        let intervalCheck = {};
+
+        function loadPertanyaanPenilaian() {
+            const nim = nimMahasiswa; // Gunakan variable global nimMahasiswa
+            if (!nim) {
+                alert('NIM mahasiswa tidak ditemukan');
+                return;
+            }
+            
+            // Validasi: harus ada jadwal yang valid sebelum load pertanyaan
+            if (!jadwalPenilaian || Object.keys(jadwalPenilaian).length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Jadwal Tidak Valid',
+                    text: 'Tidak dapat memuat pertanyaan penilaian karena jadwal tidak valid. Mohon hubungi admin.',
+                    confirmButtonText: 'Kembali ke Dashboard'
+                }).then(() => {
+                    window.location.href = '{{ url_for("pembimbing.das_pembimbing") }}';
+                });
+                return;
+            }
+
+            $.ajax({
+                url: '{{ url_for("pembimbing.get_penilaian_data_with_sesi") }}',
+                type: 'GET',
+                data: { nim: nim },
+                success: function(response) {
+                    if (response.success) {
+                        // Gunakan struktur data yang baru jika tersedia
+                        if (response.pertanyaan_organized && response.pertanyaan_organized.length > 0) {
+                            pertanyaanList = response.pertanyaan_organized || [];
+                            console.log('DEBUG: Using organized pertanyaan structure:', pertanyaanList);
+                        } else {
+                            pertanyaanList = response.pertanyaan || [];
+                            console.log('DEBUG: Using legacy pertanyaan structure:', pertanyaanList);
+                        }
+                        skorPerSesi = response.skor_per_sesi || {};
+                        currentSesi = response.current_sesi || 1;
+                        jadwalInfo = response.jadwal_info || {};
+                        intervalCheck = response.interval_check || {};
+                        scheduleActive = response.schedule_active !== false; // Default true jika tidak ada
+                        metadataPerSesi = response.metadata_per_sesi || {}; // ✅ PERBAIKAN: Ambil metadata per sesi dari backend
+                        
+                        // NEW: Data sesi terlewat
+                        const sesiTerlewat = response.sesi_terlewat || [];
+                        const sesiBerdasarkanWaktu = response.sesi_berdasarkan_waktu || currentSesi;
+                        
+                        // RESET: Auto-fill flag jika ada perubahan jadwal yang signifikan
+                        if (window.lastJadwalInfo && JSON.stringify(window.lastJadwalInfo) !== JSON.stringify(jadwalInfo)) {
+                            console.log('DEBUG: Jadwal berubah, reset auto-fill flag');
+                            delete window.autoFillExecuted;
+                        }
+                        // Simpan jadwal info untuk perbandingan berikutnya
+                        window.lastJadwalInfo = JSON.parse(JSON.stringify(jadwalInfo));
+                        
+                        // FIX: Jangan force reset ke sesi 1 jika interval check gagal
+                        // Biarkan currentSesi dari backend untuk menentukan sesi yang seharusnya aktif
+                        if (Object.keys(skorPerSesi).length === 0) {
+                            // Cek apakah interval check gagal (sudah waktunya sesi 2+)
+                            if (!intervalCheck.bisa_nilai) {
+                                // Jangan force reset, biarkan currentSesi dari backend
+                                console.log('DEBUG NO FORCE RESET FRONTEND: Interval check gagal, tidak force reset ke sesi 1');
+                            } else {
+                                // Interval check berhasil, boleh force reset
+                                currentSesi = 1;
+                                console.log('DEBUG FORCE RESET FRONTEND: Interval check berhasil, forcing currentSesi to 1');
+                            }
+                        }
+                        
+                        console.log('Data penilaian loaded:', {
+                            pertanyaan: pertanyaanList.length,
+                            currentSesi: currentSesi,
+                            skorPerSesi: skorPerSesi,
+                            jadwalInfo: jadwalInfo,
+                            intervalCheck: intervalCheck
+                        });
+                        
+
+                        
+                        if (pertanyaanList.length === 0) {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Tidak Ada Pertanyaan',
+                                text: 'Belum ada pertanyaan penilaian yang aktif. Silakan hubungi admin untuk mengatur pertanyaan penilaian.'
+                            });
+                            return;
+                        }
+                        
+                        // Update info jadwal dan sesi
+                        updateJadwalInfo();
+                        updateSesiInfo();
+                        
+                        // Jika ini adalah reload setelah save, beri notifikasi sukses
+                        if (window.afterSesiSave) {
+                            console.log('DEBUG: Data reload completed after sesi save');
+                            
+                            // Reset flag
+                            delete window.afterSesiSave;
+                            
+                            // Tampilkan info sesi baru jika ada
+                            setTimeout(() => {
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Data Berhasil Dimuat!',
+                                    text: `Sekarang di ${jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list && jadwalInfo.jam_list[currentSesi - 1] ? `Jam ${jadwalInfo.jam_list[currentSesi - 1]}` : `${getIntervalLabel()} ${currentSesi}`}. ${intervalCheck.bisa_nilai ? 'Bisa input skor.' : 'Menunggu jadwal berikutnya.'}`,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                            }, 500);
+                        }
+                        
+                        // Debug: Log data untuk troubleshooting
+                        console.log('DEBUG FRONTEND LENGKAP:', {
+                            intervalCheck: intervalCheck,
+                            currentSesi: currentSesi,
+                            jadwalInfo: jadwalInfo,
+                            pertanyaanList: pertanyaanList.length,
+                            skorPerSesi: skorPerSesi,
+                            scheduleActive: scheduleActive,
+                            response: response
+                        });
+                        
+                        // Cek validasi interval - SKIP untuk sesi pertama
+                        console.log('DEBUG INTERVAL CHECK:', {
+                            currentSesi: currentSesi,
+                            intervalCheck: intervalCheck,
+                            bisaNilai: intervalCheck.bisa_nilai
+                        });
+                        
+                        // FIX: Logika interval check yang lebih ketat
+                        if (currentSesi === 1 && intervalCheck.bisa_nilai) {
+                            // Sesi pertama - form ditampilkan jika interval check berhasil
+                            $('#guardCard').addClass('d-none');
+                            $('#formPenilaian').show();
+                            console.log('DEBUG: Sesi pertama - form ditampilkan, interval check berhasil');
+                        } else if (currentSesi === 1 && !intervalCheck.bisa_nilai) {
+                            // Sesi pertama tapi interval check gagal (sudah waktunya sesi 2)
+                            $('#guardCard').removeClass('d-none').addClass('alert-warning').removeClass('alert-success');
+                            $('#guardMessage').text(intervalCheck.pesan || `${jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list && jadwalInfo.jam_list[0] ? `Jam ${jadwalInfo.jam_list[0]}` : `${getIntervalLabel()} 1`} sudah tidak dapat diakses. Silakan lanjut ke ${getIntervalLabel().toLowerCase()} berikutnya.`);
+                            $('#formPenilaian').hide();
+                            console.log('DEBUG: Sesi pertama - form disembunyikan, interval check gagal');
+                        } else if (currentSesi > 1 && !intervalCheck.bisa_nilai) {
+                            // Sesi kedua ke atas - perlu cek interval
+                            $('#guardCard').removeClass('d-none').addClass('alert-warning').removeClass('alert-success');
+                            $('#guardMessage').text(intervalCheck.pesan || `Menunggu jadwal untuk ${jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list && jadwalInfo.jam_list[currentSesi - 1] ? `Jam ${jadwalInfo.jam_list[currentSesi - 1]}` : `${getIntervalLabel().toLowerCase()} ${currentSesi}`}`);
+                            $('#formPenilaian').hide();
+                            console.log('DEBUG: Form disembunyikan karena interval check gagal untuk sesi', currentSesi);
+                        } else if (currentSesi > 1 && intervalCheck.bisa_nilai) {
+                            // Sesi kedua ke atas - interval check berhasil
+                            $('#guardCard').removeClass('d-none').addClass('alert-success').removeClass('alert-warning');
+                            $('#guardMessage').text(`Sekarang bisa input skor untuk ${jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list && jadwalInfo.jam_list[currentSesi - 1] ? `Jam ${jadwalInfo.jam_list[currentSesi - 1]}` : `${getIntervalLabel().toLowerCase()} ${currentSesi}`}`);
+                            $('#formPenilaian').show();
+                            console.log('DEBUG: Form ditampilkan, interval check berhasil untuk sesi', currentSesi);
+                        }
+                        
+                        // ✅ PERBAIKAN: Tampilkan pesan error khusus untuk interval tipe tidak sesuai
+                        if (intervalCheck.pesan && intervalCheck.pesan.includes('Interval tipe tidak sesuai')) {
+                            $('#guardCard').removeClass('d-none').addClass('alert-danger').removeClass('alert-warning alert-success');
+                            $('#guardMessage').html(`<i class="bi bi-exclamation-triangle me-2"></i><strong>Error Interval Tipe:</strong> ${intervalCheck.pesan}`);
+                            $('#formPenilaian').hide();
+                            console.log('DEBUG: Form disembunyikan karena interval tipe tidak sesuai');
+                        }
+                        
+                        // NEW: Auto-fill sesi terlewat secara otomatis (hanya jika belum pernah dijalankan)
+                        if (sesiTerlewat.length > 0 && !window.autoFillExecuted) {
+                            console.log('DEBUG: Auto-filling sesi terlewat secara otomatis:', sesiTerlewat);
+                            
+                            // Set flag untuk mencegah auto-fill berulang
+                            window.autoFillExecuted = true;
+                            
+                            // Tampilkan notifikasi kecil bahwa auto-fill sedang berjalan
+                            const intervalLabel = getIntervalLabel();
+                            let sesiText = '';
+                            
+                            if (jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list) {
+                                const jamLabels = sesiTerlewat.map(sesi => {
+                                    const jamIndex = sesi - 1;
+                                    return jadwalInfo.jam_list[jamIndex] ? `Jam ${jadwalInfo.jam_list[jamIndex]}` : `${intervalLabel} ${sesi}`;
+                                });
+                                sesiText = jamLabels.join(', ');
+                            } else {
+                                sesiText = sesiTerlewat.length === 1 ? `${intervalLabel} ${sesiTerlewat[0]}` : `${intervalLabel} ${sesi}`;
+                            }
+                            
+                            // Notifikasi toast yang tidak mengganggu
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'Auto-fill Sesi Terlewat',
+                                text: `Mengisi ${sesiText} dengan skor 0 secara otomatis...`,
+                                timer: 2000,
+                                showConfirmButton: false,
+                                toast: true,
+                                position: 'top-end'
+                            });
+                            
+                            // Jalankan auto-fill
+                            autoFillSesiTerlewat(sesiTerlewat);
+                        } else if (sesiTerlewat.length > 0 && window.autoFillExecuted) {
+                            console.log('DEBUG: Auto-fill sudah pernah dijalankan, skip untuk mencegah pengulangan');
+                        }
+                        
+                        // Debug: Pastikan tabel di-render
+                        console.log('DEBUG: Memanggil renderPertanyaanTable');
+                        renderPertanyaanTable();
+                        
+                        // Debug: Cek apakah tabel muncul dan reset button state
+                        setTimeout(() => {
+                            const table = $('#tablePenilaian');
+                            const tbody = table.find('tbody');
+                            console.log('DEBUG TABLE AFTER RELOAD:', {
+                                tableExists: table.length > 0,
+                                tbodyExists: tbody.length > 0,
+                                tbodyChildren: tbody.children().length,
+                                tableVisible: table.is(':visible'),
+                                formVisible: $('#formPenilaian').is(':visible'),
+                                currentSesi: currentSesi,
+                                inputCount: $('.skor-input').length
+                            });
+                            
+                            // Reset button state setelah reload
+                            checkAllInputsFilled();
+                            
+                            // NEW: Panggil onDataReloadComplete jika ini adalah reload setelah save
+                            onDataReloadComplete();
+                        }, 100);
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message || 'Gagal memuat pertanyaan penilaian'
+                        });
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat memuat pertanyaan penilaian'
+                    });
+                }
+            });
+        }
+
+        function updateJadwalInfo() {
+            let infoHtml = '';
+            
+            // Debug: log jadwalInfo untuk troubleshooting
+            console.log('DEBUG updateJadwalInfo:', jadwalInfo);
+            
+            // Tampilkan informasi jadwal yang lengkap
+            if (jadwalInfo && Object.keys(jadwalInfo).length > 0) {
+                // Info interval dan jadwal utama
+                if (jadwalInfo.interval_tipe) {
+                    infoHtml += `<div class="mb-2"><strong>Jenis Interval:</strong> <span class="badge bg-primary">${jadwalInfo.interval_tipe.replace('_', ' ').toUpperCase()}</span></div>`;
+                }
+                
+                // ✅ PERBAIKAN: Info interval tipe penilaian yang ada (jika berbeda)
+                if (metadataPerSesi && Object.keys(metadataPerSesi).length > 0) {
+                    const intervalTipePenilaian = Object.values(metadataPerSesi)[0].interval_tipe;
+                    if (intervalTipePenilaian && intervalTipePenilaian !== jadwalInfo.interval_tipe) {
+                        infoHtml += `<div class="mb-2"><strong>Interval Penilaian:</strong> <span class="badge bg-warning">${intervalTipePenilaian.replace('_', ' ').toUpperCase()}</span> <small class="text-danger">(Berbeda dengan jadwal saat ini)</small></div>`;
+                    } else if (intervalTipePenilaian) {
+                        infoHtml += `<div class="mb-2"><strong>Interval Penilaian:</strong> <span class="badge bg-success">${intervalTipePenilaian.replace('_', ' ').toUpperCase()}</span> <small class="text-success">(Sesuai dengan jadwal saat ini)</small></div>`;
+                    }
+                }
+                
+                if (jadwalInfo.interval_nilai) {
+                    infoHtml += `<div class="mb-2"><strong>Nilai Interval:</strong> <span class="badge bg-info">${jadwalInfo.interval_nilai}</span></div>`;
+                }
+                
+                // Info waktu mulai dan selesai
+                if (jadwalInfo.jam_mulai) {
+                    const jamMulai = new Date(jadwalInfo.jam_mulai);
+                    const jamMulaiFormatted = jamMulai.toLocaleTimeString('id-ID', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: false 
+                    });
+                    infoHtml += `<div class="mb-2"><strong>Waktu Mulai:</strong> <span class="badge bg-success">${jamMulaiFormatted}</span></div>`;
+                }
+                
+                if (jadwalInfo.jam_selesai) {
+                    const jamSelesai = new Date(jadwalInfo.jam_selesai);
+                    const jamSelesaiFormatted = jamSelesai.toLocaleTimeString('id-ID', { 
+                        hour: '2-digit', 
+                        minute: '2-digit',
+                        hour12: false 
+                    });
+                    infoHtml += `<div class="mb-2"><strong>Waktu Selesai:</strong> <span class="badge bg-danger">${jamSelesaiFormatted}</span></div>`;
+                }
+                
+                // Info jam_list jika ada (untuk interval setiap_jam)
+                if (jadwalInfo.jam_list && jadwalInfo.jam_list.length > 0) {
+                    const jamLabels = jadwalInfo.jam_list.map((jam, index) => {
+                        const sesiNumber = index + 1;
+                        return `<span class="badge bg-secondary me-1">Sesi ${sesiNumber}: ${jam}</span>`;
+                    }).join('');
+                    infoHtml += `<div class="mb-2"><strong>Daftar Sesi:</strong><br>${jamLabels}</div>`;
+                }
+                
+                // ✅ PERBAIKAN: Info metadata kolom jika ada (prioritas metadata dari database)
+                if (metadataPerSesi && Object.keys(metadataPerSesi).length > 0) {
+                    // Gunakan metadata per sesi dari database
+                    const metadataLabels = Object.keys(metadataPerSesi)
+                        .sort((a, b) => parseInt(a) - parseInt(b))
+                        .map(sesi => {
+                            const metadata = metadataPerSesi[sesi];
+                            return `<span class="badge bg-success me-1">${metadata.nama_kolom}</span>`;
+                        }).join('');
+                    
+                    infoHtml += `<div class="mb-2"><strong>Nama Kolom :</strong><br>${metadataLabels}</div>`;
+                } else if (jadwalInfo.metadata_kolom && jadwalInfo.metadata_kolom.length > 0) {
+                    // Fallback ke metadata dari admin
+                    const validMetadataLabels = jadwalInfo.metadata_kolom
+                        .filter(meta => {
+                            // ✅ PERBAIKAN: Filter metadata yang sesuai dengan interval tipe
+                            const metadataName = meta.nama_kolom;
+                            const intervalTipe = jadwalInfo.interval_tipe;
+                            
+                            if (intervalTipe === 'setiap_jam' && metadataName.startsWith('Jam ')) {
+                                return true;
+                            } else if (intervalTipe === 'harian' && (metadataName.includes('Senin') || metadataName.includes('Selasa') || metadataName.includes('Rabu') || metadataName.includes('Kamis') || metadataName.includes('Jumat') || metadataName.includes('Sabtu') || metadataName.includes('Minggu'))) {
+                                return true;
+                            } else if (intervalTipe === 'mingguan' && metadataName.startsWith('Minggu ')) {
+                                return true;
+                            } else if (intervalTipe === 'bulanan' && (metadataName.startsWith('Bulan ') || metadataName.includes('Agustus') || metadataName.includes('September') || metadataName.includes('Oktober') || metadataName.includes('November') || metadataName.includes('Desember') || metadataName.includes('Januari') || metadataName.includes('Februari') || metadataName.includes('Maret') || metadataName.includes('April') || metadataName.includes('Mei') || metadataName.includes('Juni') || metadataName.includes('Juli'))) {
+                                return true;
+                            }
+                            return false;
+                        })
+                        .map((meta, index) => {
+                            return `<span class="badge bg-warning me-1">${meta.nama_kolom}</span>`;
+                        }).join('');
+                    
+                    if (validMetadataLabels) {
+                        infoHtml += `<div class="mb-2"><strong>Nama Kolom (Admin):</strong><br>${validMetadataLabels}</div>`;
+                    } else {
+                        // Jika tidak ada metadata yang valid, tampilkan info fallback
+                        const intervalLabel = getIntervalLabel();
+                        const fallbackLabels = jadwalInfo.metadata_kolom.map((meta, index) => {
+                            return `<span class="badge bg-secondary me-1">${intervalLabel} ${meta.urutan_kolom}</span>`;
+                        }).join('');
+                        infoHtml += `<div class="mb-2"><strong>Nama Kolom (Fallback):</strong><br>${fallbackLabels}</div>`;
+                    }
+                }
+                
+                // Info status jadwal
+                if (jadwalInfo.status) {
+                    infoHtml += `<div class="mt-3"><strong>Status:</strong> <span class="badge bg-info">${jadwalInfo.status}</span></div>`;
+                }
+                
+                // Info periode jika ada
+                if (jadwalInfo.periode) {
+                    infoHtml += `<div class="mt-2"><small class="text-muted"><i class="bi bi-calendar-event me-1"></i>${jadwalInfo.periode}</small></div>`;
+                }
+                
+                
+                
+            } else {
+                // Jika tidak ada data jadwal
+                infoHtml = `
+                    <div class="text-center text-muted">
+                        <i class="bi bi-exclamation-triangle text-warning" style="font-size: 1.5rem;"></i>
+                        <div class="mt-2">Data jadwal tidak tersedia</div>
+                        <small>Mohon hubungi admin untuk mengatur jadwal penilaian</small>
+                    </div>
+                `;
+            }
+            
+            $('#jadwalInfo').html(infoHtml);
+        }
+
+        function updateSesiInfo() {
+            // Tentukan label berdasarkan interval tipe
+            let intervalLabel = getIntervalLabel();
+            
+            // ✅ PERBAIKAN: Update current sesi dengan label yang sesuai (prioritas metadata dari database)
+            let currentSesiLabel = '';
+            
+            // Prioritas 1: Gunakan metadata per sesi dari database
+            if (metadataPerSesi && metadataPerSesi[currentSesi] && metadataPerSesi[currentSesi].nama_kolom) {
+                currentSesiLabel = metadataPerSesi[currentSesi].nama_kolom;
+                console.log(`DEBUG: Menggunakan metadata per sesi untuk current sesi ${currentSesi}:`, currentSesiLabel);
+            }
+            // Prioritas 2: Gunakan metadata kolom dari admin jika tersedia
+            else if (jadwalInfo.metadata_kolom && jadwalInfo.metadata_kolom.length > 0) {
+                const metadata = jadwalInfo.metadata_kolom.find(m => m.urutan_kolom === currentSesi);
+                if (metadata) {
+                    // ✅ PERBAIKAN: Validasi metadata sesuai dengan interval tipe
+                    const metadataName = metadata.nama_kolom;
+                    const intervalTipe = jadwalInfo.interval_tipe;
+                    
+                    // Cek apakah metadata sesuai dengan interval tipe
+                    let isValidMetadata = false;
+                    
+                    if (intervalTipe === 'setiap_jam' && metadataName.startsWith('Jam ')) {
+                        isValidMetadata = true;
+                    } else if (intervalTipe === 'harian' && (metadataName.includes('Senin') || metadataName.includes('Selasa') || metadataName.includes('Rabu') || metadataName.includes('Kamis') || metadataName.includes('Jumat') || metadataName.includes('Sabtu') || metadataName.includes('Minggu'))) {
+                        isValidMetadata = true;
+                    } else if (intervalTipe === 'mingguan' && metadataName.startsWith('Minggu ')) {
+                        isValidMetadata = true;
+                    } else if (intervalTipe === 'bulanan' && (metadataName.startsWith('Bulan ') || metadataName.includes('Agustus') || metadataName.includes('September') || metadataName.includes('Oktober') || metadataName.includes('November') || metadataName.includes('Desember') || metadataName.includes('Januari') || metadataName.includes('Februari') || metadataName.includes('Maret') || metadataName.includes('April') || metadataName.includes('Mei') || metadataName.includes('Juni') || metadataName.includes('Juli'))) {
+                        isValidMetadata = true;
+                    }
+                    
+                    if (isValidMetadata) {
+                        currentSesiLabel = metadataName;
+                    } else {
+                        console.log(`DEBUG: Metadata tidak sesuai interval untuk sesi info - interval: ${intervalTipe}, metadata: ${metadataName}, menggunakan fallback`);
+                        currentSesiLabel = `${intervalLabel} ${currentSesi}`;
+                    }
+                } else {
+                    currentSesiLabel = `${intervalLabel} ${currentSesi}`;
+                }
+            } else if (jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list && jadwalInfo.jam_list[currentSesi - 1]) {
+                currentSesiLabel = `Jam ${jadwalInfo.jam_list[currentSesi - 1]}`;
+            } else {
+                currentSesiLabel = `${intervalLabel} ${currentSesi}`;
+            }
+            
+            $('#currentSesi').text(currentSesiLabel);
+            
+            // Update semua label yang terkait dengan interval
+            $('#sesiLabel').text(intervalLabel);
+            $('#sesiDesc').text(intervalLabel);
+            $('#skorHeaderLabel').text(intervalLabel);
+            
+            // Hitung total sesi yang sudah dilakukan
+            let totalSesiDilakukan = 0;
+            for (let pertanyaanId in skorPerSesi) {
+                const sesiKeys = Object.keys(skorPerSesi[pertanyaanId]);
+                totalSesiDilakukan = Math.max(totalSesiDilakukan, sesiKeys.length);
+            }
+            
+            // Update info sesi dengan informasi yang lebih lengkap
+            let sesiInfoHtml = `
+                <span class="badge bg-success" id="currentSesi">${currentSesiLabel}</span>
+                <small class="text-muted d-block mt-1">${intervalLabel} penilaian yang sedang berlangsung</small>
+            `;
+            
+            // Tambahkan info total sesi jika ada
+            if (jadwalInfo.metadata_kolom && jadwalInfo.metadata_kolom.length > 0) {
+                sesiInfoHtml += `<small class="text-info d-block mt-1">Total ${jadwalInfo.metadata_kolom.length} ${intervalLabel.toLowerCase()}</small>`;
+            } else if (jadwalInfo.jam_list && jadwalInfo.jam_list.length > 0) {
+                sesiInfoHtml += `<small class="text-info d-block mt-1">Total ${jadwalInfo.jam_list.length} ${intervalLabel.toLowerCase()}</small>`;
+            }
+            
+            // Tambahkan info sesi yang sudah dilakukan
+            if (totalSesiDilakukan > 0) {
+                sesiInfoHtml += `<small class="text-success d-block mt-1"><i class="bi bi-check-circle me-1"></i>Sudah dilakukan ${totalSesiDilakukan} ${intervalLabel.toLowerCase()} penilaian</small>`;
+            }
+            
+            // ✅ PERBAIKAN: Tambahkan info sesi berikutnya jika ada
+            const nextSesi = currentSesi + 1;
+            let nextSesiLabel = `${intervalLabel} ${nextSesi}`;
+            
+            // Prioritas 1: Gunakan metadata per sesi dari database untuk sesi berikutnya
+            if (metadataPerSesi && metadataPerSesi[nextSesi] && metadataPerSesi[nextSesi].nama_kolom) {
+                nextSesiLabel = metadataPerSesi[nextSesi].nama_kolom;
+            }
+            // Prioritas 2: Gunakan metadata kolom dari admin jika tersedia
+            else if (jadwalInfo.metadata_kolom && currentSesi < jadwalInfo.metadata_kolom.length) {
+                const nextMetadata = jadwalInfo.metadata_kolom.find(m => m.urutan_kolom === nextSesi);
+                if (nextMetadata) {
+                    // ✅ PERBAIKAN: Validasi metadata sesuai dengan interval tipe
+                    const metadataName = nextMetadata.nama_kolom;
+                    const intervalTipe = jadwalInfo.interval_tipe;
+                    
+                    // Cek apakah metadata sesuai dengan interval tipe
+                    let isValidMetadata = false;
+                    
+                    if (intervalTipe === 'setiap_jam' && metadataName.startsWith('Jam ')) {
+                        isValidMetadata = true;
+                    } else if (intervalTipe === 'harian' && (metadataName.includes('Senin') || metadataName.includes('Selasa') || metadataName.includes('Rabu') || metadataName.includes('Kamis') || metadataName.includes('Jumat') || metadataName.includes('Sabtu') || metadataName.includes('Minggu'))) {
+                        isValidMetadata = true;
+                    } else if (intervalTipe === 'mingguan' && metadataName.startsWith('Minggu ')) {
+                        isValidMetadata = true;
+                    } else if (intervalTipe === 'bulanan' && (metadataName.startsWith('Bulan ') || metadataName.includes('Agustus') || metadataName.includes('September') || metadataName.includes('Oktober') || metadataName.includes('November') || metadataName.includes('Desember') || metadataName.includes('Januari') || metadataName.includes('Februari') || metadataName.includes('Maret') || metadataName.includes('April') || metadataName.includes('Mei') || metadataName.includes('Juni') || metadataName.includes('Juli'))) {
+                        isValidMetadata = true;
+                    }
+                    
+                    if (isValidMetadata) {
+                        nextSesiLabel = metadataName;
+                    }
+                }
+            } else if (jadwalInfo.jam_list && currentSesi < jadwalInfo.jam_list.length) {
+                nextSesiLabel = jadwalInfo.jam_list[nextSesi - 1] ? `Jam ${jadwalInfo.jam_list[nextSesi - 1]}` : `${intervalLabel} ${nextSesi}`;
+            }
+            
+            // Tampilkan info sesi berikutnya jika ada
+            if (nextSesi <= (jadwalInfo.metadata_kolom ? jadwalInfo.metadata_kolom.length : (jadwalInfo.jam_list ? jadwalInfo.jam_list.length : 999))) {
+                sesiInfoHtml += `<small class="text-warning d-block mt-1"><i class="bi bi-clock me-1"></i>Sesi berikutnya: ${nextSesiLabel}</small>`;
+            }
+            
+            $('#sesiInfo').html(sesiInfoHtml);
+        }
+
+        function renderPertanyaanTable() {
+            // Update header kolom skor berdasarkan jumlah sesi
+            let maxSesi = Math.max(1, currentSesi); // Minimal 1 sesi
+            for (let pertanyaanId in skorPerSesi) {
+                const sesiKeys = Object.keys(skorPerSesi[pertanyaanId]);
+                if (sesiKeys.length > 0) {
+                    maxSesi = Math.max(maxSesi, Math.max(...sesiKeys.map(Number)));
+                }
+            }
+            
+            // Jika jadwal sudah berakhir, batasi maxSesi ke sesi yang sudah ada saja
+            if (!scheduleActive && Object.keys(skorPerSesi).length > 0) {
+                // Hitung sesi tertinggi yang sudah ada data
+                let existingMaxSesi = 0;
+                for (let pertanyaanId in skorPerSesi) {
+                    const sesiKeys = Object.keys(skorPerSesi[pertanyaanId]);
+                    if (sesiKeys.length > 0) {
+                        existingMaxSesi = Math.max(existingMaxSesi, Math.max(...sesiKeys.map(Number)));
+                    }
+                }
+                maxSesi = Math.max(1, existingMaxSesi);
+                console.log('DEBUG: Schedule ended, limiting maxSesi to', maxSesi);
+            }
+            
+            // Update header skor dengan label yang sesuai interval tipe
+            let skorHeaders = '';
+            let skorSubHeaders = '';
+            
+            for (let i = 1; i <= maxSesi; i++) {
+                skorSubHeaders += `<th class="text-center">${getColumnLabel(i)}</th>`;
+            }
+            $('#skorHeaderContainer').attr('colspan', maxSesi);
+            $('#skorSubHeaderRow').html(skorSubHeaders);
+            
+            // Render tbody
+            const tbody = $('#tablePenilaian tbody');
+            tbody.empty();
+            totalBobot = 0;
+
+            // Cek apakah menggunakan struktur kategori yang baru
+            const isUsingKategori = pertanyaanList.length > 0 && pertanyaanList[0].kategori;
+            
+            if (isUsingKategori) {
+                // Render dengan struktur kategori
+                pertanyaanList.forEach(function(kategori, kategoriIndex) {
+                    // Header kategori
+                    const kategoriRow = `
+                        <tr class="table-primary">
+                            <td colspan="${maxSesi + 7}" class="fw-bold">
+                                <i class="bi bi-folder-fill me-2"></i>${kategori.nama_kategori}
+                                <span class="float-end">
+                                    <small class="text-muted">
+                                        Total Bobot: ${kategori.total_bobot_kategori.toFixed(1)}
+                                    </small>
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.append(kategoriRow);
+                    
+                    // Pertanyaan dalam kategori
+                    kategori.pertanyaan_list.forEach(function(item, pertanyaanIndex) {
+                        totalBobot += parseFloat(item.bobot);
+                        
+                        // Generate kolom skor per sesi
+                        let skorCells = '';
+                        let totalSkorPertanyaan = 0;
+                        let jumlahSesi = 0;
+                        
+                        for (let i = 1; i <= maxSesi; i++) {
+                            const skorData = skorPerSesi[item.id] && skorPerSesi[item.id][i];
+                            let cellContent = '';
+                            
+                            if (skorData) {
+                                // Skor sudah ada
+                                const isLocked = skorData.is_locked;
+                                const skorValue = skorData.skor;
+                                totalSkorPertanyaan += skorValue;
+                                jumlahSesi++;
+                                
+                                if (isLocked) {
+                                    cellContent = `
+                                        <div class="text-center">
+                                            <span class="badge bg-secondary">${skorValue}</span>
+                                            <br><small class="text-muted">Terkunci</small>
+                                        </div>
+                                    `;
+                                } else {
+                                    cellContent = `
+                                        <div class="text-center">
+                                            <span class="badge bg-warning">${skorValue}</span>
+                                            <br><small class="text-muted">Belum dikunci</small>
+                                        </div>
+                                    `;
+                                }
+                            } else if (i === currentSesi && scheduleActive && intervalCheck.bisa_nilai) {
+                                // FIX: Sesi aktif - input langsung (hanya jika jadwal masih aktif DAN interval check berhasil)
+                                cellContent = `
+                                    <div class="text-center">
+                                        <input type="number" class="form-control form-control-sm skor-input" 
+                                               data-id="${item.id}" data-skor-maks="${item.skor_maksimal}" data-sesi="${i}"
+                                               data-bobot="${item.bobot}"
+                                               min="0" max="${item.skor_maksimal}" 
+                                               placeholder="0-${item.skor_maksimal}" 
+                                               style="width: 80px; margin: 0 auto;">
+                                    </div>
+                                `;
+                            } else if (i === currentSesi && scheduleActive && !intervalCheck.bisa_nilai) {
+                                // FIX: Sesi aktif tapi interval check gagal - tampilkan pesan error
+                                cellContent = `
+                                    <div class="text-center">
+                                        <span class="badge bg-danger">Tidak Bisa Input</span>
+                                        <br><small class="text-muted">${intervalCheck.pesan || `Menunggu ${getIntervalLabel().toLowerCase()} berikutnya`}</small>
+                                    </div>
+                                `;
+                            } else {
+                                // Sesi belum aktif
+                                cellContent = `
+                                    <div class="text-center">
+                                        <span class="text-muted">-</span>
+                                    </div>
+                                `;
+                            }
+                            
+                            skorCells += `<td class="skor-cell-${i}" data-id="${item.id}" data-sesi="${i}">${cellContent}</td>`;
+                        }
+                        
+                        // Hitung rata-rata dan nilai akhir
+                        const rataRata = jumlahSesi > 0 ? (totalSkorPertanyaan / jumlahSesi) : 0;
+                        const nilaiAkhir = (rataRata / item.skor_maksimal) * item.bobot;
+                        
+                        // Nomor pertanyaan di-reset untuk setiap kategori (1, 2, 3...)
+                        const nomorPertanyaan = pertanyaanIndex + 1;
+                        
+                        const row = `
+                            <tr>
+                                <td>${nomorPertanyaan}</td>
+                                <td>${item.pertanyaan}</td>
+                                <td>${item.bobot}</td>
+                                <td class="text-center">${item.skor_maksimal}</td>
+                                ${skorCells}
+                                <td class="text-center rata-rata-${item.id}">${rataRata.toFixed(1)}</td>
+                                <td class="text-center nilai-akhir-${item.id}">${nilaiAkhir.toFixed(2)}</td>
+                            </tr>
+                        `;
+                        tbody.append(row);
+                    });
+                    
+                    // Separator antar kategori (kecuali kategori terakhir)
+                    if (kategoriIndex < pertanyaanList.length - 1) {
+                        const separatorRow = `
+                            <tr class="table-light">
+                                <td colspan="${maxSesi + 7}" style="height: 8px; background-color: #f8f9fa;"></td>
+                            </tr>
+                        `;
+                        tbody.append(separatorRow);
+                    }
+                });
+            } else {
+                // Render dengan struktur lama (backward compatibility)
+                pertanyaanList.forEach(function(item, index) {
+                    totalBobot += parseFloat(item.bobot);
+                    
+                    // Generate kolom skor per sesi
+                    let skorCells = '';
+                    let totalSkorPertanyaan = 0;
+                    let jumlahSesi = 0;
+                    
+                    for (let i = 1; i <= maxSesi; i++) {
+                        const skorData = skorPerSesi[item.id] && skorPerSesi[item.id][i];
+                        let cellContent = '';
+                        
+                        if (skorData) {
+                            // Skor sudah ada
+                            const isLocked = skorData.is_locked;
+                            const skorValue = skorData.skor;
+                            totalSkorPertanyaan += skorValue;
+                            jumlahSesi++;
+                            
+                            if (isLocked) {
+                                cellContent = `
+                                    <div class="text-center">
+                                        <span class="badge bg-secondary">${skorValue}</span>
+                                        <br><small class="text-muted">Terkunci</small>
+                                    </div>
+                                `;
+                            } else {
+                                cellContent = `
+                                    <div class="text-center">
+                                        <span class="badge bg-warning">${skorValue}</span>
+                                        <br><small class="text-muted">Belum dikunci</small>
+                                    </div>
+                                `;
+                            }
+                        } else if (i === currentSesi && scheduleActive && intervalCheck.bisa_nilai) {
+                            // FIX: Sesi aktif - input langsung (hanya jika jadwal masih aktif DAN interval check berhasil)
+                            cellContent = `
+                                <div class="text-center">
+                                    <input type="number" class="form-control form-control-sm skor-input" 
+                                           data-id="${item.id}" data-skor-maks="${item.skor_maksimal}" data-sesi="${i}"
+                                           data-bobot="${item.bobot}"
+                                           min="0" max="${item.skor_maksimal}" 
+                                           placeholder="0-${item.skor_maksimal}" 
+                                           style="width: 80px; margin: 0 auto;">
+                                </div>
+                            `;
+                        } else if (i === currentSesi && scheduleActive && !intervalCheck.bisa_nilai) {
+                            // FIX: Sesi aktif tapi interval check gagal - tampilkan pesan error
+                            cellContent = `
+                                <div class="text-center">
+                                    <span class="badge bg-danger">Tidak Bisa Input</span>
+                                    <br><small class="text-muted">${intervalCheck.pesan || `Menunggu ${getIntervalLabel().toLowerCase()} berikutnya`}</small>
+                                </div>
+                            `;
+                        } else {
+                            // Sesi belum aktif
+                            cellContent = `
+                                <div class="text-center">
+                                    <span class="text-muted">-</span>
+                                </div>
+                            `;
+                        }
+                        
+                        skorCells += `<td class="skor-cell-${i}" data-id="${item.id}" data-sesi="${i}">${cellContent}</td>`;
+                    }
+                    
+                    // Hitung rata-rata dan nilai akhir
+                    const rataRata = jumlahSesi > 0 ? (totalSkorPertanyaan / jumlahSesi) : 0;
+                    const nilaiAkhir = (rataRata / item.skor_maksimal) * item.bobot;
+                    
+                    const row = `
+                        <tr>
+                            <td>${index + 1}</td>
+                            <td>${item.pertanyaan}</td>
+                            <td>${item.bobot}</td>
+                            <td class="text-center">${item.skor_maksimal}</td>
+                            ${skorCells}
+                            <td class="text-center rata-rata-${item.id}">${rataRata.toFixed(1)}</td>
+                            <td class="text-center nilai-akhir-${item.id}">${nilaiAkhir.toFixed(2)}</td>
+                        </tr>
+                    `;
+                    tbody.append(row);
+                });
+            }
+
+            // Footer total akan diupdate oleh updateTotalSkorFooter()
+            // Set colspan sesuai jumlah sesi yang sebenarnya
+            $('#totalSkorContainer').attr('colspan', maxSesi);
+
+            // Hitung rata-rata dan nilai akhir total
+            let totalRataRata = 0;
+            let totalNilaiAkhir = 0;
+            
+            pertanyaanList.forEach(function(item) {
+                const rataRataEl = $(`.rata-rata-${item.id}`);
+                const nilaiAkhirEl = $(`.nilai-akhir-${item.id}`);
+                
+                if (rataRataEl.length && nilaiAkhirEl.length) {
+                    totalRataRata += parseFloat(rataRataEl.text()) || 0;
+                    totalNilaiAkhir += parseFloat(nilaiAkhirEl.text()) || 0;
+                }
+            });
+            
+            $('#totalRataRata').text(totalRataRata.toFixed(1));
+            $('#totalNilaiAkhir').text(totalNilaiAkhir.toFixed(2));
+            
+            // Bind event untuk input skor langsung - real-time calculation
+            $(document).off('input keyup', '.skor-input').on('input keyup', '.skor-input', function(){
+                const skorMaks = parseInt($(this).data('skor-maks'));
+                let value = parseInt($(this).val());
+                
+                // Validasi range
+                if (value > skorMaks) {
+                    $(this).val(skorMaks);
+                    value = skorMaks;
+                }
+                if (value < 0) {
+                    $(this).val(0);
+                    value = 0;
+                }
+                
+                // Update perhitungan real-time
+                updateRealTimeCalculation();
+                
+                // Cek apakah semua input sudah diisi untuk enable tombol simpan
+                checkAllInputsFilled();
+            });
+            
+            // Hitung total
+            hitungTotal();
+            
+            // Update footer total skor
+            updateTotalSkorFooter();
+            
+            // Inisialisasi tombol simpan
+            checkAllInputsFilled();
+        }
+
+        function hitungNilai(input) {
+            let skor = parseFloat($(input).val()) || 0;
+            const bobot = parseFloat($(input).data('bobot'));
+            const skorMaksimal = parseFloat($(input).data('skor-maksimal'));
+            
+            // Validasi skor tidak melebihi maksimal
+            if (skor > skorMaksimal) {
+                $(input).val(skorMaksimal);
+                skor = skorMaksimal;
+            }
+
+            // Hitung nilai terbobot
+            const nilaiAdmin = (skor / skorMaksimal) * bobot;
+            $(input).closest('tr').find('.nilai-admin').text(nilaiAdmin.toFixed(2));
+
+            // Update total secara real-time
+            hitungTotal();
+        }
+
+        function updateRealTimeCalculation() {
+            // Cek apakah menggunakan struktur kategori yang baru
+            const isUsingKategori = pertanyaanList.length > 0 && pertanyaanList[0].kategori;
+
+            if (isUsingKategori) {
+                // Update rata-rata dan nilai akhir per pertanyaan secara real-time dengan struktur kategori
+                pertanyaanList.forEach(function(kategori) {
+                    kategori.pertanyaan_list.forEach(function(item) {
+                        updatePertanyaanCalculation(item.id, item.skor_maksimal, item.bobot);
+                    });
+                });
+            } else {
+                // Update rata-rata dan nilai akhir per pertanyaan secara real-time dengan struktur lama
+                pertanyaanList.forEach(function(item) {
+                    updatePertanyaanCalculation(item.id, item.skor_maksimal, item.bobot);
+                });
+            }
+            
+            // Update total keseluruhan
+            updateTotalKeseluruhan();
+            
+            // Update total skor per sesi di footer
+            updateTotalSkorFooter();
+            
+            // Debug: log untuk memastikan update real-time berjalan
+            console.log('DEBUG REAL-TIME: Updated calculations and footer');
+        }
+        
+        // ✅ PERBAIKAN: Fungsi baru untuk menghitung per pertanyaan dengan benar
+        function updatePertanyaanCalculation(pertanyaanId, skorMaksimal, bobot) {
+            const inputElement = $(`.skor-input[data-id="${pertanyaanId}"]`);
+            let skorInput = 0;
+            
+            if (inputElement.length > 0 && inputElement.val()) {
+                skorInput = parseFloat(inputElement.val()) || 0;
+            }
+            
+            // ✅ PERBAIKAN: Hitung total skor dari semua sesi yang sudah tersimpan
+            let totalSkorPertanyaan = 0;
+            let jumlahSesi = 0;
+            
+            // Ambil dari skorPerSesi yang sudah ada di database
+            if (skorPerSesi[pertanyaanId]) {
+                for (let sesi in skorPerSesi[pertanyaanId]) {
+                    const skorData = skorPerSesi[pertanyaanId][sesi];
+                    if (skorData && skorData.skor !== undefined && skorData.skor !== null) {
+                        totalSkorPertanyaan += parseFloat(skorData.skor) || 0;  // ✅ PERBAIKAN: Hitung semua sesi (termasuk skor 0)
+                        jumlahSesi++;
+                    }
+                }
+            }
+            
+            // Tambahkan skor input saat ini jika ada
+            if (skorInput > 0) {
+                totalSkorPertanyaan += skorInput;
+                jumlahSesi++;
+            }
+            
+            // ✅ PERBAIKAN: Hitung rata-rata dan nilai akhir dengan benar
+            const rataRata = jumlahSesi > 0 ? (totalSkorPertanyaan / jumlahSesi) : 0;  // ✅ PERBAIKAN: Rata-rata = total skor / jumlah sesi (semua sesi)
+            const nilaiAkhir = (rataRata / skorMaksimal) * bobot;
+            
+            // Update tampilan real-time
+            const rataRataEl = $(`.rata-rata-${pertanyaanId}`);
+            const nilaiAkhirEl = $(`.nilai-akhir-${pertanyaanId}`);
+            
+            if (rataRataEl.length && nilaiAkhirEl.length) {
+                rataRataEl.text(rataRata.toFixed(1));
+                nilaiAkhirEl.text(nilaiAkhir.toFixed(2));
+                
+                // Tambahkan effect visual untuk menunjukkan perubahan
+                if (skorInput > 0) {
+                    rataRataEl.addClass('text-primary font-weight-bold');
+                    nilaiAkhirEl.addClass('text-success font-weight-bold');
+                    
+                    // Hapus effect setelah 1 detik
+                    setTimeout(() => {
+                        rataRataEl.removeClass('text-primary font-weight-bold');
+                        nilaiAkhirEl.removeClass('text-success font-weight-bold');
+                    }, 1000);
+                }
+            }
+            
+            // Debug: log perhitungan untuk troubleshooting
+            console.log(`DEBUG CALCULATION ${pertanyaanId}:`, {
+                totalSkor: totalSkorPertanyaan,
+                jumlahSesi: jumlahSesi,
+                rataRata: rataRata,
+                nilaiAkhir: nilaiAkhir,
+                skorInput: skorInput,
+                skorPerSesi: skorPerSesi[pertanyaanId]
+            });
+        }
+        
+        // ✅ PERBAIKAN: Fungsi baru untuk menghitung skor per sesi dengan benar
+        function calculateSkorSesi(pertanyaanId, sesi) {
+            let skorSesi = 0;
+            
+            // Cek apakah ini sesi aktif dan ada input yang belum disimpan
+            if (sesi === currentSesi && scheduleActive) {
+                const inputElement = $(`.skor-input[data-id="${pertanyaanId}"][data-sesi="${sesi}"]`);
+                if (inputElement.length > 0 && inputElement.val()) {
+                    skorSesi += parseFloat(inputElement.val()) || 0;
+                }
+            }
+            
+            // Cek apakah ada skor tersimpan di database untuk sesi ini
+            if (skorPerSesi[pertanyaanId] && skorPerSesi[pertanyaanId][sesi]) {
+                const skorData = skorPerSesi[pertanyaanId][sesi];
+                if (skorData && skorData.skor !== undefined && skorData.skor !== null) {
+                    skorSesi += parseFloat(skorData.skor) || 0;
+                }
+            }
+            
+            // Debug: log perhitungan skor per sesi
+            console.log(`DEBUG SKOR SESI ${pertanyaanId}-${sesi}:`, {
+                skorSesi: skorSesi,
+                sesi: sesi,
+                currentSesi: currentSesi,
+                scheduleActive: scheduleActive,
+                skorPerSesi: skorPerSesi[pertanyaanId] ? skorPerSesi[pertanyaanId][sesi] : null
+            });
+            
+            return skorSesi;
+        }
+        
+        function updateTotalSkorFooter() {
+            // Hitung maksimal sesi yang perlu ditampilkan
+            let maxSesi = Math.max(1, currentSesi);
+            for (let pertanyaanId in skorPerSesi) {
+                const sesiKeys = Object.keys(skorPerSesi[pertanyaanId]);
+                if (sesiKeys.length > 0) {
+                    maxSesi = Math.max(maxSesi, Math.max(...sesiKeys.map(Number)));
+                }
+            }
+            
+            // Jika jadwal sudah berakhir, batasi maxSesi ke sesi yang sudah ada saja
+            if (!scheduleActive && Object.keys(skorPerSesi).length > 0) {
+                let existingMaxSesi = 0;
+                for (let pertanyaanId in skorPerSesi) {
+                    const sesiKeys = Object.keys(skorPerSesi[pertanyaanId]);
+                    if (sesiKeys.length > 0) {
+                        existingMaxSesi = Math.max(existingMaxSesi, Math.max(...sesiKeys.map(Number)));
+                    }
+                }
+                maxSesi = Math.max(1, existingMaxSesi);
+            }
+            
+            // ✅ PERBAIKAN: Generate total skor per sesi dengan perhitungan yang benar
+            let totalSkorFooter = '';
+            for (let i = 1; i <= maxSesi; i++) {
+                let totalSesiIni = 0;
+                
+                // Cek apakah menggunakan struktur kategori yang baru
+                const isUsingKategori = pertanyaanList.length > 0 && pertanyaanList[0].kategori;
+                
+                if (isUsingKategori) {
+                    // Hitung dari struktur kategori
+                    pertanyaanList.forEach(function(kategori) {
+                        kategori.pertanyaan_list.forEach(function(item) {
+                            totalSesiIni += calculateSkorSesi(item.id, i);
+                        });
+                    });
+                } else {
+                    // Hitung dari struktur lama (backward compatibility)
+                    pertanyaanList.forEach(function(item) {
+                        totalSesiIni += calculateSkorSesi(item.id, i);
+                    });
+                }
+                
+                // BUAT KOLOM TERPISAH UNTUK SETIAP SESI
+                totalSkorFooter += `<th class="text-center total-skor-sesi-${i}" style="min-width: 100px;">${totalSesiIni}</th>`;
+            }
+            
+            // Update colspan dan isi footer dengan kolom terpisah
+            $('#totalSkorContainer').attr('colspan', maxSesi).html(totalSkorFooter);
+            
+            // Debug: log untuk memastikan colspan sudah benar
+            console.log('DEBUG FOOTER: maxSesi =', maxSesi, 'colspan =', $('#totalSkorContainer').attr('colspan'), 'totalSkorFooter length =', totalSkorFooter.length);
+            
+            // Effect visual untuk footer yang berubah
+            $(`.total-skor-sesi-${currentSesi}`).addClass('text-success font-weight-bold');
+            setTimeout(() => {
+                $(`.total-skor-sesi-${currentSesi}`).removeClass('text-success font-weight-bold');
+            }, 1000);
+            
+            // ✅ PENTING: Update total keseluruhan setelah update footer
+            updateTotalKeseluruhan();
+        }
+        
+        function updateTotalKeseluruhan() {
+            let totalRataRata = 0;
+            let totalNilaiAkhir = 0;
+            
+            // Cek apakah menggunakan struktur kategori yang baru
+            const isUsingKategori = pertanyaanList.length > 0 && pertanyaanList[0].kategori;
+            
+            if (isUsingKategori) {
+                // Hitung dari struktur kategori
+                pertanyaanList.forEach(function(kategori) {
+                    kategori.pertanyaan_list.forEach(function(item) {
+                        const rataRataEl = $(`.rata-rata-${item.id}`);
+                        const nilaiAkhirEl = $(`.nilai-akhir-${item.id}`);
+                        
+                        if (rataRataEl.length && nilaiAkhirEl.length) {
+                            totalRataRata += parseFloat(rataRataEl.text()) || 0;
+                            totalNilaiAkhir += parseFloat(nilaiAkhirEl.text()) || 0;
+                        }
+                    });
+                });
+            } else {
+                // Hitung dari struktur lama (backward compatibility)
+                pertanyaanList.forEach(function(item) {
+                    const rataRataEl = $(`.rata-rata-${item.id}`);
+                    const nilaiAkhirEl = $(`.nilai-akhir-${item.id}`);
+                    
+                    if (rataRataEl.length && nilaiAkhirEl.length) {
+                        totalRataRata += parseFloat(rataRataEl.text()) || 0;
+                        totalNilaiAkhir += parseFloat(nilaiAkhirEl.text()) || 0;
+                    }
+                });
+            }
+            
+            const totalRataRataEl = $('#totalRataRata');
+            const totalNilaiAkhirEl = $('#totalNilaiAkhir');
+            
+            totalRataRataEl.text(totalRataRata.toFixed(1));
+            totalNilaiAkhirEl.text(totalNilaiAkhir.toFixed(2));
+            
+            // Effect visual untuk total
+            totalRataRataEl.addClass('text-info font-weight-bold');
+            totalNilaiAkhirEl.addClass('text-warning font-weight-bold');
+            
+            setTimeout(() => {
+                totalRataRataEl.removeClass('text-info font-weight-bold');
+                totalNilaiAkhirEl.removeClass('text-warning font-weight-bold');
+            }, 800);
+            
+            // Debug: log untuk memastikan perhitungan benar
+            console.log('DEBUG TOTAL: totalRataRata =', totalRataRata, 'totalNilaiAkhir =', totalNilaiAkhir);
+        }
+
+        // ✅ PERBAIKAN: Fungsi hitung total yang sudah diperbaiki
+        function hitungTotal() {
+            let totalSkor = 0;
+            let totalNilai = 0;
+            let totalBobot = 0;
+
+            // Cek apakah menggunakan struktur kategori yang baru
+            const isUsingKategori = pertanyaanList.length > 0 && pertanyaanList[0].kategori;
+
+            if (isUsingKategori) {
+                // Hitung dari struktur kategori
+                pertanyaanList.forEach(function(kategori) {
+                    kategori.pertanyaan_list.forEach(function(item) {
+                        const totalData = calculateTotalPertanyaan(item.id, item.skor_maksimal, item.bobot);
+                        totalSkor += totalData.totalSkor;
+                        totalNilai += totalData.totalNilai;
+                        totalBobot += totalData.totalBobot;
+                    });
+                });
+            } else {
+                // Hitung dari struktur lama (backward compatibility)
+                pertanyaanList.forEach(function(item) {
+                    const totalData = calculateTotalPertanyaan(item.id, item.skor_maksimal, item.bobot);
+                    totalSkor += totalData.totalSkor;
+                    totalNilai += totalData.totalNilai;
+                    totalBobot += totalData.totalBobot;
+                });
+            }
+
+            // Hitung nilai akhir seperti IPK
+            const nilaiAkhir = totalBobot > 0 ? (totalNilai / totalBobot) * 100 : 0;
+            
+            $('#totalSkor').text(totalSkor);
+            $('#totalNilai').text(nilaiAkhir.toFixed(2) + '%');
+            
+            // Debug: log total untuk memastikan perhitungan benar
+            console.log('Total Skor:', totalSkor, 'Total Nilai:', totalNilai.toFixed(2), 'Total Bobot:', totalBobot, 'Nilai Akhir:', nilaiAkhir.toFixed(2) + '%');
+            
+            // ✅ PENTING: Update footer setelah hitung total
+            updateTotalSkorFooter();
+        }
+        
+        // ✅ PERBAIKAN: Fungsi baru untuk menghitung total per pertanyaan dengan benar
+        function calculateTotalPertanyaan(pertanyaanId, skorMaksimal, bobot) {
+            let totalSkor = 0;
+            let totalNilai = 0;
+            let totalBobot = 0;
+            
+            // Cek input yang sedang aktif
+            const inputElement = $(`.skor-input[data-id="${pertanyaanId}"]`);
+            let skorInput = 0;
+            
+            if (inputElement.length > 0 && inputElement.val()) {
+                skorInput = parseFloat(inputElement.val()) || 0;
+            }
+            
+            // ✅ PERBAIKAN: Hitung total skor dari semua sesi yang sudah tersimpan di database
+            if (skorPerSesi[pertanyaanId]) {
+                for (let sesi in skorPerSesi[pertanyaanId]) {
+                    const skorData = skorPerSesi[pertanyaanId][sesi];
+                    if (skorData && skorData.skor !== undefined && skorData.skor !== null) {
+                        const skor = parseFloat(skorData.skor) || 0;
+                        totalSkor += skor;
+                        
+                        // Hitung nilai terbobot untuk setiap sesi
+                        const nilai = (skor / skorMaksimal) * bobot;
+                        totalNilai += nilai;
+                    }
+                }
+            }
+            
+            // Tambahkan skor input saat ini jika ada
+            if (skorInput > 0) {
+                totalSkor += skorInput;
+                const nilai = (skorInput / skorMaksimal) * bobot;
+                totalNilai += nilai;
+            }
+            
+            totalBobot = bobot;
+            
+            // Debug: log perhitungan total per pertanyaan
+            console.log(`DEBUG TOTAL PERTANYAAN ${pertanyaanId}:`, {
+                totalSkor: totalSkor,
+                totalNilai: totalNilai,
+                totalBobot: totalBobot,
+                skorInput: skorInput,
+                skorPerSesi: skorPerSesi[pertanyaanId]
+            });
+            
+            return { totalSkor, totalNilai, totalBobot };
+        }
+
+        // Function loadSkorTersimpan() DIHAPUS - Data skor sudah included di get_penilaian_data_with_sesi
+        // Function tampilkanInputSkor() dan simpanSkorSesi() DIHAPUS - Sekarang menggunakan input langsung
+
+        function checkAllInputsFilled() {
+            // FIX: Cek apakah interval check berhasil dan ada input yang bisa diisi
+            if (!intervalCheck.bisa_nilai) {
+                $('#btnSimpanPenilaian').hide();
+                return;
+            }
+            
+            let allFilled = true;
+            $('.skor-input').each(function() {
+                if (!$(this).val() || $(this).val() === '') {
+                    allFilled = false;
+                    return false; // break loop
+                }
+            });
+            
+            // Tampilkan tombol hanya jika interval check berhasil
+            if (intervalCheck.bisa_nilai) {
+                $('#btnSimpanPenilaian').show();
+                $('#btnSimpanPenilaian').prop('disabled', !allFilled);
+                
+                if (allFilled) {
+                    $('#btnSimpanPenilaian').removeClass('btn-secondary').addClass('btn-success');
+                    } else {
+                    $('#btnSimpanPenilaian').removeClass('btn-success').addClass('btn-secondary');
+                }
+            } else {
+                $('#btnSimpanPenilaian').hide();
+            }
+        }
+        
+        function simpanPenilaianSesi() {
+            // Prevent multiple click
+            if ($('#btnSimpanPenilaian').prop('disabled')) {
+                console.log('DEBUG: Tombol simpan sedang disabled, mencegah multiple click');
+                return;
+            }
+            
+            // Kumpulkan semua data skor dari input
+            const skorData = [];
+            let allValid = true;
+            
+            $('.skor-input').each(function() {
+                const idPertanyaan = $(this).data('id');
+                const skor = parseInt($(this).val());
+                const skorMaks = parseInt($(this).data('skor-maks'));
+                const sesi = parseInt($(this).data('sesi'));
+                
+                if (isNaN(skor) || skor < 0 || skor > skorMaks) {
+                    allValid = false;
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                    skorData.push({
+                        id_pertanyaan: idPertanyaan,
+                        skor: skor,
+                        sesi: sesi
+                    });
+                }
+            });
+            
+            if (!allValid) {
+                Swal.fire('Error', 'Ada skor yang tidak valid. Periksa input Anda.', 'error');
+                return;
+            }
+            
+            if (skorData.length === 0) {
+                Swal.fire('Error', 'Tidak ada data skor untuk disimpan.', 'error');
+                return;
+            }
+            
+            // Konfirmasi simpan
+            Swal.fire({
+                title: `Simpan Penilaian Sesi ${currentSesi}?`,
+                text: `Anda akan menyimpan ${skorData.length} skor. Setelah disimpan, skor akan terkunci dan tidak bisa diubah.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Simpan!',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#28a745'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    simpanBatchSkor(skorData);
+                }
+            });
+        }
+
+        function simpanBatchSkor(skorData) {
+            const nim = nimMahasiswa;
+            if (!nim) {
+                Swal.fire('Error', 'NIM mahasiswa tidak ditemukan', 'error');
+                return;
+            }
+            
+            // Loading
+            Swal.fire({
+                title: 'Menyimpan Penilaian...',
+                text: `Menyimpan ${skorData.length} skor untuk sesi ${currentSesi}`,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Simpan satu per satu dengan delay untuk mencegah race condition
+            let savedCount = 0;
+            let hasError = false;
+            let currentIndex = 0;
+            
+            // Disable tombol simpan untuk mencegah multiple click
+            $('#btnSimpanPenilaian').prop('disabled', true).text('Menyimpan...');
+            
+            function processNextItem() {
+                if (currentIndex >= skorData.length) {
+                    // Semua item sudah diproses
+                    console.log(`DEBUG: Semua ${savedCount} skor selesai diproses. hasError: ${hasError}`);
+                    finalizeSesiSave(hasError);
+                    return;
+                }
+                
+                const item = skorData[currentIndex];
+                console.log(`DEBUG: Memproses pertanyaan ${item.id_pertanyaan} (${currentIndex + 1}/${skorData.length})`);
+                
+                $.ajax({
+                    url: '{{ url_for("pembimbing.simpan_skor_sesi") }}',
+                    type: 'POST',
+                    data: {
+                        nim_mahasiswa: nim,
+                        id_pertanyaan: item.id_pertanyaan,
+                        skor: item.skor,
+                        sesi_penilaian: item.sesi
+                    },
+                    success: function(response) {
+                        savedCount++;
+                        console.log(`DEBUG SIMPAN: Response untuk pertanyaan ${item.id_pertanyaan}:`, response);
+                        
+                        if (response.success) {
+                            // Update data lokal
+                            if (!skorPerSesi[item.id_pertanyaan]) {
+                                skorPerSesi[item.id_pertanyaan] = {};
+                            }
+                            skorPerSesi[item.id_pertanyaan][item.sesi] = {
+                                skor: item.skor,
+                                nilai: response.nilai || 0,
+                                is_locked: true,
+                                tanggal_input: new Date().toISOString()
+                            };
+                            console.log(`DEBUG: Skor berhasil disimpan untuk pertanyaan ${item.id_pertanyaan}`);
+                        } else {
+                            hasError = true;
+                            console.error(`DEBUG: Error menyimpan pertanyaan ${item.id_pertanyaan}:`, response.message);
+                        }
+                        
+                        // Update progress di loading dialog
+                        const progress = Math.round(((currentIndex + 1) / skorData.length) * 100);
+                        Swal.update({
+                            title: 'Menyimpan Penilaian...',
+                            html: `
+                                <div class="mb-3">Menyimpan ${currentIndex + 1} dari ${skorData.length} skor</div>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar" role="progressbar" style="width: ${progress}%">${progress}%</div>
+                                </div>
+                            `
+                        });
+                        
+                        // Lanjut ke item berikutnya dengan delay kecil
+                        currentIndex++;
+                        setTimeout(processNextItem, 100); // Delay 100ms antar request
+                    },
+                    error: function(xhr, status, error) {
+                        savedCount++;
+                        hasError = true;
+                        
+                        console.error(`DEBUG: AJAX Error untuk pertanyaan ${item.id_pertanyaan}:`, {
+                            xhr: xhr,
+                            status: status,
+                            error: error,
+                            responseText: xhr.responseText
+                        });
+                        
+                        // Update progress meskipun error
+                        const progress = Math.round(((currentIndex + 1) / skorData.length) * 100);
+                        Swal.update({
+                            title: 'Menyimpan Penilaian...',
+                            html: `
+                                <div class="mb-3">Menyimpan ${currentIndex + 1} dari ${skorData.length} skor</div>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: ${progress}%">${progress}%</div>
+                                </div>
+                                <div class="text-danger mt-2">Error pada pertanyaan ${item.id_pertanyaan}</div>
+                            `
+                        });
+                        
+                        // Lanjut ke item berikutnya meskipun error
+                        currentIndex++;
+                        setTimeout(processNextItem, 100);
+                    }
+                });
+            }
+            
+            // Mulai proses dengan item pertama
+            processNextItem();
+        }
+        
+        function finalizeSesiSave(hasError) {
+            console.log(`DEBUG FINALIZE: hasError = ${hasError}`);
+            
+            // Reset tombol simpan ke kondisi normal
+            $('#btnSimpanPenilaian').prop('disabled', false).text('Simpan Penilaian Sesi');
+            
+            if (hasError) {
+                console.error('DEBUG FINALIZE: Ada error, menampilkan pesan error');
+                Swal.fire('Error', 'Beberapa skor gagal disimpan. Silakan coba lagi.', 'error');
+                return;
+            }
+
+            console.log('DEBUG FINALIZE: Tidak ada error, melanjutkan ke success');
+
+            // Sukses - tampilkan notifikasi
+            Swal.fire({
+                icon: 'success',
+                title: 'Penilaian Berhasil Disimpan!',
+                text: `Sesi ${currentSesi} telah dikunci. Memuat data terbaru...`,
+                timer: 1500,
+                showConfirmButton: false
+            });
+            
+            // Reload data dari server untuk sinkronisasi penuh
+            setTimeout(() => {
+                console.log('DEBUG: Reloading data after sesi save...');
+                
+                // Set flag untuk deteksi reload setelah save
+                window.afterSesiSave = true;
+                
+                // Tampilkan loading indicator
+                $('#formPenilaian').hide();
+                $('#guardCard').removeClass('d-none').addClass('alert-info').removeClass('alert-warning');
+                $('#guardMessage').html('<i class="spinner-border spinner-border-sm me-2"></i>Memuat data terbaru dari server...');
+                
+                // Reload semua data dari server
+                loadPertanyaanPenilaian(); 
+            }, 1600);
+        }
+
+        // NEW: Update alert info setelah reload data selesai
+        function onDataReloadComplete() {
+            if (window.afterSesiSave) {
+                console.log('DEBUG: Data reload selesai setelah save, update alert info');
+                
+                // Update pesan guard sesuai status jadwal
+                updateGuardMessageAfterSave();
+                
+                // Mulai countdown timer untuk update real-time
+                startCountdownTimer();
+                
+                // Reset flag
+                window.afterSesiSave = false;
+            }
+        }
+
+        // NEW: Fungsi untuk memperbarui pesan guard setelah penyimpanan skor
+        function updateGuardMessageAfterSave() {
+            if (!jadwalInfo) return;
+            
+            const now = new Date();
+            const jadwalSelesai = new Date(jadwalInfo.jadwal_selesai);
+            
+            // Cek apakah jadwal sudah selesai
+            if (now > jadwalSelesai) {
+                // Jadwal sudah selesai - tampilkan info penutupan
+                $('#guardCard').removeClass('d-none').addClass('alert-info').removeClass('alert-success alert-warning');
+                $('#guardMessage').html('<i class="fas fa-flag-checkered me-2"></i><strong>Penilaian Selesai!</strong> Jadwal penilaian telah berakhir. Semua sesi telah dikunci.');
+                return;
+            }
+            
+            // Cek apakah ada sesi berikutnya
+            const nextSesi = currentSesi + 1;
+            const totalSesi = jadwalInfo.total_sesi;
+            
+            if (nextSesi <= totalSesi) {
+                // Ada sesi berikutnya - tampilkan info jadwal berikutnya
+                let nextSesiLabel = '';
+                
+                // ✅ PERBAIKAN: Gunakan metadata per sesi dari database jika tersedia
+                if (metadataPerSesi && metadataPerSesi[nextSesi] && metadataPerSesi[nextSesi].nama_kolom) {
+                    nextSesiLabel = metadataPerSesi[nextSesi].nama_kolom;
+                } else if (jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list && jadwalInfo.jam_list[nextSesi - 1]) {
+                    nextSesiLabel = `Jam ${jadwalInfo.jam_list[nextSesi - 1]}`;
+                } else {
+                    nextSesiLabel = `${getIntervalLabel()} ${nextSesi}`;
+                }
+                
+                // Hitung waktu tunggu untuk sesi berikutnya
+                let waktuTunggu = '';
+                if (jadwalInfo.interval_tipe === 'setiap_jam') {
+                    const nextSesiTime = new Date(jadwalInfo.jadwal_mulai);
+                    nextSesiTime.setHours(nextSesiTime.getHours() + ((nextSesi - 1) * jadwalInfo.interval_nilai));
+                    
+                                    if (now < nextSesiTime) {
+                    const diffMs = nextSesiTime - now;
+                    const diffMinutes = Math.floor(diffMs / (1000 * 60));
+                    waktuTunggu = ` dalam ${diffMinutes} menit`;
+                }
+                
+                // ✅ PERBAIKAN: Gunakan metadata per sesi dari database jika tersedia
+                if (metadataPerSesi && metadataPerSesi[nextSesi] && metadataPerSesi[nextSesi].nama_kolom) {
+                    nextSesiLabel = metadataPerSesi[nextSesi].nama_kolom;
+                }
+                }
+                
+                $('#guardCard').removeClass('d-none').addClass('alert-success').removeClass('alert-warning alert-info');
+                $('#guardMessage').html(`<i class="fas fa-clock me-2"></i><strong>Sesi Berikutnya:</strong> ${nextSesiLabel}${waktuTunggu}. Silakan tunggu hingga waktunya tiba.`);
+            } else {
+                // Ini adalah sesi terakhir - tampilkan info menunggu penutupan
+                $('#guardCard').removeClass('d-none').addClass('alert-warning').removeClass('alert-success alert-info');
+                $('#guardMessage').html('<i class="fas fa-hourglass-end me-2"></i><strong>Sesi Terakhir Selesai!</strong> Menunggu penutupan jadwal penilaian.');
+            }
+        }
+
+        // NEW: Fungsi untuk update countdown waktu tunggu secara real-time
+        function startCountdownTimer() {
+            if (!jadwalInfo || !window.afterSesiSave) return;
+            
+            const countdownInterval = setInterval(() => {
+                if (!jadwalInfo) {
+                    clearInterval(countdownInterval);
+                    return;
+                }
+                
+                const now = new Date();
+                const jadwalSelesai = new Date(jadwalInfo.jadwal_selesai);
+                
+                // Cek apakah jadwal sudah selesai
+                if (now > jadwalSelesai) {
+                    clearInterval(countdownInterval);
+                    updateGuardMessageAfterSave(); // Update ke status penutupan
+                    return;
+                }
+                
+                // Update countdown untuk sesi berikutnya
+                const nextSesi = currentSesi + 1;
+                const totalSesi = jadwalInfo.total_sesi;
+                
+                if (nextSesi <= totalSesi && jadwalInfo.interval_tipe === 'setiap_jam') {
+                    const nextSesiTime = new Date(jadwalInfo.jadwal_mulai);
+                    nextSesiTime.setHours(nextSesiTime.getHours() + ((nextSesi - 1) * jadwalInfo.interval_nilai));
+                    
+                    if (now < nextSesiTime) {
+                        const diffMs = nextSesiTime - now;
+                        const diffMinutes = Math.floor(diffMs / (1000 * 60));
+                        const diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+                        
+                        // ✅ PERBAIKAN: Gunakan metadata per sesi dari database jika tersedia
+                        let nextSesiLabel = `Jam ${jadwalInfo.jam_list[nextSesi - 1]}`;
+                        if (metadataPerSesi && metadataPerSesi[nextSesi] && metadataPerSesi[nextSesi].nama_kolom) {
+                            nextSesiLabel = metadataPerSesi[nextSesi].nama_kolom;
+                        }
+                        
+                        if (diffMinutes > 0) {
+                            $('#guardMessage').html(`<i class="fas fa-clock me-2"></i><strong>Sesi Berikutnya:</strong> ${nextSesiLabel} dalam ${diffMinutes}m ${diffSeconds}s. Silakan tunggu hingga waktunya tiba.`);
+                        } else {
+                            $('#guardMessage').html(`<i class="fas fa-clock me-2"></i><strong>Sesi Berikutnya:</strong> ${nextSesiLabel} dalam ${diffSeconds}s. Silakan tunggu hingga waktunya tiba.`);
+                        }
+                    }
+                }
+            }, 1000); // Update setiap detik
+            
+            // Simpan interval ID untuk bisa di-clear nanti
+            window.countdownTimerInterval = countdownInterval;
+        }
+        
+        function showSesiTerlewatNotification(sesiTerlewat) {
+            console.log('DEBUG: Menampilkan notifikasi sesi terlewat:', sesiTerlewat);
+            
+            const intervalLabel = getIntervalLabel();
+            let sesiText = '';
+            
+            // ✅ PERBAIKAN: Gunakan metadata per sesi dari database jika tersedia
+            if (metadataPerSesi && Object.keys(metadataPerSesi).length > 0) {
+                const sesiLabels = sesiTerlewat.map(sesi => {
+                    if (metadataPerSesi[sesi] && metadataPerSesi[sesi].nama_kolom) {
+                        return metadataPerSesi[sesi].nama_kolom;
+                    } else {
+                        return `${intervalLabel} ${sesi}`;
+                    }
+                });
+                sesiText = sesiLabels.join(', ');
+            } else if (jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list) {
+                if (sesiTerlewat.length === 1) {
+                    const jamIndex = sesiTerlewat[0] - 1;
+                    sesiText = jadwalInfo.jam_list[jamIndex] ? `Jam ${jadwalInfo.jam_list[jamIndex]}` : `${intervalLabel} ${sesiTerlewat[0]}`;
+                } else {
+                    const jamLabels = sesiTerlewat.map(sesi => {
+                        const jamIndex = sesi - 1;
+                        return jadwalInfo.jam_list[jamIndex] ? `Jam ${jadwalInfo.jam_list[jamIndex]}` : `${intervalLabel} ${sesi}`;
+                    });
+                    sesiText = jamLabels.join(', ');
+                }
+            } else {
+                sesiText = sesiTerlewat.length === 1 ? `${intervalLabel} ${sesiTerlewat[0]}` : `${intervalLabel} ${sesiTerlewat.join(', ')}`;
+            }
+            
+                Swal.fire({
+                    icon: 'warning',
+                title: `${intervalLabel} Penilaian Terlewat!`,
+                html: `
+                    <p><strong>${sesiText}</strong> tidak memiliki data penilaian.</p>
+                    <p>Berdasarkan jadwal, seharusnya ${intervalLabel.toLowerCase()} tersebut sudah diisi.</p>
+                    <hr>
+                    <p><strong>Pilihan Anda:</strong></p>
+                    <ul style="text-align: left; margin: 0 auto; display: inline-block;">
+                        <li><strong>Isi dengan Skor 0:</strong> Otomatis mengisi semua pertanyaan dengan skor 0 (terkunci)</li>
+                        <li><strong>Lewati:</strong> Biarkan ${intervalLabel.toLowerCase()} kosong, lanjut ke ${intervalLabel.toLowerCase()} aktif</li>
+                    </ul>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Isi dengan Skor 0',
+                cancelButtonText: 'Lewati',
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    autoFillSesiTerlewat(sesiTerlewat);
+                } else {
+                    console.log('User memilih untuk melewati sesi terlewat');
+                }
+            });
+        }
+        
+        function autoFillSesiTerlewat(sesiList) {
+            const nim = nimMahasiswa;
+            if (!nim) {
+                console.error('NIM mahasiswa tidak ditemukan');
+                return;
+            }
+
+            // Log auto-fill process (silent mode)
+            const intervalLabel = getIntervalLabel();
+            console.log(`DEBUG: Memulai auto-fill untuk sesi terlewat:`, sesiList);
+            
+            // ✅ PERBAIKAN: Gunakan metadata per sesi dari database jika tersedia
+            if (metadataPerSesi && Object.keys(metadataPerSesi).length > 0) {
+                const sesiLabels = sesiList.map(sesi => {
+                    if (metadataPerSesi[sesi] && metadataPerSesi[sesi].nama_kolom) {
+                        return metadataPerSesi[sesi].nama_kolom;
+                    } else {
+                        return `${intervalLabel} ${sesi}`;
+                    }
+                });
+                console.log(`Auto-filling sesi: ${sesiLabels.join(', ')} dengan skor 0`);
+            } else if (jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list) {
+                const jamLabels = sesiList.map(sesi => {
+                    const jamIndex = sesi - 1;
+                    return jadwalInfo.jam_list[jamIndex] ? `Jam ${jadwalInfo.jam_list[jamIndex]}` : `${intervalLabel} ${sesi}`;
+                });
+                console.log(`Auto-filling jam: ${jamLabels.join(', ')} dengan skor 0`);
+            } else {
+                console.log(`Auto-filling ${sesiList.length} ${intervalLabel.toLowerCase()} dengan skor 0`);
+            }
+            
+            $.ajax({
+                url: '{{ url_for("pembimbing.auto_fill_sesi_terlewat") }}',
+                type: 'POST',
+                data: {
+                    nim_mahasiswa: nim,
+                    sesi_list: sesiList.join(',')
+                },
+                success: function(response) {
+                    if (response.success) {
+                        console.log('DEBUG: Auto-fill sesi terlewat berhasil:', response.message);
+                        
+                        // Reload data untuk menampilkan perubahan (silent mode)
+                        setTimeout(() => {
+                            loadPertanyaanPenilaian();
+                        }, 500);
+                        
+                    } else {
+                        console.error('DEBUG: Auto-fill sesi terlewat gagal:', response.message);
+                        // Tampilkan notifikasi error yang tidak mengganggu
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Auto-fill Gagal',
+                            text: response.message || 'Terjadi kesalahan saat mengisi sesi terlewat',
+                            timer: 3000,
+                            showConfirmButton: false,
+                            toast: true,
+                            position: 'top-end'
+                        });
+                    }
+                },
+                error: function() {
+                    console.error('DEBUG: Error saat auto-fill sesi terlewat');
+                    // Tampilkan notifikasi error yang tidak mengganggu
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Auto-fill Error',
+                        text: 'Terjadi kesalahan saat menghubungi server',
+                        timer: 3000,
+                        showConfirmButton: false,
+                        toast: true,
+                        position: 'top-end'
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

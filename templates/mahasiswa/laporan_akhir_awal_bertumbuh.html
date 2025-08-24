@@ -1,0 +1,2083 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laporan Akhir Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+    <style>
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        /* Modal Styles */
+        .modal-xl {
+            max-width: 1200px;
+        }
+
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .modal-header {
+            background: transparent;
+            color: #3b3f5c;
+            border-bottom: 1px solid #e9ecef;
+            padding: 1.5rem 1.5rem 1rem 1.5rem;
+        }
+
+        .modal-header .modal-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #3b3f5c;
+        }
+
+        .modal-header .btn-close {
+            filter: none;
+            opacity: 0.7;
+        }
+
+        .modal-header .btn-close:hover {
+            opacity: 1;
+        }
+
+        .barang-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .barang-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .barang-item h6 {
+            color: #435ebe !important;
+            font-weight: 600;
+        }
+
+        .form-label.fw-bold {
+            color: #3b3f5c;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #435ebe;
+            box-shadow: 0 0 0 0.2rem rgba(67, 94, 190, 0.25);
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-color: #d1d5db;
+            color: #6c757d;
+        }
+
+        .btn-outline-danger {
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-danger:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-outline-primary {
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 94, 190, 0.3);
+        }
+
+        .modal-footer .btn {
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-weight: 500;
+        }
+
+        .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+
+        /* Animation for modal */
+        .modal.fade .modal-dialog {
+            transition: transform 0.3s ease-out;
+            transform: translate(0, -50px);
+        }
+
+        .modal.show .modal-dialog {
+            transform: none;
+        }
+
+        /* Enhanced Table Responsiveness */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .table {
+            margin-bottom: 0;
+            min-width: 1200px; /* Ensure minimum width for readability */
+        }
+
+        .table th, .table td {
+            padding: 12px 8px;
+            vertical-align: middle;
+            word-wrap: break-word;
+            white-space: normal;
+            border: 1px solid #dee2e6;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            color: #495057;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table td {
+            font-size: 0.85rem;
+            line-height: 1.3;
+            color: #212529;
+        }
+
+        /* Status column styling */
+        .table th:last-child,
+        .table td:last-child {
+            width: 5%;
+        }
+
+        /* Enhanced Responsive Breakpoints */
+        @media (max-width: 1600px) {
+            .table th, .table td {
+                font-size: 0.8rem;
+                padding: 10px 6px;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .table th, .table td {
+                font-size: 0.75rem;
+                padding: 8px 5px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .table th, .table td {
+                font-size: 0.7rem;
+                padding: 6px 4px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .table th, .table td {
+                font-size: 0.65rem;
+                padding: 5px 3px;
+            }
+            
+            .table {
+                min-width: 1000px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .table th, .table td {
+                font-size: 0.6rem;
+                padding: 4px 2px;
+            }
+            
+            .table {
+                min-width: 900px;
+            }
+            
+            /* Optimize button sizes for mobile */
+            .btn-lihat-nota {
+                font-size: 0.7rem !important;
+                padding: 0.2rem 0.6rem !important;
+            }
+            
+            .badge {
+                font-size: 0.6rem;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .table th, .table td {
+                font-size: 0.55rem;
+                padding: 3px 1px;
+            }
+            
+            .table {
+                min-width: 800px;
+            }
+            
+            /* Stack info in mobile */
+            .card-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .page-heading .row {
+                flex-direction: column;
+            }
+            
+            .page-heading .col-12 {
+                order: 1;
+                margin-bottom: 15px;
+            }
+        }
+
+        /* Mobile-first table improvements */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Ensure table fits without horizontal scroll on larger screens */
+        @media (min-width: 1600px) {
+            .card-body .table-responsive {
+                overflow-x: visible;
+            }
+            
+            .table {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+
+        /* Action Buttons with Circle Background */
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+
+
+        .action-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(67, 94, 190, 0.25);
+        }
+
+        .btn-edit {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563EB;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #EF4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #DC2626;
+            color: white;
+        }
+
+        /* Action column styling */
+        .table td:last-child {
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* Enhanced button styling */
+        .action-btn i {
+            transition: transform 0.2s ease;
+        }
+
+        .action-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Total Row Styling */
+        .total-row {
+            background: #f8f9fa;
+            font-weight: 700;
+        }
+
+        .total-row td {
+            border-top: 2px solid #dee2e6;
+        }
+
+        #totalJumlah {
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        #totalNilaiBantuan {
+            background: #e8f5e8;
+            color: #198754;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        #totalSisa {
+            background: #fff3cd;
+            color: #856404;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* SweetAlert2 Custom Styling */
+        .swal2-popup {
+            border-radius: 15px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .swal2-title {
+            color: #3b3f5c;
+            font-weight: 700;
+        }
+
+        .swal2-content {
+            color: #6c757d;
+        }
+
+        .swal2-confirm {
+            background: #435ebe !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-cancel {
+            background: #6c757d !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-success-circular-line-left,
+        .swal2-success-circular-line-right,
+        .swal2-success-fix {
+            background-color: transparent !important;
+        }
+
+        .swal2-icon.swal2-success {
+            border-color: #435ebe !important;
+        }
+
+        .swal2-icon.swal2-success [class^='swal2-success-line'] {
+            background-color: #435ebe !important;
+        }
+
+        .swal2-icon.swal2-success .swal2-success-ring {
+            border-color: #435ebe !important;
+        }
+
+        /* Modal Edit Header - Neutral Color */
+        #modalEditAnggaran .modal-header {
+            background: #f8f9fa;
+            color: #3b3f5c;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        #modalEditAnggaran .modal-header .btn-close {
+            filter: none;
+        }
+
+        /* Disabled button styling */
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #6c757d !important;
+            color: #fff !important;
+            border: none !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn:disabled:hover {
+            background: #6c757d !important;
+            color: #fff !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .form-select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+
+        .form-select:disabled:focus {
+            border-color: #ced4da;
+            box-shadow: none;
+        }
+
+        /* Info message styling */
+        .info-message {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-message .badge {
+            font-size: 0.8rem;
+            padding: 0.5rem 0.75rem;
+        }
+
+        .btn-circle:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-circle.btn-warning:disabled {
+            background-color: #ffc107;
+            border-color: #ffc107;
+        }
+
+        .btn-circle.btn-danger:disabled {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .input-group .form-control {
+            border-radius: 8px 0 0 8px;
+            font-size: 0.95rem;
+            padding: 0.5rem 0.75rem;
+        }
+        .input-group .btn {
+            border-radius: 0;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .input-group .btn-primary {
+            border-radius: 0 8px 8px 0;
+        }
+        .input-group .btn-outline-primary {
+            border-right: none;
+        }
+        @media (max-width: 500px) {
+            .input-group .form-control, .input-group .btn {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.5rem;
+            }
+        }
+        .btn-lihat-link {
+            background: #435ebe !important;
+            color: #fff !important;
+            border-radius: 1.5rem !important;
+            font-size: 0.8rem !important;
+            padding: 0.25rem 0.9rem !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .btn-lihat-link:hover {
+            background: #25396f !important;
+            color: #fff !important;
+        }
+
+        /* Button Circle Styles */
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .btn-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-circle:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(67, 94, 190, 0.25);
+        }
+
+        .btn-circle.btn-primary {
+            background: #435ebe;
+            color: white;
+        }
+
+        .btn-circle.btn-primary:hover {
+            background: #25396f;
+            color: white;
+        }
+
+        .btn-circle.btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-circle.btn-info:hover {
+            background: #138496;
+            color: white;
+        }
+
+        .btn-circle.btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-circle.btn-warning:hover {
+            background: #e0a800;
+            color: #212529;
+        }
+
+        .btn-circle.btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-circle.btn-danger:hover {
+            background: #c82333;
+            color: white;
+        }
+
+        /* Notification Badge */
+        .notification-btn {
+            position: relative;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        /* Styling untuk alert dalam modal */
+        .modal-body .alert {
+            border-radius: 15px;
+            border: none;
+            padding: 1.25rem;
+        }
+
+        .modal-body .alert-info {
+            background: #e3f2fd;
+            color: #0d47a1;
+            border-left: 4px solid #2196f3;
+        }
+
+        .modal-body .alert-warning {
+            background: #fff3e0;
+            color: #e65100;
+            border-left: 4px solid #ff9800;
+        }
+
+        .modal-body .alert-heading {
+            color: inherit;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-mahasiswa.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        {% if has_lolos_proposal %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin = 'lolos' - lengkap -->
+                        <li class="sidebar-item active has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                <span>Pendanaan Hibah</span>
+                            </a>
+                            <ul class="submenu active">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                </li>
+                                <li class="submenu-item active">
+                                        <a href="{{ url_for('mahasiswa.laporan_akhir') }}">Laporan Akhir</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span>Produksi</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.pengelolaan_bahan_baku_mahasiswa') }}">Bahan Baku</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.aktivitas_produksi_mahasiswa') }}">Produksi</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.pembelian_alat_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-tools"></i>
+                                <span>Alat Produksi</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.biaya_operasional_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-calculator"></i>
+                                <span>Biaya Operasional</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.biaya_non_operasional_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-wallet2"></i>
+                                <span>Biaya Lain-lain</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.laporan_penjualan_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-receipt"></i>
+                                    <span>Laporan Penjualan</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-graph-up"></i>
+                                    <span>Pelaporan Keuangan</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_laba_rugi_mahasiswa') }}">Laporan Laba Rugi</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_arus_kas_mahasiswa') }}">Laporan Arus Kas</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_neraca_mahasiswa') }}">Laporan Neraca</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% else %}
+                        <!-- Menu untuk mahasiswa dengan proposal status_admin != 'lolos' atau tanpa proposal - terbatas -->
+                        <li class="sidebar-item active has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                            <ul class="submenu active">
+                                <li class="submenu-item active">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% endif %}
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.bimbingan') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.profile_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-person-circle"></i>
+                                <span>Profile Mahasiswa</span>
+                            </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a href="{{ url_for('mahasiswa.nilai_mahasiswa') }}" class='sidebar-link'>
+                                        <i class="bi bi-star-fill"></i>
+                                        <span>Nilai Mahasiswa</span>
+                                    </a>
+                                </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Laporan Akhir {{ "Bertumbuh" if mahasiswa_info and "bertumbuh" in mahasiswa_info.tahapan_usaha.lower() else "Awal" }}</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Laporkan hasil akhir usahamu di AYMP UNJAYA.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Laporan Akhir {{ "Bertumbuh" if mahasiswa_info and "bertumbuh" in mahasiswa_info.tahapan_usaha.lower() else "Awal" }}</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Tables start -->
+                <section class="section">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Laporan Akhir {{ "Bertumbuh" if mahasiswa_info and "bertumbuh" in mahasiswa_info.tahapan_usaha.lower() else "Awal" }}</span>
+                            <div class="d-flex gap-2">
+                                {% if file_laporan_akhir %}
+                                    <!-- File sudah diupload -->
+                                    {% if file_laporan_akhir.status == 'revisi' %}
+                                        <!-- Status revisi: tampilkan tombol edit, lihat file, dan komentar -->
+                                        {% if jadwal_akhir and jadwal_akhir.bisa_upload %}
+                                            <button type="button" class="btn-circle btn-warning" data-bs-toggle="modal" data-bs-target="#modalUploadLaporanAkhir" title="Edit File Laporan Akhir">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                        {% elif jadwal_akhir and jadwal_akhir.warna == 'warning' %}
+                                            <button type="button" class="btn-circle btn-warning" disabled title="Edit belum dibuka">
+                                                <i class="fa fa-clock"></i>
+                                            </button>
+                                        {% elif jadwal_akhir and jadwal_akhir.warna == 'danger' %}
+                                            <button type="button" class="btn-circle btn-danger" disabled title="Jadwal edit sudah berakhir">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        {% else %}
+                                            <!-- Fallback: jika tidak ada jadwal, tampilkan tombol edit aktif -->
+                                            <button type="button" class="btn-circle btn-warning" data-bs-toggle="modal" data-bs-target="#modalUploadLaporanAkhir" title="Edit File Laporan Akhir">
+                                                <i class="fa fa-edit"></i>
+                                            </button>
+                                        {% endif %}
+                                        <div class="position-relative d-inline-block">
+                                            <a href="{{ url_for('mahasiswa.view_file_laporan_akhir', proposal_id=proposal_id) }}" class="btn-circle btn-info" title="Lihat File Laporan Akhir" target="_blank">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            {% if file_laporan_akhir.komentar_pembimbing %}
+                                            <button type="button" class="btn-circle btn-danger notification-btn" data-bs-toggle="modal" data-bs-target="#modalKomentarPembimbingAkhir" title="Lihat Komentar Pembimbing">
+                                                <i class="fa fa-comment"></i>
+                                            </button>
+                                            <span class="notification-badge">!</span>
+                                            {% endif %}
+                                        </div>
+                                    {% else %}
+                                        <!-- Status selain revisi: hanya tampilkan tombol lihat file dan komentar -->
+                                        <div class="position-relative d-inline-block">
+                                            <a href="{{ url_for('mahasiswa.view_file_laporan_akhir', proposal_id=proposal_id) }}" class="btn-circle btn-info" title="Lihat File Laporan Akhir" target="_blank">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                            {% if file_laporan_akhir.komentar_pembimbing %}
+                                            <button type="button" class="btn-circle btn-danger notification-btn" data-bs-toggle="modal" data-bs-target="#modalKomentarPembimbingAkhir" title="Lihat Komentar Pembimbing">
+                                                <i class="fa fa-comment"></i>
+                                            </button>
+                                            <span class="notification-badge">!</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge 
+                                            {% if file_laporan_akhir.status == 'draf' %}bg-secondary
+                                            {% elif file_laporan_akhir.status == 'diajukan' %}bg-primary
+                                            {% elif file_laporan_akhir.status == 'disetujui' %}bg-success
+                                            {% elif file_laporan_akhir.status == 'revisi' %}bg-warning
+                                            {% endif %} me-2">
+                                            {{ file_laporan_akhir.status|title }}
+                                        </span>
+                                    </div>
+                                {% else %}
+                                    <!-- File belum diupload, tampilkan tombol upload sesuai jadwal -->
+                                    {% if jadwal_akhir and jadwal_akhir.bisa_upload %}
+                                        <button type="button" class="btn-circle btn-primary" data-bs-toggle="modal" data-bs-target="#modalUploadLaporanAkhir" title="Upload File Laporan Akhir">
+                                            <i class="fa fa-upload"></i>
+                                        </button>
+                                    {% elif jadwal_akhir and jadwal_akhir.warna == 'warning' %}
+                                        <button type="button" class="btn-circle btn-warning" disabled title="Upload belum dibuka">
+                                            <i class="fa fa-clock"></i>
+                                        </button>
+                                    {% elif jadwal_akhir and jadwal_akhir.warna == 'danger' %}
+                                        <button type="button" class="btn-circle btn-danger" disabled title="Jadwal upload sudah berakhir">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                    {% else %}
+                                        <!-- Fallback: jika tidak ada jadwal, tampilkan tombol upload aktif -->
+                                        <button type="button" class="btn-circle btn-primary" data-bs-toggle="modal" data-bs-target="#modalUploadLaporanAkhir" title="Upload File Laporan Akhir">
+                                            <i class="fa fa-upload"></i>
+                                        </button>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- Informasi Status Jadwal -->
+                            <div class="info-message mb-3">
+                                <i class="fa fa-calendar me-2"></i>
+                                <strong>Status Jadwal Laporan Akhir:</strong>
+                                {% if jadwal_akhir %}
+                                    <span class="badge bg-{{ jadwal_akhir.warna }} ms-2">{{ jadwal_akhir.status }}</span>
+                                    <small class="d-block mt-1">{{ jadwal_akhir.pesan }}</small>
+                                    {% if jadwal_akhir.mulai and jadwal_akhir.selesai %}
+                                        <small class="d-block text-muted">
+                                            <i class="fa fa-clock me-1"></i>
+                                            Jadwal: {{ jadwal_akhir.mulai }} - {{ jadwal_akhir.selesai }}
+                                        </small>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-info ms-2">Tidak ada jadwal</span>
+                                    <small class="d-block mt-1">Bisa upload kapan saja</small>
+                                {% endif %}
+                            </div>
+
+                            {% if not anggaran_data_flat %}
+                                <div class="info-message">
+                                    <i class="fa fa-info-circle me-2"></i>
+                                    <strong>Informasi:</strong> Belum ada data laporan akhir. Data akan muncul setelah laporan kemajuan Anda disetujui oleh pembimbing.
+                                </div>
+                            {% else %}
+                                <div class="info-message">
+                                    <i class="fa fa-info-circle me-2"></i>
+                                    <strong>Petunjuk:</strong> Klik tombol tambah (+) untuk mengisi kuantitas dan jumlah sesuai dengan capaian akhir yang telah dicapai. 
+                                    <ul class="mb-0 mt-2">
+                                        <li><strong>Total Laporan Akhir:</strong> Jumlah total dari semua item laporan akhir yang diisi</li>
+                                        <li><strong>Total Nilai Bantuan:</strong> Jumlah bantuan yang diberikan oleh reviewer</li>
+                                        <li><strong>Sisa:</strong> Sisa dari (Total Nilai Bantuan - Total Laporan Kemajuan) yang dapat digunakan untuk laporan akhir</li>
+                                        <li><strong>Data Reset:</strong> Kuantitas, harga satuan, jumlah, dan keterangan di-reset ke 0/kosong dari laporan kemajuan</li>
+                                    </ul>
+                                    <strong>Peringatan:</strong> Total laporan akhir tidak boleh melebihi sisa. Setelah disimpan, data akan otomatis dikirim ke pembimbing dan tidak bisa diubah.
+                                </div>
+                            {% endif %}
+                            {% if anggaran_data_flat %}
+                            <div class="table-responsive">
+                                <table class="table align-middle text-center" style="width: 100%; font-size: 0.85rem;">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" style="vertical-align:middle; width: 15%;">Kegiatan Utama</th>
+                                            <th colspan="6" style="width: 55%;">Capaian</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 10%;">Keterangan/<br>Ref. Harga</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 10%;">Target Capaian<br>H = Output A</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 10%;">Penanggung Jawab</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 5%;">Status</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 5%;">Aksi</th>
+                                        </tr>
+                                        <tr>
+                                            <th style="width: 10%;">Kegiatan<br>A</th>
+                                            <th style="width: 12%;">Nama Barang<br>B</th>
+                                            <th style="width: 8%;">Kuantitas<br>C</th>
+                                            <th style="width: 8%;">Satuan<br>D</th>
+                                            <th style="width: 12%;">Harga Satuan<br>E</th>
+                                            <th style="width: 10%;">Jumlah (Rp)<br>F=C×E</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in anggaran_data_flat %}
+                                            <tr>
+                                                {% if row.show_kegiatan_utama %}
+                                                    <td rowspan="{{ row.kegiatan_utama_rowspan }}">{{ row.kegiatan_utama|e }}</td>
+                                                {% endif %}
+                                                {% if row.show_kegiatan %}
+                                                    <td rowspan="{{ row.kegiatan_rowspan }}">{{ row.kegiatan|e }}</td>
+                                                {% endif %}
+                                                <td>{{ row.nama_barang|e }}</td>
+                                                <td>
+                                                    <span class="kuantitas-display">{{ row.kuantitas if row.kuantitas > 0 else '-' }}</span>
+                                                    <input type="number" class="form-control form-control-sm kuantitas-input" 
+                                                           value="{{ row.kuantitas if row.kuantitas > 0 else '' }}" style="display:none;" 
+                                                           data-id="{{ row.id }}" data-tabel="{{ tabel_laporan }}" placeholder="Kuantitas" required>
+                                                </td>
+                                                <td>{{ row.satuan|e }}</td>
+                                                <td>
+                                                    <span class="harga-satuan-display">{{ "Rp " + "{:,}".format(row.harga_satuan|int) if row.harga_satuan > 0 else '-' }}</span>
+                                                    <input type="number" class="form-control form-control-sm harga-satuan-input" 
+                                                           value="{{ row.harga_satuan if row.harga_satuan > 0 else '' }}" style="display:none;" 
+                                                           data-id="{{ row.id }}" data-tabel="{{ tabel_laporan }}" placeholder="Harga satuan" required>
+                                                </td>
+                                                <td>
+                                                    <span class="jumlah-display">{{ "Rp " + "{:,}".format(row.jumlah|int) if row.jumlah > 0 else '-' }}</span>
+                                                    <input type="number" class="form-control form-control-sm jumlah-input" 
+                                                           value="{{ row.jumlah if row.jumlah > 0 else '' }}" style="display:none;" 
+                                                           data-id="{{ row.id }}" data-tabel="{{ tabel_laporan }}" placeholder="Jumlah" required>
+                                                </td>
+                                                <td>
+                                                    <span class="keterangan-display">
+                                                        {% if row.keterangan %}
+                                                            <button class="btn btn-primary btn-sm btn-lihat-nota" data-file="{{ row.keterangan|e }}" style="border-radius: 1.5rem; padding: 0.25rem 0.9rem; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                                                <i class="fa fa-file-pdf me-1"></i>Lihat Nota
+                                                            </button>
+                                                        {% else %}
+                                                            <span class="text-muted">-</span>
+                                                        {% endif %}
+                                                    </span>
+                                                    <input type="file" accept="application/pdf" class="form-control form-control-sm keterangan-input" style="display:none;" data-id="{{ row.id }}" data-tabel="{{ tabel_laporan }}">
+                                                </td>
+                                                {% if row.show_target_capaian %}
+                                                    <td rowspan="{{ row.target_capaian_rowspan }}">{{ row.target_capaian|e }}</td>
+                                                {% endif %}
+                                                {% if row.show_penanggung_jawab %}
+                                                    <td rowspan="{{ row.penanggung_jawab_rowspan }}">{{ row.penanggung_jawab }}</td>
+                                                {% endif %}
+                                                <td>
+                                                    {% if row.status == 'disetujui' %}
+                                                        <span class="badge bg-success">{{ row.status|upper }}</span>
+                                                    {% elif row.status == 'ditolak' %}
+                                                        <span class="badge bg-danger">{{ row.status|upper }}</span>
+                                                    {% elif row.status == 'revisi' %}
+                                                        <span class="badge bg-warning text-dark">{{ row.status|upper }}</span>
+                                                    {% elif row.status == 'diajukan' %}
+                                                        <span class="badge bg-info">{{ row.status|upper }}</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">{{ row.status|upper }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if row.status in ['draf', 'revisi'] %}
+                                                        <button class="btn btn-sm btn-outline-primary edit-btn" title="Tambah Kuantitas & Jumlah" 
+                                                                onclick="editLaporanKemajuan('{{ row.id }}', '{{ tabel_laporan }}')" 
+                                                                data-id="{{ row.id }}" data-tabel="{{ tabel_laporan }}">
+                                                            <i class="fa fa-plus"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-success save-btn" title="Simpan & Ajukan" 
+                                                                onclick="saveLaporanAkhir('{{ row.id }}', '{{ tabel_laporan }}')" 
+                                                                style="display:none;" data-id="{{ row.id }}" data-tabel="{{ tabel_laporan }}">
+                                                            <i class="fa fa-check"></i>
+                                                        </button>
+                                                        <button class="btn btn-sm btn-outline-danger cancel-btn" title="Batal" 
+                                                                onclick="cancelEditLaporanKemajuan('{{ row.id }}')" 
+                                                                style="display:none;" data-id="{{ row.id }}">
+                                                            <i class="fa fa-times"></i>
+                                                        </button>
+                                                    {% elif row.status in ['diajukan', 'disetujui', 'ditolak'] %}
+                                                        <span class="text-muted">-</span>
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="total-row">
+                                            <td colspan="6" class="text-end fw-bold">TOTAL LAPORAN AKHIR:</td>
+                                            <td id="totalJumlah" class="fw-bold">Rp 0</td>
+                                            <td colspan="5"></td>
+                                        </tr>
+                                        <tr class="total-row" style="background: #e8f5e8;">
+                                            <td colspan="6" class="text-end fw-bold text-success">
+                                                <i class="fa-solid fa-money-bill-wave me-1"></i>TOTAL NILAI BANTUAN:
+                                            </td>
+                                            <td id="totalNilaiBantuan" class="fw-bold text-success">Rp {{ "{:,}".format(total_nilai_bantuan|int) }}</td>
+                                            <td colspan="5"></td>
+                                        </tr>
+                                        <tr class="total-row" style="background: #fff3cd;">
+                                            <td colspan="6" class="text-end fw-bold text-warning">
+                                                <i class="fa-solid fa-calculator me-1"></i>SISA (Nilai Bantuan - Laporan Kemajuan):
+                                            </td>
+                                            <td id="totalSisa" class="fw-bold text-warning">Rp {{ "{:,}".format((total_nilai_bantuan|int) - (total_laporan_kemajuan_disetujui|int)) }}</td>
+                                            <td colspan="5"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Basic Tables end -->
+            </div>
+
+            <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js" integrity="sha512-fD9DI5bZwQxOi7MhYWnnNPlvXdp/2Pj3XSTRrFs5FQa4mizyGLnJcN6tuvUS6LbmgN1ut+XGSABKvjN0H6Aoow==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            <script src="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.all.min.js') }}"></script>
+    <script>
+        // Guard jadwal akhir: nonaktifkan upload/aksi sebelum jadwal mulai
+        (function initJadwalAkhir(){
+            function parseDT(val){ return val ? new Date(val.replace('T',' ') + ':00') : null; }
+            $.get('{{ url_for("mahasiswa.get_pengaturan_jadwal_mhs") }}').done(function(resp){
+                if (!resp || !resp.success) return;
+                const d = resp.data || {};
+                const start = parseDT(d.akhir_mulai);
+                const end = parseDT(d.akhir_selesai);
+                const now = new Date();
+                
+                // Hanya batasi jika jadwal ada dan aktif
+                if (start && end) {
+                    if (now < start) {
+                        const info = document.createElement('div');
+                        info.className = 'alert alert-info';
+                        info.innerHTML = '<i class="bi bi-info-circle"></i> Jadwal Laporan Akhir dimulai pada <b>' + start.toLocaleString() + '</b>. Saat ini Anda belum bisa mengisi laporan akhir.';
+                        const container = document.querySelector('.page-title') || document.body;
+                        container.parentNode.insertBefore(info, container.nextSibling);
+                        
+                        // Nonaktifkan tombol upload dan aksi
+                        $('.btn-circle[data-bs-target="#modalUploadLaporanAkhir"]').prop('disabled', true);
+                        $('[onclick^="saveLaporanAkhir"]').prop('disabled', true);
+                        $('.edit-btn').prop('disabled', true);
+                        
+                        // Update status jadwal di template
+                        updateJadwalStatus('Jadwal Belum Dimulai', `Jadwal akan dimulai: ${start.toLocaleString()}`, 'warning');
+                    } else if (now > end) {
+                        const warn = document.createElement('div');
+                        warn.className = 'alert alert-warning';
+                        warn.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Jadwal Laporan Akhir telah berakhir pada <b>' + end.toLocaleString() + '</b>. Pengajuan baru akan ditolak.';
+                        const container = document.querySelector('.page-title') || document.body;
+                        container.parentNode.insertBefore(warn, container.nextSibling);
+                        
+                        // Nonaktifkan tombol upload dan aksi
+                        $('.btn-circle[data-bs-target="#modalUploadLaporanAkhir"]').prop('disabled', true);
+                        $('[onclick^="saveLaporanAkhir"]').prop('disabled', true);
+                        $('.edit-btn').prop('disabled', true);
+                        
+                        // Update status jadwal di template
+                        updateJadwalStatus('Jadwal Berakhir', `Jadwal telah berakhir: ${end.toLocaleString()}`, 'danger');
+                    } else {
+                        // Dalam jadwal aktif - tampilkan pesan info
+                        const info = document.createElement('div');
+                        info.className = 'alert alert-success';
+                        info.innerHTML = '<i class="bi bi-check-circle"></i> <b>Jadwal Laporan Akhir Aktif!</b> Anda dapat mengisi laporan akhir sekarang.';
+                        const container = document.querySelector('.page-title') || document.body;
+                        container.parentNode.insertBefore(info, container.nextSibling);
+                        
+                        // Aktifkan semua tombol
+                        $('.btn-circle[data-bs-target="#modalUploadLaporanAkhir"]').prop('disabled', false);
+                        $('[onclick^="saveLaporanAkhir"]').prop('disabled', false);
+                        $('.edit-btn').prop('disabled', false);
+                        
+                        // Update status jadwal di template
+                        updateJadwalStatus('Jadwal Aktif', 'Anda dapat mengisi laporan akhir sekarang.', 'success');
+                    }
+                } else {
+                    // Tidak ada jadwal - tampilkan pesan info dan izinkan penginputan
+                    const info = document.createElement('div');
+                    info.className = 'alert alert-info';
+                    info.innerHTML = '<i class="bi bi-info-circle"></i> <b>Tidak ada jadwal yang ditentukan.</b> Anda dapat mengisi laporan akhir kapan saja.';
+                    const container = document.querySelector('.page-title') || document.body;
+                    container.parentNode.insertBefore(info, container.nextSibling);
+                    
+                    // Aktifkan semua tombol karena tidak ada jadwal
+                    $('.btn-circle[data-bs-target="#modalUploadLaporanAkhir"]').prop('disabled', false);
+                    $('[onclick^="saveLaporanAkhir"]').prop('disabled', false);
+                    $('.edit-btn').prop('disabled', false);
+                    
+                    // Update status jadwal di template
+                    updateJadwalStatus('Tidak Ada Jadwal', 'Tidak ada jadwal yang ditentukan. Anda dapat mengisi laporan akhir kapan saja.', 'info');
+                }
+            });
+        })();
+        
+        // Fungsi untuk update status jadwal di template
+        function updateJadwalStatus(status, message, badgeClass) {
+            const jadwalStatusElement = document.querySelector('.info-message .badge');
+            const jadwalMessageElement = document.querySelector('.info-message small');
+            
+            if (jadwalStatusElement && jadwalMessageElement) {
+                jadwalStatusElement.textContent = status;
+                jadwalStatusElement.className = `badge bg-${badgeClass} ms-2`;
+                jadwalMessageElement.textContent = message;
+            }
+        }
+    </script>
+            <!-- Custom JS harus setelah jQuery dan plugin -->
+            <script>
+              // Fungsi untuk edit laporan kemajuan
+              window.editLaporanKemajuan = function(laporanId, tabelLaporan) {
+                  const row = document.querySelector(`[data-id="${laporanId}"]`).closest('tr');
+                  const kuantitasDisplay = row.querySelector('.kuantitas-display');
+                  const kuantitasInput = row.querySelector('.kuantitas-input');
+                  const hargaSatuanDisplay = row.querySelector('.harga-satuan-display');
+                  const hargaSatuanInput = row.querySelector('.harga-satuan-input');
+                  const jumlahDisplay = row.querySelector('.jumlah-display');
+                  const jumlahInput = row.querySelector('.jumlah-input');
+                  const editBtn = row.querySelector('.edit-btn');
+                  const saveBtn = row.querySelector('.save-btn');
+                  const cancelBtn = row.querySelector('.cancel-btn');
+                  const keteranganDisplay = row.querySelector('.keterangan-display');
+                  const keteranganInput = row.querySelector('.keterangan-input');
+
+                  // Tampilkan input, sembunyikan display
+                  kuantitasDisplay.style.display = 'none';
+                  kuantitasInput.style.display = 'inline-block';
+                  hargaSatuanDisplay.style.display = 'none';
+                  hargaSatuanInput.style.display = 'inline-block';
+                  jumlahDisplay.style.display = 'none';
+                  jumlahInput.style.display = 'inline-block';
+                  keteranganDisplay.style.display = 'none';
+                  keteranganInput.style.display = 'block';
+
+                  // Tampilkan tombol save dan cancel, sembunyikan edit
+                  editBtn.style.display = 'none';
+                  saveBtn.style.display = 'inline-block';
+                  cancelBtn.style.display = 'inline-block';
+
+                  // Focus pada input kuantitas
+                  kuantitasInput.focus();
+              }
+
+              // Fungsi untuk menyimpan laporan kemajuan
+              window.saveLaporanAkhir = function(laporanId, tabelLaporan) {
+                  const row = document.querySelector(`[data-id="${laporanId}"]`).closest('tr');
+                  const kuantitasInput = row.querySelector('.kuantitas-input');
+                  const hargaSatuanInput = row.querySelector('.harga-satuan-input');
+                  const jumlahInput = row.querySelector('.jumlah-input');
+                  const keteranganInput = row.querySelector('.keterangan-input');
+                  const file = keteranganInput && keteranganInput.files.length > 0 ? keteranganInput.files[0] : null;
+                  const kuantitas = kuantitasInput.value;
+                  const hargaSatuan = hargaSatuanInput.value;
+                  const jumlah = jumlahInput.value;
+                  
+                  if (!kuantitas || kuantitas <= 0) {
+                      Swal.fire('Error', 'Kuantitas harus diisi dan harus lebih dari 0!', 'error');
+                      return;
+                  }
+                  if (!hargaSatuan || hargaSatuan <= 0) {
+                      Swal.fire('Error', 'Harga satuan harus diisi dan harus lebih dari 0!', 'error');
+                      return;
+                  }
+                  if (!jumlah || jumlah <= 0) {
+                      Swal.fire('Error', 'Jumlah harus diisi dan harus lebih dari 0!', 'error');
+                      return;
+                  }
+                  if (!file) {
+                      Swal.fire('Error', 'Silakan upload file nota (PDF) terlebih dahulu!', 'error');
+                      return;
+                  }
+                  
+                  // Debug: Log data yang akan dikirim
+                  console.log('Data yang akan dikirim:', {
+                      laporanId: laporanId,
+                      tabelLaporan: tabelLaporan,
+                      kuantitas: kuantitas,
+                      hargaSatuan: hargaSatuan,
+                      jumlah: jumlah,
+                      file: file ? file.name : 'No file'
+                  });
+                  
+                  // Debug: Log FormData contents
+                  const formData = new FormData();
+                  formData.append('id', laporanId);
+                  formData.append('tabel_laporan', tabelLaporan);
+                  formData.append('kuantitas', kuantitas);
+                  formData.append('harga_satuan', hargaSatuan);
+                  formData.append('jumlah', jumlah);
+                  formData.append('status', 'diajukan');
+                  formData.append('nota_file', file);
+                  
+                  // Debug: Log FormData entries
+                  console.log('FormData entries:');
+                  for (let [key, value] of formData.entries()) {
+                      console.log(key + ': ' + (value instanceof File ? value.name : value));
+                  }
+                  Swal.fire({
+                      title: 'Menyimpan...',
+                      text: 'Sedang menyimpan perubahan dan mengubah status',
+                      allowOutsideClick: false,
+                      didOpen: () => { Swal.showLoading(); }
+                  });
+                  fetch('/mahasiswa/update_laporan_akhir', {
+                      method: 'POST',
+                      body: formData,
+                      headers: {
+                          
+                      }
+                  })
+                  .then(response => {
+                      console.log('Response status:', response.status);
+                      if (!response.ok) {
+                          return response.text().then(text => { throw new Error(text); });
+                      }
+                      return response.json();
+                  })
+                  .then(data => {
+                      console.log('Response data:', data);
+                      if (data.success) {
+                          Swal.fire({
+                              icon: 'success',
+                              title: 'Berhasil',
+                              text: 'Data laporan akhir berhasil disimpan dan status diubah menjadi diajukan!',
+                              timer: 2000,
+                              showConfirmButton: false
+                          }).then(() => { location.reload(); });
+                      } else {
+                          Swal.fire({ icon: 'error', title: 'Gagal', text: data.message });
+                      }
+                  })
+                  .catch(error => {
+                      console.error('Error:', error);
+                      Swal.fire({ icon: 'error', title: 'Error', text: 'Terjadi kesalahan saat menyimpan data' });
+                  });
+              }
+
+              // Fungsi untuk membatalkan edit
+              window.cancelEditLaporanKemajuan = function(laporanId) {
+                  const row = document.querySelector(`[data-id="${laporanId}"]`).closest('tr');
+                  const kuantitasDisplay = row.querySelector('.kuantitas-display');
+                  const kuantitasInput = row.querySelector('.kuantitas-input');
+                  const hargaSatuanDisplay = row.querySelector('.harga-satuan-display');
+                  const hargaSatuanInput = row.querySelector('.harga-satuan-input');
+                  const jumlahDisplay = row.querySelector('.jumlah-display');
+                  const jumlahInput = row.querySelector('.jumlah-input');
+                  const editBtn = row.querySelector('.edit-btn');
+                  const saveBtn = row.querySelector('.save-btn');
+                  const cancelBtn = row.querySelector('.cancel-btn');
+                  const keteranganDisplay = row.querySelector('.keterangan-display');
+                  const keteranganInput = row.querySelector('.keterangan-input');
+
+                  // Kembalikan nilai input ke nilai asli
+                  const kuantitasText = kuantitasDisplay.textContent;
+                  const hargaSatuanText = hargaSatuanDisplay.textContent;
+                  const jumlahText = jumlahDisplay.textContent;
+                  
+                  kuantitasInput.value = kuantitasText === '-' ? '' : kuantitasText;
+                  hargaSatuanInput.value = hargaSatuanText === '-' ? '' : hargaSatuanText.replace(/[^\d]/g, '');
+                  jumlahInput.value = jumlahText === '-' ? '' : jumlahText.replace(/[^\d]/g, '');
+                  keteranganInput.value = '';
+
+                  // Tampilkan display, sembunyikan input
+                  kuantitasDisplay.style.display = 'inline';
+                  kuantitasInput.style.display = 'none';
+                  hargaSatuanDisplay.style.display = 'inline';
+                  hargaSatuanInput.style.display = 'none';
+                  jumlahDisplay.style.display = 'inline';
+                  jumlahInput.style.display = 'none';
+                  keteranganDisplay.style.display = 'inline';
+                  keteranganInput.style.display = 'none';
+
+                  // Tampilkan tombol edit, sembunyikan save dan cancel
+                  editBtn.style.display = 'inline-block';
+                  saveBtn.style.display = 'none';
+                  cancelBtn.style.display = 'none';
+              }
+
+              // Function to update total jumlah
+              function updateTotalJumlah() {
+                  let total = 0;
+                  $('.jumlah-display').each(function() {
+                      const jumlahText = $(this).text();
+                      if (jumlahText !== '-') {
+                          const jumlah = parseFloat(jumlahText.replace(/[^\d]/g, '')) || 0;
+                          total += jumlah;
+                      }
+                  });
+                  
+                  // Ambil total laporan kemajuan dan nilai bantuan dari template
+                  const totalLaporanKemajuan = {{ total_laporan_kemajuan_disetujui|int }};
+                  const totalNilaiBantuan = {{ total_nilai_bantuan|int }};
+                  const sisa = totalNilaiBantuan - totalLaporanKemajuan;
+                  
+                  // Update semua footer dengan format yang baru (hanya jika elemen ada)
+                  const totalJumlahElement = $('#totalJumlah');
+                  const totalNilaiBantuanElement = $('#totalNilaiBantuan');
+                  const totalSisaElement = $('#totalSisa');
+                  
+                  if (totalJumlahElement.length > 0) {
+                      totalJumlahElement.text('Rp ' + total.toLocaleString('id-ID'));
+                  }
+                  if (totalNilaiBantuanElement.length > 0) {
+                      totalNilaiBantuanElement.text('Rp ' + totalNilaiBantuan.toLocaleString('id-ID'));
+                  }
+                  if (totalSisaElement.length > 0) {
+                      totalSisaElement.text('Rp ' + sisa.toLocaleString('id-ID'));
+                  }
+                  
+                  // Validasi real-time setelah update total
+                  validateTotalNilaiBantuan();
+              }
+              
+              // Function to validate total sisa real-time
+              function validateTotalNilaiBantuan() {
+                  // Ambil total laporan kemajuan dan nilai bantuan dari template
+                  const totalLaporanKemajuan = {{ total_laporan_kemajuan_disetujui|int }};
+                  const totalNilaiBantuan = {{ total_nilai_bantuan|int }};
+                  const sisa = totalNilaiBantuan - totalLaporanKemajuan;
+                  
+                  // Hitung total laporan akhir saat ini
+                  let totalLaporanAkhir = 0;
+                  document.querySelectorAll('.jumlah-display').forEach(function(element) {
+                      const jumlahText = element.textContent;
+                      if (jumlahText !== '-') {
+                          const jumlah = parseFloat(jumlahText.replace(/[^\d]/g, '')) || 0;
+                          totalLaporanAkhir += jumlah;
+                      }
+                  });
+                  
+                  // Ubah warna total laporan akhir jika melebihi sisa
+                  const totalElement = document.getElementById('totalJumlah');
+                  const totalSisaElement = document.getElementById('totalSisa');
+                  
+                  // Cek apakah elemen ada sebelum mengakses propertinya
+                  if (totalElement && totalSisaElement) {
+                      if (totalLaporanAkhir > sisa) {
+                          totalElement.style.color = '#dc3545'; // Merah
+                          totalElement.style.fontWeight = 'bold';
+                          totalSisaElement.style.color = '#dc3545'; // Merah untuk sisa juga
+                          totalSisaElement.style.fontWeight = 'bold';
+                      } else {
+                          totalElement.style.color = '#1976d2'; // Reset ke default biru
+                          totalElement.style.fontWeight = '700';
+                          totalSisaElement.style.color = '#856404'; // Reset ke default kuning
+                          totalSisaElement.style.fontWeight = '700';
+                      }
+                  }
+                  
+                  // Disable/enable semua tombol save berdasarkan sisa
+                  document.querySelectorAll('.save-btn').forEach(function(btn) {
+                      if (totalLaporanAkhir > sisa) {
+                          btn.disabled = true;
+                          btn.style.opacity = '0.5';
+                          btn.style.cursor = 'not-allowed';
+                      } else {
+                          btn.disabled = false;
+                          btn.style.opacity = '1';
+                          btn.style.cursor = 'pointer';
+                      }
+                  });
+              }
+
+              // Event handler untuk tombol lihat nota PDF
+              $(document).on('click', '.btn-lihat-nota', function() {
+                var filePath = $(this).data('file');
+                if (filePath) {
+                    // Buat URL untuk file PDF - hapus 'static/' dari path
+                    var fileUrl = '/' + filePath.replace('static/', '');
+                    console.log('Opening file:', fileUrl);
+                    window.open(fileUrl, '_blank');
+                }
+              });
+
+              // Calculate jumlah when kuantitas or harga satuan changes
+              $(document).on('input', '.kuantitas-input, .harga-satuan-input', function() {
+                  const row = $(this).closest('tr');
+                  const kuantitas = parseFloat(row.find('.kuantitas-input').val()) || 0;
+                  const hargaSatuan = parseFloat(row.find('.harga-satuan-input').val()) || 0;
+                  const jumlah = kuantitas * hargaSatuan;
+                  
+                  row.find('.jumlah-input').val(jumlah);
+                  row.find('.jumlah-display').text('Rp ' + jumlah.toLocaleString('id-ID'));
+                  
+                  // Update total secara real-time
+                  updateTotalJumlah();
+              });
+
+              // Initialize total on page load
+              $(document).ready(function() {
+                  // Hanya jalankan fungsi jika ada data laporan akhir
+                  if ($('.jumlah-display').length > 0) {
+                      updateTotalJumlah();
+                      validateTotalNilaiBantuan();
+                  }
+              });
+            </script>
+
+            <!-- Modal Edit Anggaran -->
+            <div class="modal fade" id="modalEditAnggaran" tabindex="-1" aria-labelledby="modalEditAnggaranLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalEditAnggaranLabel">Edit Anggaran</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formEditAnggaran">
+                                <input type="hidden" id="editAnggaranId">
+                                <input type="hidden" id="editAnggaranStatus">
+                                <!-- Editable fields -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Kegiatan Utama</label>
+                                        <input type="text" class="form-control" id="editKegiatanUtama">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Kegiatan</label>
+                                        <input type="text" class="form-control" id="editKegiatan">
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Nama Barang</label>
+                                        <input type="text" class="form-control" id="editNamaBarang">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Penanggung Jawab</label>
+                                        <input type="text" class="form-control" id="editPenanggungJawab">
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Satuan</label>
+                                        <select class="form-select" id="editSatuan">
+                                            <option value="Unit">Unit</option>
+                                            <option value="Pcs">Pcs</option>
+                                            <option value="Set">Set</option>
+                                            <option value="Paket">Paket</option>
+                                            <option value="Lembar">Lembar</option>
+                                            <option value="Buku">Buku</option>
+                                            <option value="Botol">Botol</option>
+                                            <option value="Kg">Kg</option>
+                                            <option value="Liter">Liter</option>
+                                            <option value="Meter">Meter</option>
+                                            <option value="Jam">Jam</option>
+                                            <option value="Hari">Hari</option>
+                                            <option value="Bulan">Bulan</option>
+                                            <option value="Tahun">Tahun</option>
+                                            <option value="Kali">Kali</option>
+                                            <option value="Sesi">Sesi</option>
+                                            <option value="Kunjungan">Kunjungan</option>
+                                            <option value="Lainnya">Lainnya</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Harga Satuan</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="number" class="form-control" id="editHargaSatuan" step="1">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Target Capaian</label>
+                                        <textarea class="form-control" id="editTargetCapaian" rows="3"></textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Keterangan</label>
+                                        <input type="text" class="form-control" id="editKeterangan">
+                                    </div>
+                                </div>
+                                
+                                <!-- Editable fields -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Kuantitas</label>
+                                        <input type="number" class="form-control" id="editKuantitas" required min="1">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Jumlah (Rp)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="text" class="form-control" id="editJumlah" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="button" class="btn btn-primary" id="simpanEditBtn">
+                                <i class="fa fa-save me-2"></i>Simpan Perubahan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal untuk melihat link keterangan -->
+    <div class="modal fade" id="modalLihatLink" tabindex="-1" aria-labelledby="modalLihatLinkLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLihatLinkLabel">Link Referensi Harga</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Link referensi harga: <a href="#" id="linkKeterangan" target="_blank"></a></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to format currency
+        function formatRupiah(amount) {
+            return new Intl.NumberFormat('id-ID').format(amount);
+        }
+
+        // Fungsi untuk edit laporan kemajuan
+        window.editLaporanKemajuan = function(laporanId, tabelLaporan) {
+                const row = document.querySelector(`[data-id="${laporanId}"]`).closest('tr');
+                const kuantitasDisplay = row.querySelector('.kuantitas-display');
+                const kuantitasInput = row.querySelector('.kuantitas-input');
+                const hargaSatuanDisplay = row.querySelector('.harga-satuan-display');
+                const hargaSatuanInput = row.querySelector('.harga-satuan-input');
+                const jumlahDisplay = row.querySelector('.jumlah-display');
+                const jumlahInput = row.querySelector('.jumlah-input');
+                const editBtn = row.querySelector('.edit-btn');
+                const saveBtn = row.querySelector('.save-btn');
+                const cancelBtn = row.querySelector('.cancel-btn');
+                const keteranganDisplay = row.querySelector('.keterangan-display');
+                const keteranganInput = row.querySelector('.keterangan-input');
+
+                // Tampilkan input, sembunyikan display
+                kuantitasDisplay.style.display = 'none';
+                kuantitasInput.style.display = 'inline-block';
+                hargaSatuanDisplay.style.display = 'none';
+                hargaSatuanInput.style.display = 'flex';
+                jumlahDisplay.style.display = 'none';
+                jumlahInput.style.display = 'flex';
+                keteranganDisplay.style.display = 'none';
+                keteranganInput.style.display = 'block';
+
+                // Tampilkan tombol save dan cancel, sembunyikan edit
+                editBtn.style.display = 'none';
+                saveBtn.style.display = 'inline-block';
+                cancelBtn.style.display = 'inline-block';
+
+                // Focus pada input kuantitas
+                kuantitasInput.focus();
+            }
+
+            // Fungsi untuk membatalkan edit
+            window.cancelEditLaporanKemajuan = function(laporanId) {
+                const row = document.querySelector(`[data-id="${laporanId}"]`).closest('tr');
+                const kuantitasDisplay = row.querySelector('.kuantitas-display');
+                const kuantitasInput = row.querySelector('.kuantitas-input');
+                const hargaSatuanDisplay = row.querySelector('.harga-satuan-display');
+                const hargaSatuanInput = row.querySelector('.harga-satuan-input');
+                const jumlahDisplay = row.querySelector('.jumlah-display');
+                const jumlahInput = row.querySelector('.jumlah-input');
+                const editBtn = row.querySelector('.edit-btn');
+                const saveBtn = row.querySelector('.save-btn');
+                const cancelBtn = row.querySelector('.cancel-btn');
+                const keteranganDisplay = row.querySelector('.keterangan-display');
+                const keteranganInput = row.querySelector('.keterangan-input');
+
+                // Kembalikan nilai input ke nilai asli
+                const kuantitasText = kuantitasDisplay.textContent;
+                const hargaSatuanText = hargaSatuanDisplay.textContent;
+                const jumlahText = jumlahDisplay.textContent;
+                
+                kuantitasInput.value = kuantitasText === '-' ? '' : kuantitasText;
+                hargaSatuanInput.value = hargaSatuanText === '-' ? '' : hargaSatuanText.replace(/[^\d]/g, '');
+                jumlahInput.value = jumlahText === '-' ? '' : jumlahText.replace(/[^\d]/g, '');
+                keteranganInput.value = '';
+
+                // Tampilkan display, sembunyikan input
+                kuantitasDisplay.style.display = 'inline';
+                kuantitasInput.style.display = 'none';
+                hargaSatuanDisplay.style.display = 'inline';
+                hargaSatuanInput.style.display = 'none';
+                jumlahDisplay.style.display = 'inline';
+                jumlahInput.style.display = 'none';
+                keteranganDisplay.style.display = 'inline';
+                keteranganInput.style.display = 'none';
+
+                // Tampilkan tombol edit, sembunyikan save dan cancel
+                editBtn.style.display = 'inline-block';
+                saveBtn.style.display = 'none';
+                cancelBtn.style.display = 'none';
+            }
+
+        // Calculate jumlah when kuantitas or harga satuan changes
+        $(document).on('input', '.kuantitas-input, .harga-satuan-input', function() {
+            const row = $(this).closest('tr');
+            const kuantitas = parseFloat(row.find('.kuantitas-input').val()) || 0;
+            const hargaSatuan = parseFloat(row.find('.harga-satuan-input').val()) || 0;
+            const jumlah = kuantitas * hargaSatuan;
+            
+            row.find('.jumlah-input').val(jumlah);
+            row.find('.jumlah-display').text('Rp ' + jumlah.toLocaleString('id-ID'));
+            
+            // Update total secara real-time
+            updateTotalJumlah();
+        });
+
+        // Initialize total on page load
+        $(document).ready(function() {
+            console.log('Document ready - initializing...');
+            
+            // Debug: cek apakah modal dan form ada
+            console.log('Modal upload exists:', $('#modalUploadLaporanAkhir').length > 0);
+            console.log('Form upload exists:', $('#formUploadLaporanAkhir').length > 0);
+            console.log('File input exists:', $('#fileLaporanAkhir').length > 0);
+            console.log('Upload button exists:', $('#btnUploadLaporanAkhir').length > 0);
+            
+            // Hanya jalankan fungsi jika ada data laporan akhir
+            if ($('.jumlah-display').length > 0) {
+                updateTotalJumlah();
+                validateTotalNilaiBantuan();
+            }
+            
+            // Debug: event handler untuk modal upload
+            $('#modalUploadLaporanAkhir').on('show.bs.modal', function () {
+                console.log('Modal upload sedang dibuka');
+            });
+            
+            $('#modalUploadLaporanAkhir').on('shown.bs.modal', function () {
+                console.log('Modal upload sudah terbuka');
+            });
+            
+            // Debug: event handler untuk file input
+            $('#fileLaporanAkhir').on('change', function() {
+                const file = this.files[0];
+                console.log('File selected:', file);
+                if (file) {
+                    console.log('File name:', file.name);
+                    console.log('File size:', file.size);
+                    console.log('File type:', file.type);
+                }
+            });
+        });
+
+        // Event handler untuk tombol lihat nota PDF
+        $(document).on('click', '.btn-lihat-nota', function() {
+            var filePath = $(this).data('file');
+            if (filePath) {
+                // Buat URL untuk file PDF - hapus 'static/' dari path
+                var fileUrl = '/' + filePath.replace('static/', '');
+                console.log('Opening file:', fileUrl);
+                window.open(fileUrl, '_blank');
+            }
+        });
+
+        // Handle upload file laporan akhir - dengan event delegation yang lebih aman
+        $(document).ready(function() {
+            console.log('Document ready - setting up upload handler...');
+            
+            // Cek apakah elemen yang diperlukan ada
+            const uploadBtn = document.getElementById('btnUploadLaporanAkhir');
+            const uploadForm = document.getElementById('formUploadLaporanAkhir');
+            const fileInput = document.getElementById('fileLaporanAkhir');
+            
+            console.log('Upload button exists:', !!uploadBtn);
+            console.log('Upload form exists:', !!uploadForm);
+            console.log('File input exists:', !!fileInput);
+            
+            if (uploadBtn) {
+                // Hapus event handler yang mungkin sudah ada
+                $(uploadBtn).off('click');
+                
+                // Tambahkan event handler baru
+                $(uploadBtn).on('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('Upload button clicked - event handler triggered');
+                    
+                    // Cek status jadwal sebelum upload dengan fallback yang aman
+                    const jadwalStatus = '{{ jadwal_akhir.status if jadwal_akhir else "Tidak ada jadwal" }}';
+                    const jadwalBisaUpload = {{ 'true' if jadwal_akhir and jadwal_akhir.bisa_upload else 'false' }};
+                    const jadwalPesan = '{{ jadwal_akhir.pesan if jadwal_akhir else "Bisa upload kapan saja" }}';
+                    
+                    console.log('Jadwal status:', jadwalStatus);
+                    console.log('Jadwal bisa upload:', jadwalBisaUpload);
+                    console.log('Jadwal pesan:', jadwalPesan);
+                    
+                    // Cek proposal_id
+                    const proposalId = '{{ proposal_id }}';
+                    if (!proposalId || proposalId === 'None' || proposalId === '') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'ID Proposal tidak ditemukan. Silakan refresh halaman.',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+                    
+                    if (!jadwalBisaUpload) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Jadwal Tidak Aktif',
+                            text: jadwalPesan,
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+                    
+                    // Validasi file
+                    if (!fileInput || !fileInput.files || !fileInput.files[0]) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Pilih file terlebih dahulu!',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+                    
+                    const file = fileInput.files[0];
+                    console.log('File selected:', file.name, file.size, file.type);
+                    
+                    if (!file.name.toLowerCase().endsWith('.pdf')) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Hanya file PDF yang diizinkan!',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+                    
+                    if (file.size > 5 * 1024 * 1024) { // 5MB
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Ukuran file maksimal 5MB!',
+                            confirmButtonText: 'OK'
+                        });
+                        return;
+                    }
+                    
+                    // Show loading
+                    Swal.fire({
+                        title: 'Mengupload...',
+                        text: 'Sedang mengupload file laporan akhir',
+                        allowOutsideClick: false,
+                        didOpen: () => { 
+                            Swal.showLoading(); 
+                        }
+                    });
+                    
+                    // Buat FormData
+                    const formData = new FormData();
+                    formData.append('file_laporan_akhir', file);
+                    formData.append('proposal_id', proposalId);
+                    
+                    console.log('FormData created with proposal_id:', proposalId);
+                    console.log('FormData file:', file.name);
+                    
+                    // Debug: cek isi FormData
+                    console.log('FormData entries:');
+                    for (let [key, value] of formData.entries()) {
+                        console.log(key, value);
+                    }
+                    
+                    console.log('Sending upload request to /mahasiswa/upload_file_laporan_akhir...');
+                    
+                    fetch('/mahasiswa/upload_file_laporan_akhir', {
+                        method: 'POST',
+                        body: formData,
+                        // Tambahkan headers yang mungkin diperlukan
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        console.log('Response received:', response);
+                        console.log('Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Data received:', data);
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: data.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'Upload gagal',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Terjadi kesalahan saat mengupload file: ' + error.message,
+                            confirmButtonText: 'OK'
+                        });
+                    });
+                });
+                
+                console.log('Upload event handler bound successfully');
+            } else {
+                console.error('Upload button not found!');
+            }
+        });
+
+
+
+    </script>
+
+
+
+    <!-- Modal Upload File Laporan Akhir -->
+    <div class="modal fade" id="modalUploadLaporanAkhir" tabindex="-1" aria-labelledby="modalUploadLaporanAkhirLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalUploadLaporanAkhirLabel">
+                        <i class="fa fa-upload me-2"></i>
+                        <span id="modalTitleAkhir">Upload File Laporan Akhir</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formUploadLaporanAkhir" enctype="multipart/form-data">
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">File Laporan Akhir (PDF)</label>
+                                <input type="file" class="form-control" id="fileLaporanAkhir" name="file_laporan_akhir" accept=".pdf" required>
+                                <div class="form-text">
+                                    Format yang diizinkan: PDF. Maksimal ukuran file: 5MB
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-1"></i>
+                        Batal
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnUploadLaporanAkhir">
+                        <i class="fa fa-upload me-1"></i>
+                        <span id="btnTextAkhir">Upload File</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+            <!-- Modal Komentar Pembimbing -->
+            <div class="modal fade" id="modalKomentarPembimbingAkhir" tabindex="-1" aria-labelledby="modalKomentarPembimbingAkhirLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalKomentarPembimbingAkhirLabel">
+                                <i class="fa fa-comment me-2"></i>
+                                Komentar Pembimbing
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            {% if file_laporan_akhir and file_laporan_akhir.komentar_pembimbing %}
+                                <div class="alert alert-info">
+                                    <h6 class="alert-heading mb-2">
+                                        <i class="fa fa-user-tie me-2"></i>
+                                        Komentar dari Pembimbing:
+                                    </h6>
+                                    <p class="mb-0">{{ file_laporan_akhir.komentar_pembimbing }}</p>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    <i class="fa fa-exclamation-triangle me-2"></i>
+                                    Belum ada komentar dari pembimbing.
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fa fa-times me-1"></i>
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+</body>
+
+</html>
+

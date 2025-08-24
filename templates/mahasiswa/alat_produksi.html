@@ -1,0 +1,1087 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengelolaan Alat Produksi Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+    <style>
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+
+        .modal-body .row.g-3 {
+            row-gap: 18px;
+        }
+
+        @media (max-width: 575.98px) {
+
+            .modal-header,
+            .modal-footer,
+            .modal-body {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .modal-body {
+                padding-top: 16px;
+                padding-bottom: 6px;
+            }
+        }
+
+        .btn-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1rem;
+            border: none;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+            transition: box-shadow 0.2s;
+        }
+
+        .btn-circle:active,
+        .btn-circle:focus {
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.13);
+        }
+
+        .btn-circle i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.1em;
+            line-height: 1;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 7px;
+            vertical-align: middle;
+        }
+
+        .status-draf {
+            background: #facc15;
+        }
+
+        .status-text {
+            font-weight: 500;
+            color: #444;
+        }
+
+        /* Styling untuk alert notifications */
+        .alert {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .alert-warning {
+            border-left-color: #ffc107;
+        }
+        
+        .alert-success {
+            border-left-color: #28a745;
+        }
+        
+        .alert-danger {
+            border-left-color: #dc3545;
+        }
+        
+        .alert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .alert .btn-close {
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .alert .btn-close:hover {
+            opacity: 1;
+        }
+        
+        .alert i {
+            flex-shrink: 0;
+        }
+        
+        /* Styling untuk tombol tambah alat produksi */
+        .btn-tambah-bahan-custom {
+            background: #28a745;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-tambah-bahan-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            color: white;
+        }
+        
+        .icon-circle {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Styling untuk tombol aksi */
+        .btn-edit-bahan {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-hapus-bahan {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-edit-bahan:hover {
+            background: #e0a800;
+            color: #212529;
+        }
+        
+        .btn-hapus-bahan:hover {
+            background: #c82333;
+            color: white;
+        }
+        
+        /* Styling untuk pesan no data */
+        .no-data-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .no-data-message i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .no-data-message h5 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .no-data-message p {
+            margin-bottom: 0;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .alert {
+                padding: 12px 16px;
+            }
+            
+            .alert .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            
+            .alert i {
+                margin-bottom: 8px;
+                margin-right: 0 !important;
+            }
+        }
+
+        .proposal-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .proposal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-color: #22c55e !important;
+        }
+
+        .proposal-card .card-header {
+            transition: all 0.3s ease;
+            background: #f8f9fa !important;
+            color: #495057;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .btn-tambah-bahan {
+            background: #22c55e !important;
+            border: 2px solid #22c55e !important;
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .btn-tambah-bahan:hover {
+            background: #16a34a !important;
+            border-color: #16a34a !important;
+            transform: scale(1.05);
+        }
+
+        .btn-edit-bahan {
+            background: #435ebe !important;
+            color: white !important;
+        }
+
+        .btn-edit-bahan:hover {
+            background: #25396f !important;
+            transform: scale(1.1);
+        }
+
+        .btn-hapus-bahan {
+            background: #dc3545 !important;
+            color: white !important;
+        }
+
+        .btn-hapus-bahan:hover {
+            background: #c82333 !important;
+            transform: scale(1.1);
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .no-data-message i {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .btn-tambah-bahan-custom {
+            display: inline-flex;
+            align-items: center;
+            background: #4b7c5a;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 6px 22px 6px 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            gap: 10px;
+        }
+        .btn-tambah-bahan-custom:hover {
+            background: #356346;
+        }
+        .btn-tambah-bahan-custom .icon-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            color: #388e3c;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            margin-right: 8px;
+            font-size: 1.4em;
+            font-weight: bold;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            line-height: 1;
+        }
+
+        .btn-tambah-bahan-custom .bi-plus {
+            font-weight: bold !important;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+        
+        /* Styling untuk input harga jual */
+        .form-control[placeholder*="5500000"] {
+            border-color: #28a745;
+            background-color: #f8fff9;
+        }
+        
+        .form-control[placeholder*="5500000"]:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+        
+        .form-label[for*="hargaJual"] {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .form-text.text-muted {
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .form-text.text-muted i {
+            color: #28a745;
+        }
+        
+        @media (max-width: 768px) {
+            .form-control[placeholder*="5500000"] {
+                font-size: 16px; /* Mencegah zoom di iOS */
+            }
+            
+            .form-text.text-muted {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-mahasiswa.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}"><img
+                                    src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo"
+                                    srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        {% if has_lolos_proposal %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin = 'lolos' - lengkap -->
+                            <li class="sidebar-item  has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                                <ul class="submenu ">
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_akhir') }}">Laporan Akhir</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-item  has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span>Produksi</span>
+                                </a>
+                                <ul class="submenu ">
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.pengelolaan_bahan_baku_mahasiswa') }}">Bahan Baku</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.aktivitas_produksi_mahasiswa') }}">Produksi</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li class="sidebar-item active">
+                                <a href="{{ url_for('mahasiswa.pembelian_alat_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-tools"></i>
+                                    <span>Alat Produksi</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-item ">
+                                <a href="{{ url_for('mahasiswa.biaya_operasional_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-calculator"></i>
+                                    <span>Biaya Operasional</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item ">
+                                <a href="{{ url_for('mahasiswa.biaya_non_operasional_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-wallet2"></i>
+                                    <span>Biaya Lain-lain</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item ">
+                                <a href="{{ url_for('mahasiswa.laporan_penjualan_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-receipt"></i>
+                                    <span>Laporan Penjualan</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-item  has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-graph-up"></i>
+                                    <span>Pelaporan Keuangan</span>
+                                </a>
+                                <ul class="submenu ">
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_laba_rugi_mahasiswa') }}">Laporan Laba Rugi</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_arus_kas_mahasiswa') }}">Laporan Arus Kas</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_neraca_mahasiswa') }}">Laporan Neraca</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin != 'lolos' atau tanpa proposal - terbatas -->
+                            <li class="sidebar-item active has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                                <ul class="submenu active">
+                                    <li class="submenu-item active">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.bimbingan') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.profile_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-person-circle"></i>
+                                <span>Profile Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-star-fill"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Pengelolaan Alat Produksi</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Catat dan kelola alat produksi usahamu di AYMP UNJAYA.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Pengelolaan Alat Produksi</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Tables start -->
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        {% if proposal_data %}
+                            {% for proposal_id, data in proposal_data.items() %}
+                            <div class="card proposal-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-0">{{ data.proposal.judul_usaha }}</h5>
+                                        <small class="text-muted">{{ data.proposal.kategori }} - Tahun NIB: {% if data.proposal.tahun_nib and data.proposal.tahun_nib != '0' %}{{ data.proposal.tahun_nib }}{% else %}Tidak ada{% endif %}</small>
+                                    </div>
+                                    <button class="btn btn-tambah-bahan-custom" onclick="tambahAlatProduksi({{ data.proposal.id }})" {% if status_mahasiswa == 'selesai' %}disabled style="opacity:0.6;cursor:not-allowed;"{% endif %}>
+                                        <span class="icon-circle">
+                                            <i class="bi bi-plus"></i>
+                                        </span>
+                                        Tambah Alat Produksi
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    {% if data.alat_produksi %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="tableAlatProduksi{{ data.proposal.id }}">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Tanggal Beli</th>
+                                                    <th>Nama Peralatan</th>
+                                                    <th>Quantity</th>
+                                                    <th>Harga</th>
+                                                    <th>Harga Jual</th>
+                                                    <th>Total</th>
+                                                    <th>Keterangan</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for alat in data.alat_produksi %}
+                                                <tr>
+                                                    <td>{{ loop.index }}</td>
+                                                    <td>{{ alat.tanggal_beli.strftime('%d/%m/%Y') if alat.tanggal_beli else '-' }}</td>
+                                                    <td>{{ alat.nama_alat|e }}</td>
+                                                    <td>{{ alat.quantity }}</td>
+                                                    <td>Rp {{ "{:,.0f}".format(alat.harga) }}</td>
+                                                    <td>Rp {{ "{:,.0f}".format(alat.harga_jual) if alat.harga_jual else '0' }}</td>
+                                                    <td>Rp {{ "{:,.0f}".format(alat.total_alat_produksi) }}</td>
+                                                    <td>{{ alat.keterangan|e if alat.keterangan else '-' }}</td>
+                                                    <td>
+                                                        <button class="btn btn-circle btn-edit-bahan" onclick="editAlatProduksi({{ alat.id }})" title="Edit" {% if status_mahasiswa == 'selesai' %}disabled style="opacity:0.6;cursor:not-allowed;"{% endif %}>
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-circle btn-hapus-bahan" onclick="hapusAlatProduksi({{ alat.id }})" title="Hapus" {% if status_mahasiswa == 'selesai' %}disabled style="opacity:0.6;cursor:not-allowed;"{% endif %}>
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th colspan="6" class="text-end">Total Semua</th>
+                                                    <th id="grandTotal_{{ data.proposal.id }}">Rp 0</th>
+                                                    <th></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="no-data-message">
+                                        <i class="bi bi-tools"></i>
+                                        <h5>Belum ada data alat produksi</h5>
+                                        <p>Klik tombol "Tambah Alat Produksi" untuk menambahkan data peralatan pertama Anda.</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="no-data-message">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <h5>Tidak ada proposal yang lolos</h5>
+                                    <p>Anda harus memiliki proposal yang sudah disetujui untuk dapat mengelola bahan baku.</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+                <!-- Basic Tables end -->
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Tambah Alat Produksi -->
+    <div class="modal fade" id="modalAlatProduksi" tabindex="-1" aria-labelledby="modalAlatProduksiLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAlatProduksiLabel">Tambah Alat Produksi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formAlatProduksi">
+                    <div class="modal-body">
+                        <input type="hidden" id="proposalId" name="proposal_id">
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="tanggalBeli" class="form-label">Tanggal Beli <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="tanggalBeli" name="tanggal_beli" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="namaAlat" class="form-label">Nama Peralatan <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="namaAlat" name="nama_alat" required placeholder="Contoh: Mesin Penggiling">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" min="1" required placeholder="Contoh: 2">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="harga" class="form-label">Harga (Rp) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="harga" name="harga" min="0" required placeholder="Contoh: 5000000">
+                            </div>
+                            <div class="col-12">
+                                <label for="hargaJual" class="form-label">Harga Jual (Rp)</label>
+                                <input type="number" class="form-control" id="hargaJual" name="harga_jual" min="0" placeholder="Contoh: 5500000">
+                                <small class="form-text text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Harga jual adalah harga yang akan digunakan jika alat produksi dijual kembali (opsional)
+                                </small>
+                            </div>
+                            <div class="col-12">
+                                <div class="alert alert-info" style="margin-bottom: 0;">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    <strong>Info Perhitungan:</strong> Total = Quantity × Harga Satuan
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div id="previewTotal" class="alert alert-success" style="display:none; margin-bottom:0;">
+                                    <i class="bi bi-calculator me-2"></i>
+                                    <strong>Total:</strong> <span id="totalValue">Rp 0</span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label for="keterangan" class="form-label">Keterangan</label>
+                                <textarea class="form-control" id="keterangan" name="keterangan" rows="3" placeholder="Tambahkan keterangan jika diperlukan"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Alat Produksi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Alat Produksi -->
+    <div class="modal fade" id="modalEditAlatProduksi" tabindex="-1" aria-labelledby="modalEditAlatProduksiLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditAlatProduksiLabel">Edit Alat Produksi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formEditAlatProduksi">
+                    <div class="modal-body">
+                        <input type="hidden" id="editAlatId" name="alat_id">
+                        <input type="hidden" id="editProposalId" name="proposal_id">
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="editTanggalBeli" class="form-label">Tanggal Beli <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="editTanggalBeli" name="tanggal_beli" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editNamaAlat" class="form-label">Nama Peralatan <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editNamaAlat" name="nama_alat" required placeholder="Contoh: Mesin Penggiling">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editQuantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="editQuantity" name="quantity" min="1" required placeholder="Contoh: 2">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editHarga" class="form-label">Harga (Rp) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="editHarga" name="harga" min="0" required placeholder="Contoh: 5000000">
+                            </div>
+                            <div class="col-12">
+                                <label for="editHargaJual" class="form-label">Harga Jual (Rp)</label>
+                                <input type="number" class="form-control" id="editHargaJual" name="harga_jual" min="0" placeholder="Contoh: 5500000">
+                                <small class="form-text text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Harga jual adalah harga yang akan digunakan jika alat produksi dijual kembali (opsional)
+                                </small>
+                            </div>
+                            <div class="col-12">
+                                <div class="alert alert-info" style="margin-bottom: 0;">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    <strong>Info Perhitungan:</strong> Total = Quantity × Harga Satuan
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div id="previewEditTotal" class="alert alert-success" style="display:none; margin-bottom:0;">
+                                    <i class="bi bi-calculator me-2"></i>
+                                    <strong>Total:</strong> <span id="editTotalValue">Rp 0</span>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label for="editKeterangan" class="form-label">Keterangan</label>
+                                <textarea class="form-control" id="editKeterangan" name="keterangan" rows="3" placeholder="Tambahkan keterangan jika diperlukan"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Update Alat Produksi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}">
+    </script>
+    <script
+        src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.all.js') }}"></script>
+
+    <script>
+        // Inisialisasi DataTable untuk setiap tabel
+        $(document).ready(function() {
+            {% for proposal_id, data in proposal_data.items() %}
+                {% if data.alat_produksi %}
+                $('#tableAlatProduksi{{ data.proposal.id }}').DataTable({
+                    responsive: true,
+                    language: {
+                        "sProcessing":   "Sedang memproses...",
+                        "sLengthMenu":   "Tampilkan _MENU_ data",
+                        "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                        "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                        "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                        "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                        "sInfoPostFix":  "",
+                        "sSearch":       "Cari:",
+                        "sUrl":          "",
+                        "oPaginate": {
+                            "sFirst":    "Pertama",
+                            "sPrevious": "Sebelumnya",
+                            "sNext":     "Selanjutnya",
+                            "sLast":     "Terakhir"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                            "sSortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                        }
+                    }
+                });
+                
+                // Hitung total harga alat produksi
+                let total = 0;
+                {% for alat in data.alat_produksi %}
+                    total += {{ alat.total_alat_produksi }};
+                {% endfor %}
+                $('#grandTotal_{{ data.proposal.id }}').text('Rp ' + total.toLocaleString('id-ID'));
+                {% endif %}
+            {% endfor %}
+        });
+
+        // Fungsi untuk menambah alat produksi
+        function tambahAlatProduksi(proposalId) {
+            {% if status_mahasiswa == 'selesai' %}
+            Swal.fire('Akses Dibatasi', 'Anda tidak dapat menambahkan alat produksi karena status akun Anda adalah "selesai".', 'warning');
+            return;
+            {% endif %}
+            
+            $('#modalAlatProduksiLabel').text('Tambah Alat Produksi');
+            $('#formAlatProduksi')[0].reset();
+            $('#proposalId').val(proposalId);
+            $('#modalAlatProduksi').modal('show');
+        }
+
+        // Fungsi untuk edit alat produksi
+        function editAlatProduksi(alatId) {
+            {% if status_mahasiswa == 'selesai' %}
+            Swal.fire('Akses Dibatasi', 'Anda tidak dapat mengedit alat produksi karena status akun Anda adalah "selesai".', 'warning');
+            return;
+            {% endif %}
+            
+            $.ajax({
+                url: `/mahasiswa/get_alat_produksi/${alatId}`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        const alat = response.data;
+                        $('#editAlatId').val(alat.id);
+                        $('#editNamaAlat').val(alat.nama_alat);
+                        $('#editQuantity').val(alat.quantity);
+                        $('#editHarga').val(alat.harga);
+                        $('#editHargaJual').val(alat.harga_jual || 0);
+                        $('#editTanggalBeli').val(alat.tanggal_beli);
+                        $('#editKeterangan').val(alat.keterangan || '');
+                        
+                        $('#modalEditAlatProduksi').modal('show');
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Terjadi kesalahan saat mengambil data alat produksi', 'error');
+                }
+            });
+        }
+
+        // Fungsi untuk hapus alat produksi
+        function hapusAlatProduksi(alatId) {
+            {% if status_mahasiswa == 'selesai' %}
+            Swal.fire('Akses Dibatasi', 'Anda tidak dapat menghapus alat produksi karena status akun Anda adalah "selesai".', 'warning');
+            return;
+            {% endif %}
+            
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: 'Apakah Anda yakin ingin menghapus alat produksi ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/mahasiswa/delete_alat_produksi',
+                        method: 'POST',
+                        data: {
+                            alat_id: alatId
+                        },
+                        
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Berhasil!', response.message, 'success');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1500);
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Terjadi kesalahan saat menghapus alat produksi', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Event handler untuk form tambah alat produksi
+        $('#formAlatProduksi').on('submit', function(e) {
+            e.preventDefault();
+            
+            $.ajax({
+                url: '/mahasiswa/tambah_alat_produksi',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('Berhasil!', response.message, 'success').then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Terjadi kesalahan saat menambah alat produksi', 'error');
+                }
+            });
+        });
+
+        // Event handler untuk form edit alat produksi
+        $('#formEditAlatProduksi').on('submit', function(e) {
+            e.preventDefault();
+            
+            $.ajax({
+                url: '/mahasiswa/update_alat_produksi',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('Berhasil!', response.message, 'success').then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Terjadi kesalahan saat mengupdate alat produksi', 'error');
+                }
+            });
+        });
+
+        // Preview total pada form tambah alat produksi
+        function updateTotalPreview() {
+            let qty = parseInt($('#quantity').val()) || 0;
+            let harga = parseInt($('#harga').val()) || 0;
+            let total = qty * harga;
+            if (qty > 0 && harga > 0) {
+                $('#previewTotal').show();
+                $('#totalValue').text('Rp ' + total.toLocaleString('id-ID'));
+            } else {
+                $('#previewTotal').hide();
+            }
+        }
+        $('#quantity, #harga').on('input', updateTotalPreview);
+        // Preview total pada form edit alat produksi
+        function updateEditTotalPreview() {
+            let qty = parseInt($('#editQuantity').val()) || 0;
+            let harga = parseInt($('#editHarga').val()) || 0;
+            let total = qty * harga;
+            if (qty > 0 && harga > 0) {
+                $('#previewEditTotal').show();
+                $('#editTotalValue').text('Rp ' + total.toLocaleString('id-ID'));
+            } else {
+                $('#previewEditTotal').hide();
+            }
+        }
+        $('#editQuantity, #editHarga').on('input', updateEditTotalPreview);
+        // Tampilkan preview saat modal edit dibuka
+        $('#modalEditAlatProduksi').on('shown.bs.modal', function () {
+            updateEditTotalPreview();
+        });
+    </script>
+
+</body>
+
+</html>
+

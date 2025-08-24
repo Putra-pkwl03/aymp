@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Biaya Operasional Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            }
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-circle.btn-primary {
+            background: #435ebe;
+            color: white;
+        }
+        .btn-circle.btn-primary:hover {
+            background: #2c3e50;
+            color: white;
+        }
+        .btn-circle.btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-circle.btn-secondary:hover {
+            background: #495057;
+            color: white;
+        }
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1.1rem;
+            line-height: 40px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+        .table th, .table td {
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        @media (max-width: 1200px) {
+            .table th, .table td {
+                font-size: 0.85rem;
+                padding: 7px 3px;
+            }
+        }
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+        .judul-usaha {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .judul-usaha:hover {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-pembimbing.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                            <ul class="submenu ">
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_laporan_akhir') }}">Laporan Akhir</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        <li class="sidebar-item active has-sub">
+                                <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Monitoring Mahasiswa</span>
+                                </a>
+                            <ul class="submenu active">
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                    </li>
+                                    <li class="submenu-item active">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                            </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                    </li>
+                                </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('pembimbing.daftar_penilaian_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-pencil-square"></i>
+                                <span>Penilaian Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Monitoring Biaya Operasional Mahasiswa</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">
+                                Pantau biaya operasional mahasiswa bimbinganmu di AYMP UNJAYA.
+                            </p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.das_pembimbing') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Monitoring Biaya Operasional</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <div class="card" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+                                <div>
+                                    <div style="font-weight:700;font-size:1.25rem;">Data Mahasiswa Bimbingan</div>
+                                    <small class="text-muted">Klik tombol aksi untuk melihat detail biaya operasional</small>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table mb-0" id="table1">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama</th>
+                                            <th>Judul Usaha</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if mahasiswa_list %}
+                                            {% for mahasiswa in mahasiswa_list %}
+                                                <tr>
+                                                    <td>{{ loop.index }}</td>
+                                                    <td>
+                                                        <div class="fw-bold">{{ mahasiswa.nama_ketua|e }}</div>
+                                                        <small class="text-muted">{{ mahasiswa.nim|e }} | {{ mahasiswa.program_studi|e }}</small>
+                                                    </td>
+                                                    <td>
+                                                        <div class="judul-usaha" title="{{ mahasiswa.judul_usaha|e }}">
+                                                            {{ mahasiswa.judul_usaha|e }}
+                                                        </div>
+                                                        <small class="text-muted">Tahap Usaha: {{ mahasiswa.tahapan_usaha|e if mahasiswa.tahapan_usaha else '-' }}</small>
+                                                    </td>
+                                                    <td>
+                                                        {% if mahasiswa.has_biaya_operasional %}
+                                                            <a href="{{ url_for('pembimbing.pembimbing_biaya_operasional', mahasiswa_id=mahasiswa.id) }}" 
+                                                               class="btn-circle btn-primary" 
+                                                               title="Lihat Biaya Operasional">
+                                                                <i class="bi bi-calculator-fill"></i>
+                                                            </a>
+                                                        {% else %}
+                                                            <button class="btn-circle btn-secondary" 
+                                                                    title="Belum ada data biaya operasional" 
+                                                                    disabled>
+                                                                <i class="bi bi-calculator"></i>
+                                                            </button>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="4" class="text-center text-muted">
+                                                    <i class="bi bi-inbox" style="font-size: 2rem; color: #dee2e6;"></i>
+                                                    <br>
+                                                    <small>Tidak ada data mahasiswa bimbingan</small>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+
+    <script>
+        $(document).ready(function() {
+            let jquery_datatable = $("#table1").DataTable({
+                language: {
+                    "sProcessing":   "Sedang memproses...",
+                    "sLengthMenu":   "Tampilkan _MENU_ data",
+                    "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                    "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                    "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Cari:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "Pertama",
+                        "sPrevious": "Sebelumnya",
+                        "sNext":     "Selanjutnya",
+                        "sLast":     "Terakhir"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                        "sSortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                    }
+                },
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]]
+            });
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+</body>
+
+</html> 

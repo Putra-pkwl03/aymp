@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pembimbing Admin - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <!-- <link rel="stylesheet" href="assets/vendors/jquery-datatables/jquery.dataTables.min.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/choices.js/choices.min.css') }}">
+    <style>
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+
+        .modal-body .row.g-3 {
+            row-gap: 18px;
+        }
+
+        @media (max-width: 575.98px) {
+
+            .modal-header,
+            .modal-footer,
+            .modal-body {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .modal-body {
+                padding-top: 16px;
+                padding-bottom: 6px;
+            }
+        }
+
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-circle:active,
+        .btn-circle:focus {
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.13);
+        }
+        .btn-circle i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.1em;
+            line-height: 1;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 7px;
+            vertical-align: middle;
+        }
+
+        .status-draft {
+            background: #facc15;
+        }
+
+        .status-active {
+            background: #22c55e;
+        }
+
+        .status-inactive {
+            background: #ef4444;
+        }
+
+        .status-text {
+            font-weight: 500;
+            color: #444;
+        }
+
+        .approval-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .status-display {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-rejected {
+            background: #ef4444;
+        }
+
+        /* Styling dasar untuk tabel */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+        
+        /* Responsive untuk pembimbing management */
+        @media (max-width: 768px) {
+            .pembimbing-management .card {
+                margin-bottom: 1rem;
+            }
+            
+            .pembimbing-management .btn-action {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 0.5rem;
+            }
+            
+            .btn-action-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn-action-group .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .pembimbing-management .btn-circle {
+                width: 35px !important;
+                height: 35px !important;
+                font-size: 1rem !important;
+            }
+            
+            .status-display {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+            
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+            
+            .table td, .table th {
+                padding: 0.5rem 0.25rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .pembimbing-management .btn-circle {
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 0.9rem !important;
+            }
+            
+            .btn-circle {
+                width: 32px !important;
+                height: 32px !important;
+                font-size: 0.95rem !important;
+            }
+            
+            .btn-circle i {
+                font-size: 0.85em !important;
+            }
+            
+            .table-responsive {
+                font-size: 0.75rem;
+            }
+            
+            .table td, .table th {
+                padding: 0.375rem 0.125rem;
+            }
+            
+            .btn-circle .fa-gear {
+                font-size: 0.8em;
+            }
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Responsive table */
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Info box styling */
+        .text-muted small {
+            font-size: 13px;
+        }
+
+        /* Modal styling */
+        .modal-lg {
+            max-width: 800px;
+        }
+
+        .modal-body .form-label {
+            font-weight: 600;
+            color: #3b3f5c;
+            margin-bottom: 8px;
+        }
+
+        .modal-body .form-control,
+        .modal-body .form-select {
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            padding: 10px 15px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .modal-body .form-control:focus,
+        .modal-body .form-select:focus {
+            border-color: #435ebe;
+            box-shadow: 0 0 0 0.2rem rgba(67, 94, 190, 0.25);
+            outline: none;
+        }
+
+        /* Styling untuk input di tabel */
+        .table input[type="number"] {
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 13px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .table input[type="number"]:focus {
+            border-color: #435ebe;
+            box-shadow: 0 0 0 0.2rem rgba(67, 94, 190, 0.25);
+            outline: none;
+        }
+
+        .table input[type="number"]:hover {
+            border-color: #435ebe;
+        }
+
+        /* Styling untuk tabel di modal */
+        .modal .table {
+            margin-bottom: 0;
+        }
+
+        .modal .table th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+
+        .modal .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+
+                    .modal .table tbody tr:hover {
+                background-color: rgba(67, 94, 190, 0.05);
+            }
+            
+            .modal-body {
+                padding: 20px 24px 12px 24px;
+            }
+            
+            .modal-body .row.g-3 {
+                row-gap: 16px;
+            }
+            
+            .modal-body .form-label {
+                font-size: 0.9rem;
+                margin-bottom: 8px;
+            }
+            
+            .modal-body .form-control,
+            .modal-body .form-select {
+                font-size: 0.9rem;
+                padding: 10px 14px;
+            }
+            
+            .modal-body small {
+                font-size: 0.8rem;
+            }
+            
+            .modal-body .form-label .fa-info-circle {
+                font-size: 1em;
+            }
+
+        /* Styling untuk judul tabel di modal */
+        .modal h6 {
+            color: #3b3f5c;
+            font-weight: 600;
+            border-bottom: 2px solid #435ebe;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+
+        /* Responsive design untuk modal */
+        @media (max-width: 768px) {
+            .modal-lg {
+                max-width: 95%;
+                margin: 1rem auto;
+            }
+            
+            .modal-header {
+                padding: 16px 20px 10px 20px;
+            }
+            
+            .modal-header .modal-title {
+                font-size: 1.2rem;
+            }
+            
+            .modal .table {
+                font-size: 0.875rem;
+            }
+            
+            .modal .table th,
+            .modal .table td {
+                padding: 0.5rem 0.25rem;
+            }
+            
+            .table input[type="number"] {
+                width: 60px !important;
+                font-size: 12px;
+                padding: 4px 6px;
+            }
+            
+            .modal h6 {
+                font-size: 1.1rem;
+                margin-bottom: 14px;
+            }
+            
+            .modal h6 .fa-info-circle {
+                font-size: 1em;
+            }
+        }
+        }
+
+        @media (max-width: 576px) {
+            .modal-lg {
+                max-width: 98%;
+                margin: 0.5rem auto;
+            }
+            
+            .modal .table {
+                font-size: 0.8rem;
+            }
+            
+            .modal .table th,
+            .modal .table td {
+                padding: 0.375rem 0.125rem;
+            }
+            
+            .table input[type="number"] {
+                width: 50px !important;
+                font-size: 11px;
+                padding: 3px 4px;
+            }
+            
+            .modal h6 {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+            
+            .modal h6 .fa-info-circle {
+                font-size: 0.9em;
+            }
+        }
+        }
+
+        /* Styling untuk alert info */
+        .alert-info {
+            background-color: #e7f3ff;
+            border-color: #b3d9ff;
+            color: #0c5460;
+        }
+
+        .alert-info small {
+            color: #0c5460;
+            opacity: 0.8;
+        }
+
+        /* Responsive design untuk alert */
+        @media (max-width: 768px) {
+            .alert-info {
+                font-size: 0.875rem;
+                padding: 1rem;
+            }
+            
+            .alert-info small {
+                font-size: 0.8rem;
+            }
+            
+            .alert-info .fa-info-circle {
+                font-size: 1em;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .alert-info {
+                font-size: 0.8rem;
+                padding: 0.75rem;
+            }
+            
+            .alert-info small {
+                font-size: 0.75rem;
+            }
+            
+            .modal-body .form-label {
+                font-size: 0.875rem;
+                margin-bottom: 6px;
+            }
+            
+            .modal-body .form-control,
+            .modal-body .form-select {
+                font-size: 0.875rem;
+                padding: 8px 12px;
+            }
+            
+            .modal-body small {
+                font-size: 0.75rem;
+            }
+            
+            .alert-info .fa-info-circle {
+                font-size: 0.9em;
+            }
+            
+            .modal-body .form-label .fa-info-circle {
+                font-size: 0.9em;
+            }
+        }
+            
+            .modal-footer .btn {
+                font-size: 0.875rem;
+                padding: 8px 16px;
+            }
+            
+            .modal-footer .btn i {
+                font-size: 0.8em;
+            }
+        }
+
+        /* Styling untuk SweetAlert */
+        .swal2-popup {
+            border-radius: 16px !important;
+        }
+
+        .swal2-title {
+            color: #3b3f5c !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-html-container {
+            margin: 1rem 0 !important;
+        }
+
+        .swal2-html-container p {
+            margin-bottom: 0.5rem !important;
+            color: #3b3f5c !important;
+        }
+
+        .swal2-html-container small {
+            color: #6c757d !important;
+            font-size: 0.875rem !important;
+        }
+
+        .swal2-html-container .bg-light {
+            background-color: #f8f9fa !important;
+        }
+
+        .swal2-html-container .rounded {
+            border-radius: 0.375rem !important;
+        }
+
+        .swal2-html-container .p-2 {
+            padding: 0.5rem !important;
+        }
+
+        .swal2-html-container .mt-2 {
+            margin-top: 0.5rem !important;
+        }
+
+        /* Responsive design untuk SweetAlert */
+        @media (max-width: 768px) {
+            .swal2-popup {
+                width: 90% !important;
+                margin: 1rem auto !important;
+            }
+            
+            .swal2-title {
+                font-size: 1.25rem !important;
+            }
+            
+            .swal2-html-container {
+                font-size: 0.875rem !important;
+            }
+            
+            .swal2-html-container small {
+                font-size: 0.8rem !important;
+            }
+            
+            .swal2-html-container .bg-light {
+                padding: 0.75rem !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .swal2-popup {
+                width: 95% !important;
+                margin: 0.5rem auto !important;
+            }
+            
+            .swal2-title {
+                font-size: 1.1rem !important;
+            }
+            
+            .swal2-html-container {
+                font-size: 0.8rem !important;
+            }
+            
+            .swal2-html-container small {
+                font-size: 0.75rem !important;
+            }
+            
+            .swal2-html-container .bg-light {
+                padding: 0.5rem !important;
+            }
+        }
+
+        /* Styling untuk tombol dengan icon */
+        .btn i {
+            font-size: 0.9em;
+        }
+
+        .btn .fa-save {
+            font-weight: 600;
+        }
+
+        .btn .fa-times {
+            font-weight: 600;
+        }
+
+        /* Responsive design untuk tombol dengan icon */
+        @media (max-width: 768px) {
+            .btn i {
+                font-size: 0.85em;
+            }
+            
+            .btn .fa-save,
+            .btn .fa-times {
+                font-weight: 600;
+            }
+            
+            .btn .fa-gear {
+                font-size: 1em;
+            }
+            
+            .btn-circle {
+                width: 38px !important;
+                height: 38px !important;
+                font-size: 1.05rem !important;
+            }
+            
+            .btn-circle i {
+                font-size: 0.95em !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .btn i {
+                font-size: 0.8em;
+            }
+            
+            .btn .fa-save,
+            .btn .fa-times {
+                font-weight: 500;
+            }
+            
+            .btn .fa-gear {
+                font-size: 0.9em;
+            }
+            
+            .btn-circle {
+                width: 35px !important;
+                height: 35px !important;
+                font-size: 1rem !important;
+            }
+            
+            .btn-circle i {
+                font-size: 0.9em !important;
+            }
+        }
+
+        /* Styling untuk warning button */
+        .swal2-confirm.swal2-styled[style*="background-color: rgb(255, 193, 7)"] {
+            background-color: #ffc107 !important;
+            color: #000 !important;
+        }
+
+        /* Responsive design untuk warning button */
+        @media (max-width: 768px) {
+            .swal2-confirm.swal2-styled[style*="background-color: rgb(255, 193, 7)"] {
+                font-size: 0.9rem !important;
+                padding: 10px 18px !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .swal2-confirm.swal2-styled[style*="background-color: rgb(255, 193, 7)"] {
+                font-size: 0.875rem !important;
+                padding: 8px 16px !important;
+            }
+        }
+
+        .modal-footer .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+
+        /* Responsive design untuk modal footer */
+        @media (max-width: 768px) {
+            .modal-footer {
+                padding: 14px 20px;
+            }
+            
+            .modal-footer .btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .modal-footer .btn i {
+                font-size: 0.85em;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .modal-footer {
+                padding: 12px 16px;
+            }
+            
+            .modal-footer .btn {
+                padding: 6px 12px;
+                font-size: 0.875rem;
+            }
+            
+            .modal-footer .btn i {
+                font-size: 0.8em;
+            }
+            
+            .modal-footer .btn .fa-save,
+            .modal-footer .btn .fa-times {
+                font-weight: 500;
+            }
+            
+            .modal-body {
+                padding: 16px 12px 8px 12px;
+            }
+            
+            .modal-body .row.g-3 {
+                row-gap: 12px;
+            }
+            
+            .modal-header {
+                padding: 12px 16px 8px 16px;
+            }
+            
+            .modal-header .modal-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Fix untuk DataTables */
+        .dataTables_wrapper .dataTable {
+            width: 100% !important;
+        }
+
+        .dataTables_wrapper .dataTable th,
+        .dataTables_wrapper .dataTable td {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .dataTables_wrapper .dataTable tbody tr {
+            height: auto;
+        }
+
+        .btn.btn-tambah-pembimbing {
+            display: inline-flex;
+            align-items: center;
+            background: #4b7c5a;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 6px 22px 6px 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            gap: 10px;
+        }
+        
+        .btn.btn-tambah-pembimbing:hover {
+            background: #356346;
+        }
+        
+        .btn.btn-tambah-pembimbing .icon-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            color: #388e3c;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            margin-right: 8px;
+            font-size: 1.4em;
+            font-weight: bold;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            line-height: 1;
+        }
+
+        .btn.btn-tambah-pembimbing .fa-plus {
+            font-weight: bold !important;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        /* Responsive design untuk tombol tambah pembimbing */
+        @media (max-width: 768px) {
+            .d-flex.justify-content-between.align-items-center.mb-2.flex-nowrap {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .d-flex.justify-content-between.align-items-center.mb-2.flex-nowrap > div:first-child {
+                width: 100%;
+            }
+            
+            .d-flex.justify-content-between.align-items-center.mb-2.flex-nowrap .btn.btn-tambah-pembimbing {
+                align-self: flex-end;
+                margin-left: auto;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .btn.btn-tambah-pembimbing {
+                padding: 6px 16px 6px 8px;
+                font-size: 0.9rem;
+            }
+            
+            .btn.btn-tambah-pembimbing .icon-circle {
+                width: 28px;
+                height: 28px;
+                font-size: 1.2em;
+            }
+        }
+
+        /* Memastikan tombol tetap di pojok kanan saat zoom */
+        @media (min-width: 769px) {
+            .d-flex.justify-content-between.align-items-center.mb-2.flex-nowrap {
+                min-width: 0;
+            }
+            
+            .d-flex.justify-content-between.align-items-center.mb-2.flex-nowrap > div:first-child {
+                flex: 1;
+                min-width: 0;
+                margin-right: 15px;
+            }
+            
+            .d-flex.justify-content-between.align-items-center.mb-2.flex-nowrap .btn.btn-tambah-pembimbing {
+                flex-shrink: 0;
+                white-space: nowrap;
+            }
+        }
+
+        .status-dot.status-active {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #22c55e;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        .status-dot.status-inactive {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ef4444;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        /* Styling untuk informasi mahasiswa */
+        .table td small {
+            line-height: 1.1;
+            display: block;
+            margin-top: 1px;
+        }
+
+        .table td small:first-of-type {
+            margin-top: 2px;
+        }
+
+        /* Card hover effect */
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+
+        /* Styling untuk placeholder input */
+        .form-control::placeholder {
+            color: #6c757d !important;
+            opacity: 1 !important;
+        }
+        
+        .form-control:focus::placeholder {
+            color: #adb5bd !important;
+            opacity: 0.7 !important;
+        }
+        
+        /* Styling untuk placeholder input number */
+        input[type="number"]::placeholder {
+            color: #6c757d !important;
+            opacity: 1 !important;
+            font-size: 0.875rem;
+        }
+        
+        input[type="number"]:focus::placeholder {
+            color: #adb5bd !important;
+            opacity: 0.7 !important;
+        }
+
+        /* Styling untuk tooltip title */
+        input[type="number"][title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+
+        /* Agar dropdown Choices.js tidak terhalang oleh modal Bootstrap */
+        .choices__list--dropdown, .choices__list[aria-expanded] {
+            z-index: 2050 !important;
+        }
+        .modal-content, .modal-body {
+            overflow: visible !important;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-admin.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    </head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('admin.das_admin') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.das_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.admin_daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Mahasiswa</span>
+                            </a>
+                            <ul class="submenu">
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('admin.mahasiswa_belum_diverifikasi') }}">Belum Diverifikasi</a>
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('admin.mahasiswa_sudah_diverifikasi') }}">Sudah Diverifikasi</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi-bar-chart-line"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-clock-history"></i>
+                                <span>Log Aktivitas</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_mahasiswa') }}">Mahasiswa</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_pembimbing') }}">Pembimbing</a> 
+                                </li>
+                                
+                            </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.daftar_nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-award"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.pengajuan_proposal') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Pengajuan Proposal</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_kemajuan') }}" class='sidebar-link'>
+                                <i class="bi bi-graph-up"></i>
+                                <span>Laporan Kemajuan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_akhir') }}" class='sidebar-link'>
+                                <i class="bi bi-clipboard-data"></i>
+                                <span>Laporan Akhir</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  active">
+                            <a href="{{ url_for('admin.admin_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Pembimbing</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.reviewer') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Reviewer</span>
+                            </a>
+                                </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.data_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Admin</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.pengaturan') }}" class='sidebar-link'>
+                                <i class="bi bi-gear"></i>
+                                <span>Pengaturan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('index') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Data Pembimbing</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Kelola data pembimbing akademik di AYMP UNJAYA.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('admin.das_admin') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Data Pembimbing</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Tables start -->
+                <section class="section">
+                    <div class="container-fluid mt-4">
+
+                        <div class="card"
+                            style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+                                <div>
+                                    <div style="font-weight:700;font-size:1.25rem;">Data Pembimbing Akademik</div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button class="btn btn-tambah-pembimbing" onclick="addPembimbing()">
+                                        <span class="icon-circle"><i class="fa fa-plus"></i></span>
+                                        Tambah Pembimbing
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table mb-0" id="table1">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama</th>
+                                            <th>NIP</th>
+                                            <th>Program Studi</th>
+                                            <th>Status</th>
+                                            <th>Kuota</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if pembimbing_list %}
+                                            {% for pembimbing in pembimbing_list %}
+                                            <tr>
+                                                <td>{{ loop.index }}</td>
+                                                <td>{{ pembimbing.nama or '-' }}</td>
+                                                <td>{{ pembimbing.nip or '-' }}</td>
+                                                <td>{{ pembimbing.program_studi or '-' }}</td>
+                                                <td>
+                                                    {% if pembimbing.status|lower == 'aktif' %}
+                                                        <span class="status-dot status-active"></span> Aktif
+                                                    {% else %}
+                                                        <span class="status-dot status-inactive"></span> Nonaktif
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex flex-column">
+                                                        <small class="text-muted">Total: {{ pembimbing.kuota_mahasiswa or 5 }}</small>
+                                                        <small class="text-muted">Terpakai: {{ pembimbing.jumlah_mahasiswa_bimbing or 0 }}</small>
+                                                        <small class="{% if pembimbing.status_kuota == 'tersedia' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                                            Sisa: {{ pembimbing.sisa_kuota or 5 }}
+                                                        </small>
+                                                        <small class="text-info" style="font-size: 0.75rem;">
+                                                            <i class="fa-solid fa-info-circle me-1"></i>
+                                                            Mahasiswa selesai tidak terhitung kuota
+                                                        </small>
+                                                    </div>
+                                                </td>
+                                                <td class="td-aksi">
+                                                    <button class="btn btn-circle" style="background:#102693;color:#fff;"
+                                                            title="Edit" onclick="editPembimbing({{ pembimbing.id }})">
+                                                        <i class="fa-solid fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-circle" style="background:#f472b6;color:#fff;"
+                                                            title="Hapus" onclick="deletePembimbing({{ pembimbing.id }})">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                    <!-- Tombol Aktifkan -->
+                                                    <button class="btn btn-circle" style="background:#22c55e;color:#fff;{% if pembimbing.status|lower == 'aktif' %} opacity:0.5; cursor:not-allowed;{% endif %}" title="Aktifkan" onclick="setStatusPembimbing({{ pembimbing.id }}, 'aktif')" {% if pembimbing.status|lower == 'aktif' %}disabled{% endif %}>
+                                                        <i class="fa-solid fa-check"></i>
+                                                    </button>
+                                                    <!-- Tombol Nonaktifkan -->
+                                                    <button class="btn btn-circle" style="background:#ef4444;color:#fff;{% if pembimbing.status|lower == 'nonaktif' %} opacity:0.5; cursor:not-allowed;{% endif %}" title="Nonaktifkan" onclick="setStatusPembimbing({{ pembimbing.id }}, 'nonaktif')" {% if pembimbing.status|lower == 'nonaktif' %}disabled{% endif %}>
+                                                        <i class="fa-solid fa-xmark"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="7" class="text-center">Tidak ada data pembimbing</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Basic Tables end -->
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Edit Pembimbing -->
+    <div class="modal fade" id="editPembimbingModal" tabindex="-1" aria-labelledby="editPembimbingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPembimbingModalLabel">Edit Data Pembimbing</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editPembimbingForm">
+                        <input type="hidden" id="editPembimbingId" name="pembimbing_id">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="editNama" class="form-label">Nama Pembimbing</label>
+                                <input type="text" class="form-control" id="editNama" name="nama" placeholder="Masukkan nama pembimbing" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editNip" class="form-label">NIP</label>
+                                <input type="text" class="form-control" id="editNip" name="nip" placeholder="Masukkan NIP pembimbing" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editProgramStudi" class="form-label">Program Studi</label>
+                                <select class="choices" id="editProgramStudi" name="program_studi" required>
+                                    <option value="">Pilih Program Studi</option>
+                                    {% for prodi in program_studi_list %}
+                                        <option value="{{ prodi.nama_program_studi }}">{{ prodi.nama_program_studi }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editPassword" class="form-label">Password Baru (Opsional)</label>
+                                <input type="password" class="form-control" id="editPassword" name="password" placeholder="Masukkan password baru (opsional)">
+                                <small class="text-muted">Minimal 1 karakter. Kosongkan jika tidak ingin mengubah password.</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editKuotaMahasiswa" class="form-label">Kuota Mahasiswa</label>
+                                <input type="number" class="form-control" id="editKuotaMahasiswa" name="kuota_mahasiswa" min="1" max="20" value="5" placeholder="Masukkan kuota mahasiswa (1-20)" required>
+                                <small class="text-muted">Jumlah maksimal mahasiswa yang dapat dibimbing (1-20)</small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="savePembimbingEdit()">Simpan Perubahan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Pembimbing -->
+    <div class="modal fade" id="addPembimbingModal" tabindex="-1" aria-labelledby="addPembimbingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addPembimbingModalLabel">Tambah Data Pembimbing</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addPembimbingForm">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="addNama" class="form-label">Nama Pembimbing</label>
+                                <input type="text" class="form-control" id="addNama" name="nama" placeholder="Masukkan nama pembimbing" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="addNip" class="form-label">NIP</label>
+                                <input type="text" class="form-control" id="addNip" name="nip" placeholder="Masukkan NIP pembimbing" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="addProgramStudi" class="form-label">Program Studi</label>
+                                <select class="choices" id="addProgramStudi" name="program_studi" required>
+                                    <option value="">Pilih Program Studi</option>
+                                    {% for prodi in program_studi_list %}
+                                        <option value="{{ prodi.nama_program_studi }}">{{ prodi.nama_program_studi }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="addPassword" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="addPassword" name="password" placeholder="Masukkan password pembimbing" required minlength="1">
+                                <small class="text-muted">Minimal 1 karakter</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="addKuotaMahasiswa" class="form-label">Kuota Mahasiswa</label>
+                                <input type="number" class="form-control" id="addKuotaMahasiswa" name="kuota_mahasiswa" min="1" max="20" value="{{ session.get('default_kuota_pembimbing', 5) }}" placeholder="Masukkan kuota mahasiswa (1-20)" required>
+                                <small class="text-muted">Jumlah maksimal mahasiswa yang dapat dibimbing (1-20)</small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="savePembimbingAdd()">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/choices.js/choices.min.js') }}"></script>
+    <script>
+        // Jquery Datatable dengan error handling
+        $(document).ready(function() {
+            try {
+                let jquery_datatable = $("#table1").DataTable({
+                    language: {
+                        "sProcessing":   "Sedang memproses...",
+                        "sLengthMenu":   "Tampilkan _MENU_ entri",
+                        "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                        "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                        "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+                        "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                        "sInfoPostFix":  "",
+                        "sSearch":       "Cari:",
+                        "sUrl":          "",
+                        "oPaginate": {
+                            "sFirst":    "Pertama",
+                            "sPrevious": "Sebelumnya",
+                            "sNext":     "Selanjutnya",
+                            "sLast":     "Terakhir"
+                        }
+                    },
+                    responsive: true,
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]]
+                });
+            } catch (error) {
+                console.error('Error initializing DataTable:', error);
+            }
+
+            // Reset form ketika modal ditutup
+            $('#editPembimbingModal').on('hidden.bs.modal', function () {
+                $('#editPembimbingForm')[0].reset();
+                $('#editPembimbingId').val('');
+                $('#editPassword').val(''); // Reset password field
+            });
+
+            $('#addPembimbingModal').on('hidden.bs.modal', function () {
+                $('#addPembimbingForm')[0].reset();
+            });
+
+
+
+            // Reset password field when modal is hidden
+            $('#editPembimbingModal').on('hidden.bs.modal', function () {
+                $('#editPassword').val('');
+                
+                // Reset dropdown program studi menggunakan Choices.js
+                if (window.editProgramStudiChoices) {
+                    window.editProgramStudiChoices.removeActiveItems();
+                }
+            });
+
+            // Set default kuota mahasiswa saat modal dibuka
+            $('#addPembimbingModal').on('show.bs.modal', function () {
+                const defaultKuota = localStorage.getItem('default_kuota_mahasiswa') || 5;
+                $('#addKuotaMahasiswa').val(defaultKuota);
+            });
+
+            // Set default kuota mahasiswa saat modal edit dibuka
+            $('#editPembimbingModal').on('show.bs.modal', function () {
+                // Jangan set default untuk edit mode, biarkan nilai yang ada
+            });
+
+            // Reset form pembimbing ketika modal ditutup
+            $('#addPembimbingModal').on('hidden.bs.modal', function () {
+                $('#addPembimbingForm')[0].reset();
+                
+                // Reset dropdown program studi menggunakan Choices.js
+                if (window.addProgramStudiChoices) {
+                    window.addProgramStudiChoices.removeActiveItems();
+                }
+            });
+
+            // Inisialisasi Choices.js untuk dropdown program studi
+            const editProgramStudiSelect = document.getElementById('editProgramStudi');
+            if (editProgramStudiSelect) {
+                window.editProgramStudiChoices = new Choices(editProgramStudiSelect, {
+                    searchEnabled: true,
+                    searchPlaceholderValue: 'Ketik untuk mencari program studi...',
+                    placeholder: true,
+                    placeholderValue: 'Pilih Program Studi',
+                    removeItemButton: false,
+                    shouldSort: true,
+                    position: 'bottom',
+                    maxItemCount: 1,
+                    searchResultLimit: 10,
+                    searchFields: ['label', 'value'],
+                    renderChoiceLimit: 10,
+                    itemSelectText: '',
+                    noResultsText: 'Tidak ada program studi yang ditemukan',
+                    noChoicesText: 'Tidak ada program studi yang tersedia',
+                    classNames: {
+                        containerOuter: 'choices',
+                        containerInner: 'choices__inner',
+                        input: 'choices__input',
+                        inputCloned: 'choices__input--cloned',
+                        list: 'choices__list',
+                        listItems: 'choices__list--multiple',
+                        listSingle: 'choices__list--single',
+                        listDropdown: 'choices__list--dropdown',
+                        item: 'choices__item',
+                        placeholder: 'choices__placeholder',
+                        group: 'choices__group',
+                        groupHeading: 'choices__heading',
+                        label: 'choices__label',
+                        activeState: 'is-active',
+                        focusState: 'is-focused',
+                        openState: 'is-open',
+                        disabledState: 'is-disabled',
+                        flippedState: 'is-flipped',
+                        loadingState: 'is-loading',
+                        noResults: 'has-no-results',
+                        noChoices: 'has-no-choices'
+                    }
+                });
+                
+                // Memastikan dropdown memiliki styling yang sama
+                setTimeout(() => {
+                    const choicesContainer = document.querySelector('#editProgramStudi').closest('.choices');
+                    const choicesInner = document.querySelector('#editProgramStudi').closest('.choices__inner');
+                    if (choicesContainer && choicesInner) {
+                        choicesContainer.style.width = '100%';
+                        choicesInner.style.width = '100%';
+                        choicesInner.style.height = '38px';
+                        choicesInner.style.minHeight = '38px';
+                        choicesInner.style.padding = '0.375rem 0.75rem';
+                        choicesInner.style.fontSize = '1rem';
+                        choicesInner.style.lineHeight = '1.5';
+                        choicesInner.style.borderRadius = '0.5rem';
+                        choicesInner.style.border = '1px solid #d1d5db';
+                        choicesInner.style.boxSizing = 'border-box';
+                        choicesInner.style.display = 'flex';
+                        choicesInner.style.alignItems = 'center';
+                    }
+                }, 100);
+            }
+
+            const addProgramStudiSelect = document.getElementById('addProgramStudi');
+            if (addProgramStudiSelect) {
+                window.addProgramStudiChoices = new Choices(addProgramStudiSelect, {
+                    searchEnabled: true,
+                    searchPlaceholderValue: 'Ketik untuk mencari program studi...',
+                    placeholder: true,
+                    placeholderValue: 'Pilih Program Studi',
+                    removeItemButton: false,
+                    shouldSort: true,
+                    position: 'bottom',
+                    maxItemCount: 1,
+                    searchResultLimit: 10,
+                    searchFields: ['label', 'value'],
+                    classNames: {
+                        containerOuter: 'choices',
+                        containerInner: 'choices__inner',
+                        input: 'choices__input',
+                        inputCloned: 'choices__input--cloned',
+                        list: 'choices__list',
+                        listItems: 'choices__list--multiple',
+                        listSingle: 'choices__list--single',
+                        listDropdown: 'choices__list--dropdown',
+                        item: 'choices__item',
+                        placeholder: 'choices__placeholder',
+                        group: 'choices__group',
+                        groupHeading: 'choices__heading',
+                        label: 'choices__label',
+                        activeState: 'is-active',
+                        focusState: 'is-focused',
+                        openState: 'is-open',
+                        disabledState: 'is-disabled',
+                        flippedState: 'is-flipped',
+                        loadingState: 'is-loading',
+                        noResults: 'has-no-results',
+                        noChoices: 'has-no-choices'
+                    }
+                });
+                
+                // Memastikan dropdown memiliki styling yang sama
+                setTimeout(() => {
+                    const choicesContainer = document.querySelector('#addProgramStudi').closest('.choices');
+                    const choicesInner = document.querySelector('#addProgramStudi').closest('.choices__inner');
+                    if (choicesContainer && choicesInner) {
+                        choicesContainer.style.width = '100%';
+                        choicesInner.style.width = '100%';
+                        choicesInner.style.height = '38px';
+                        choicesInner.style.minHeight = '38px';
+                        choicesInner.style.padding = '0.375rem 0.75rem';
+                        choicesInner.style.fontSize = '1rem';
+                        choicesInner.style.lineHeight = '1.5';
+                        choicesInner.style.borderRadius = '0.5rem';
+                        choicesInner.style.border = '1px solid #d1d5db';
+                        choicesInner.style.boxSizing = 'border-box';
+                        choicesInner.style.display = 'flex';
+                        choicesInner.style.alignItems = 'center';
+                    }
+                }, 100);
+            }
+        });
+
+
+
+        // Fungsi untuk menambah pembimbing
+        function addPembimbing() {
+            $('#addPembimbingModal').modal('show');
+        }
+
+        // Fungsi untuk edit pembimbing
+        function editPembimbing(pembimbingId) {
+            // Tampilkan loading
+            Swal.fire({
+                title: 'Memuat Data...',
+                text: 'Sedang mengambil data pembimbing',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Ambil data pembimbing dari server
+            fetch(`/admin/get_pembimbing_detail/${pembimbingId}`)
+                .then(response => response.json())
+                .then(data => {
+                    Swal.close();
+                    
+                    if (data.success) {
+                        const pembimbing = data.pembimbing;
+                        
+                        // Isi form dengan data yang ada
+                        $('#editPembimbingId').val(pembimbing.id);
+                        $('#editNama').val(pembimbing.nama);
+                        $('#editNip').val(pembimbing.nip);
+                        
+                        // Set nilai dropdown program studi menggunakan Choices.js
+                        if (window.editProgramStudiChoices) {
+                            window.editProgramStudiChoices.setChoiceByValue(pembimbing.program_studi);
+                        } else {
+                            // Fallback untuk input biasa
+                            $('#editProgramStudi').val(pembimbing.program_studi);
+                        }
+                        
+                        $('#editKuotaMahasiswa').val(pembimbing.kuota_mahasiswa || 5);
+                        $('#editPassword').val(''); // Reset password field
+                        
+                        // Tampilkan modal
+                        $('#editPembimbingModal').modal('show');
+                        // Reset password field
+                        $('#editPassword').val('');
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonColor: '#ef4444'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat mengambil data pembimbing',
+                        icon: 'error',
+                        confirmButtonColor: '#ef4444'
+                    });
+                });
+        }
+
+        // Fungsi untuk hapus pembimbing
+        function deletePembimbing(pembimbingId) {
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: 'Apakah Anda yakin ingin menghapus pembimbing ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/admin/delete_pembimbing', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            
+                        },
+                        body: JSON.stringify({ pembimbing_id: pembimbingId })
+                    })
+                    .then(res => {
+                        if (!res.ok) {
+                            return res.text().then(text => { throw new Error(text); });
+                        }
+                        return res.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire('Berhasil', data.message, 'success').then(() => location.reload());
+                        } else {
+                            Swal.fire('Gagal', data.message, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire('Error', error.message || 'Terjadi kesalahan', 'error');
+                    });
+                }
+            });
+        }
+
+        // Fungsi untuk menyimpan perubahan edit pembimbing
+        function savePembimbingEdit() {
+            // Validasi form
+            const form = $('#editPembimbingForm')[0];
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Ambil data dari form
+            const formData = {
+                pembimbing_id: $('#editPembimbingId').val(),
+                nama: $('#editNama').val().trim(),
+                nip: $('#editNip').val().trim(),
+                program_studi: window.editProgramStudiChoices ? window.editProgramStudiChoices.getValue(true) : $('#editProgramStudi').val().trim(),
+                password: $('#editPassword').val(),
+                kuota_mahasiswa: $('#editKuotaMahasiswa').val()
+            };
+
+            // Tampilkan loading
+            Swal.fire({
+                title: 'Menyimpan...',
+                text: 'Sedang menyimpan perubahan data pembimbing',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Kirim data ke server
+            fetch('/admin/update_pembimbing_data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Tutup modal
+                    $('#editPembimbingModal').modal('hide');
+                    
+                    // Tampilkan pesan sukses
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: data.message,
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        // Reload halaman untuk refresh data
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'Terjadi kesalahan saat menyimpan data',
+                    icon: 'error',
+                    confirmButtonColor: '#ef4444'
+                });
+            });
+        }
+
+        // Fungsi untuk menyimpan pembimbing baru
+        function savePembimbingAdd() {
+            // Validasi form
+            const form = $('#addPembimbingForm')[0];
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Ambil data dari form
+            const defaultKuota = localStorage.getItem('default_kuota_mahasiswa') || 5;
+            const formData = {
+                nama: $('#addNama').val().trim(),
+                nip: $('#addNip').val().trim(),
+                program_studi: window.addProgramStudiChoices ? window.addProgramStudiChoices.getValue(true) : $('#addProgramStudi').val().trim(),
+                password: $('#addPassword').val(),
+                kuota_mahasiswa: $('#addKuotaMahasiswa').val() || defaultKuota
+            };
+
+            // Tampilkan loading
+            Swal.fire({
+                title: 'Menyimpan...',
+                text: 'Sedang menyimpan data pembimbing baru',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Kirim data ke server
+            fetch('/admin/add_pembimbing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Tutup modal
+                    $('#addPembimbingModal').modal('hide');
+                    
+                    // Tampilkan pesan sukses
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: data.message,
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        // Reload halaman untuk refresh data
+                        window.location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: error.message || 'Terjadi kesalahan saat menyimpan data',
+                    icon: 'error',
+                    confirmButtonColor: '#ef4444'
+                });
+            });
+        }
+
+        // Fungsi untuk mengubah status pembimbing
+        function setStatusPembimbing(pembimbingId, status) {
+            let actionText = status === 'aktif' ? 'mengaktifkan' : 'menonaktifkan';
+            let confirmColor = status === 'aktif' ? '#22c55e' : '#ef4444';
+            let confirmText = status === 'aktif' ? 'Ya, Aktifkan!' : 'Ya, Nonaktifkan!';
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: `Apakah Anda yakin ingin ${actionText} pembimbing ini?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: confirmColor,
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: confirmText,
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Memproses...',
+                        text: 'Sedang mengupdate status pembimbing',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    fetch('/admin/set_status_pembimbing', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            
+                        },
+                        body: JSON.stringify({
+                            pembimbing_id: pembimbingId,
+                            status: status
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.text().then(text => { throw new Error(text); });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: data.message,
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#ef4444'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Terjadi kesalahan saat update status',
+                            icon: 'error',
+                            confirmButtonColor: '#ef4444'
+                        });
+                    });
+                }
+            });
+        }
+
+    </script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal untuk Review - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 7px;
+            vertical-align: middle;
+        }
+
+        .status-pending {
+            background: #facc15;
+        }
+
+        .status-reviewing {
+            background: #3b82f6;
+        }
+
+        .status-completed {
+            background: #22c55e;
+        }
+
+        .status-rejected {
+            background: #ef4444;
+        }
+
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: none;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .badge {
+            font-size: 0.85em;
+            padding: 6px 12px;
+        }
+
+        .btn-circle.btn-primary {
+            background: #3b82f6 !important;
+            color: #fff !important;
+        }
+
+        .btn-circle.btn-success {
+            background: #22c55e !important;
+            color: #fff !important;
+        }
+
+        .btn-circle.btn-warning {
+            background: #f59e0b !important;
+            color: #fff !important;
+        }
+
+        .btn-circle.btn-danger {
+            background: #ef4444 !important;
+            color: #fff !important;
+        }
+
+        .btn-circle.btn-info {
+            background: #06b6d4 !important;
+            color: #fff !important;
+        }
+
+        .btn-circle i {
+            color: #fff !important;
+            font-size: 1.2em;
+        }
+        
+        /* Styling untuk jadwal status */
+        .jadwal-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .status-indicator.active {
+            border: 2px solid #10b981;
+        }
+        
+        .status-indicator.inactive {
+            border: 2px solid #f59e0b;
+        }
+        
+        .jadwal-time {
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            border-left: 3px solid #0ea5e9;
+        }
+
+        /* Status text styling */
+        .status-text {
+            font-weight: 500;
+            color: #3b3f5c;
+        }
+
+        @media (max-width: 768px) {
+            .btn-circle {
+                width: 35px !important;
+                height: 35px !important;
+                font-size: 1rem !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .btn-circle {
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 0.9rem !important;
+            }
+        }
+
+        /* Row update animation */
+        .table tbody tr {
+            transition: background-color 0.3s ease;
+        }
+
+        .table tbody tr.updated {
+            background-color: rgba(34, 197, 94, 0.1);
+            animation: highlightRow 2s ease-out;
+        }
+
+        @keyframes highlightRow {
+            0% { background-color: rgba(34, 197, 94, 0.3); }
+            100% { background-color: transparent; }
+        }
+
+        /* Status badge styling */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-sent {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        /* Card hover effect */
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+
+        /* Ripple effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Loading dots animation */
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        /* Confetti animation */
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-10px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('reviewer.dashboard') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('reviewer.dashboard') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('reviewer.proposal') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Proposal untuk Review</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('reviewer.daftar_mahasiswa_laporan_kemajuan') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Laporan Kemajuan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('reviewer.daftar_mahasiswa_laporan_akhir') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Laporan Akhir</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('index') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Laporan Kemajuan</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Daftar mahasiswa dengan laporan kemajuan untuk Anda review.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('reviewer.dashboard') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Laporan Kemajuan</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informasi Status Jadwal Review -->
+                {% if jadwal_kemajuan %}
+                <div class="card border-0 shadow-sm mb-4" style="background: #f0f9ff; border-left: 4px solid #0ea5e9;">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <div class="jadwal-icon mb-2">
+                                    <i class="bi bi-calendar-event text-info" style="font-size: 2.5rem;"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <h5 class="text-dark mb-3 fw-bold">
+                                    📅 Status Jadwal Review Laporan Kemajuan
+                                </h5>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="badge fs-6 px-3 py-2 me-3" style="
+                                        background-color: {% if jadwal_kemajuan.status == 'aktif' %}#10b981{% elif jadwal_kemajuan.status == 'belum_mulai' %}#f59e0b{% elif jadwal_kemajuan.status == 'sudah_selesai' %}#ef4444{% else %}#6b7280{% endif %};
+                                        color: white;">
+                                        {% if jadwal_kemajuan.status == 'aktif' %}
+                                            🟢 Aktif
+                                        {% elif jadwal_kemajuan.status == 'belum_mulai' %}
+                                            ⏰ Menunggu
+                                        {% elif jadwal_kemajuan.status == 'sudah_selesai' %}
+                                            🔴 Berakhir
+                                        {% else %}
+                                            {{ jadwal_kemajuan.status|title }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <p class="text-muted mb-2 fw-medium">{{ jadwal_kemajuan.pesan }}</p>
+                                {% if jadwal_kemajuan.jadwal_mulai and jadwal_kemajuan.jadwal_selesai %}
+                                <div class="jadwal-time text-muted">
+                                    <i class="bi bi-clock me-2"></i>
+                                    <strong>Jadwal:</strong> 
+                                    <span class="fw-bold text-dark">{{ jadwal_kemajuan.jadwal_mulai.strftime('%d %B %Y, %H:%M') }}</span> - 
+                                    <span class="fw-bold text-dark">{{ jadwal_kemajuan.jadwal_selesai.strftime('%d %B %Y, %H:%M') }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 text-center">
+                                {% if jadwal_kemajuan.bisa_review %}
+                                    <div class="status-indicator active">
+                                        <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                                        <p class="text-success mt-2 mb-0 fw-bold">Bisa Review</p>
+                                    </div>
+                                {% else %}
+                                    <div class="status-indicator inactive">
+                                        <i class="bi bi-x-circle-fill text-warning" style="font-size: 3rem;"></i>
+                                        <p class="text-warning mt-2 mb-0 fw-bold">Tidak Bisa</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <div class="card" style="padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+                                <div>
+                                    <div style="font-weight:700;font-size:1.25rem;">Daftar Mahasiswa Laporan Kemajuan</div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table mb-0" id="proposalTable">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Judul Usaha</th>
+                                            <th>Nama Ketua</th>
+                                            <th>Kategori</th>
+                                            <th>Dosen Pembimbing</th>
+                                            <th>Status Review</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for proposal in proposals %}
+                                            <tr data-proposal-id="{{ proposal.id_proposal }}">
+                                                <td>{{ loop.index }}</td>
+                                                <td>
+                                                    <div class="fw-bold">{{ proposal.judul_usaha }}</div>
+                                                    <small class="text-muted">NIM: {{ proposal.nim }}</small>
+                                                </td>
+                                                <td>
+                                                    <div class="fw-bold">{{ proposal.nama_ketua }}</div>
+                                                    <small class="text-muted">Program Studi: {{ proposal.program_studi }}</small>
+                                                </td>
+                                                <td>{{ proposal.kategori }}</td>
+                                                <td>
+                                                    <div class="fw-bold">{{ proposal.dosen_pembimbing or 'Belum ditentukan' }}</div>
+                                                </td>
+                                                <td>
+                                                    <div class="status-display" style="display: flex; align-items: center;" data-status="{{ proposal.status_review_laporan_kemajuan }}">
+                                                        {% if proposal.status_review_laporan_kemajuan == 'belum_dinilai' %}
+                                                            <span class="status-dot status-pending"></span>
+                                                            <span class="status-text">Belum Dinilai</span>
+                                                        {% elif proposal.status_review_laporan_kemajuan == 'sudah_dinilai' %}
+                                                            <span class="status-dot status-completed"></span>
+                                                            <span class="status-text">Sudah Dinilai</span>
+                                                        {% else %}
+                                                            <span class="status-dot status-pending"></span>
+                                                            <span class="status-text">Belum Dinilai</span>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-2 action-buttons">
+                                                        <!-- Tombol Lihat Laporan Kemajuan -->
+                                                        {% if proposal.tahapan_usaha == 'Usaha Awal' %}
+                                                            <a href="{{ url_for('reviewer.laporan_kemajuan_awal_bertumbuh', proposal_id=proposal.id_proposal) }}" 
+                                                               class="btn btn-circle" style="background:#22c55e;color:#fff;" 
+                                                               title="Lihat Laporan Kemajuan Awal">
+                                                                <i class="fa fa-eye"></i>
+                                                            </a>
+                                                        {% elif proposal.tahapan_usaha == 'Usaha Bertumbuh' %}
+                                                            <a href="{{ url_for('reviewer.laporan_kemajuan_awal_bertumbuh', proposal_id=proposal.id_proposal) }}" 
+                                                               class="btn btn-circle" style="background:#f59e0b;color:#fff;" 
+                                                               title="Lihat Laporan Kemajuan Bertumbuh">
+                                                                <i class="fa fa-chart-line"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                        
+                                                        <!-- Tombol Penilaian - Hanya tampil jika belum dinilai dan sesuai jadwal -->
+                                                        {% if proposal.status_review_laporan_kemajuan == 'belum_dinilai' %}
+                                                            {% if jadwal_kemajuan and jadwal_kemajuan.bisa_review %}
+                                                                <a href="{{ url_for('reviewer.penilaian_kemajuan', proposal_id=proposal.id_proposal) }}" 
+                                                                   class="btn btn-circle" style="background:#10b981;color:#fff;" 
+                                                                   title="Penilaian Laporan Kemajuan">
+                                                                    <i class="fa fa-star"></i>
+                                                                </a>
+                                                            {% elif jadwal_kemajuan and not jadwal_kemajuan.bisa_review %}
+                                                                <button class="btn btn-circle btn-secondary" disabled 
+                                                                        title="{{ jadwal_kemajuan.pesan }}">
+                                                                    <i class="fa fa-clock"></i>
+                                                                </button>
+                                                            {% else %}
+                                                                <a href="{{ url_for('reviewer.penilaian_kemajuan', proposal_id=proposal.id_proposal) }}" 
+                                                                   class="btn btn-circle" style="background:#10b981;color:#fff;" 
+                                                                   title="Penilaian Laporan Kemajuan">
+                                                                    <i class="fa fa-star"></i>
+                                                                </a>
+                                                            {% endif %}
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('#proposalTable').DataTable({
+                language: {
+                    "sProcessing":   "Sedang memproses...",
+                    "sLengthMenu":   "Tampilkan _MENU_ entri",
+                    "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                    "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                    "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+                    "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Cari:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "Pertama",
+                        "sPrevious": "Sebelumnya",
+                        "sNext":     "Selanjutnya",
+                        "sLast":     "Terakhir"
+                    }
+                },
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]]
+            });
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+</body>
+
+</html>

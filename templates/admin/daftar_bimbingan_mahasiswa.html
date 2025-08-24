@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Bimbingan Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            }
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-circle.btn-primary {
+            background: #435ebe;
+            color: white;
+        }
+        .btn-circle.btn-primary:hover {
+            background: #2c3e50;
+            color: white;
+        }
+        .btn-circle.btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-circle.btn-secondary:hover {
+            background: #495057;
+            color: white;
+        }
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1.1rem;
+            line-height: 40px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+        /* Pastikan pagination selalu terlihat */
+        .dataTables_paginate {
+            display: block !important;
+            visibility: visible !important;
+        }
+        .dataTables_info {
+            display: block !important;
+            visibility: visible !important;
+        }
+        .dataTables_wrapper .dataTables_paginate {
+            display: block !important;
+            visibility: visible !important;
+        }
+        .table th, .table td {
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        @media (max-width: 1200px) {
+            .table th, .table td {
+                font-size: 0.85rem;
+                padding: 7px 3px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .table th, .table td {
+                font-size: 0.8rem;
+                padding: 5px 2px;
+            }
+            
+            .btn-circle {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .page-title h3 {
+                font-size: 1.5rem;
+            }
+            
+            .page-title .text-subtitle {
+                font-size: 1rem !important;
+            }
+            
+            .card {
+                padding: 16px 12px 8px 12px !important;
+            }
+            
+            .table-responsive {
+                font-size: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .table th, .table td {
+                font-size: 0.75rem;
+                padding: 4px 1px;
+            }
+            
+            .btn-circle {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+            
+            .page-title h3 {
+                font-size: 1.3rem;
+            }
+            
+            .page-title .text-subtitle {
+                font-size: 0.9rem !important;
+            }
+            
+            .card {
+                padding: 12px 8px 6px 8px !important;
+            }
+            
+            .table-responsive {
+                font-size: 0.7rem;
+            }
+            
+            .table td small {
+                font-size: 0.7rem;
+            }
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+        .judul-usaha {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .judul-usaha:hover {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        .info-box {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #bbdefb;
+        }
+        .info-box h5 {
+            color: #1565c0;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .info-box p {
+            margin-bottom: 0;
+            color: #1976d2;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-admin.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('admin.das_admin') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.das_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('admin.admin_daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Mahasiswa</span>
+                            </a>
+                            <ul class="submenu">
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('admin.mahasiswa_belum_diverifikasi') }}">Belum Diverifikasi</a>
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('admin.mahasiswa_sudah_diverifikasi') }}">Sudah Diverifikasi</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi-bar-chart-line"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-clock-history"></i>
+                                <span>Log Aktivitas</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_mahasiswa') }}">Mahasiswa</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_pembimbing') }}">Pembimbing</a> 
+                                </li>
+                                
+                            </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.daftar_nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-award"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.pengajuan_proposal') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Pengajuan Proposal</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_kemajuan') }}" class='sidebar-link'>
+                                <i class="bi bi-graph-up"></i>
+                                <span>Laporan Kemajuan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_akhir') }}" class='sidebar-link'>
+                                <i class="bi bi-clipboard-data"></i>
+                                <span>Laporan Akhir</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Pembimbing</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.reviewer') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Reviewer</span>
+                            </a>
+                                </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.data_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Admin</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.pengaturan') }}" class='sidebar-link'>
+                                <i class="bi bi-gear"></i>
+                                <span>Pengaturan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Daftar Bimbingan Mahasiswa</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">
+                                Lihat daftar mahasiswa dan hasil bimbingan mereka di AYMP UNJAYA.
+                            </p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('admin.das_admin') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Bimbingan Mahasiswa</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <!-- Info Box -->
+                        <div class="info-box">
+                            <h5><i class="bi bi-info-circle"></i> Informasi Bimbingan</h5>
+                            <p>Halaman ini menampilkan daftar mahasiswa yang memiliki proposal yang disetujui dan dapat melihat hasil bimbingan mereka. Anda dapat melihat detail hasil diskusi, saran, dan hal-hal yang telah dibahas dalam sesi bimbingan.</p>
+                        </div>
+
+                        <!-- Daftar Mahasiswa -->
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4 class="card-title">
+                                            <i class="bi bi-people-fill text-primary"></i>
+                                            Daftar Mahasiswa dengan Bimbingan
+                                        </h4>
+                                        <p class="card-subtitle">Daftar mahasiswa yang memiliki proposal disetujui dan dapat melihat hasil bimbingan mereka</p>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped table-hover" id="tableBimbingan">
+                                                <thead>
+                                                    <tr>
+                                                        <th width="5%">No</th>
+                                                        <th width="20%">Nama Mahasiswa</th>
+                                                        <th width="15%">NIM</th>
+                                                        <th width="35%">Judul Usaha</th>
+                                                        <th width="15%">Dosen Pembimbing</th>
+                                                        <th width="10%">Aksi</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% if daftar_mahasiswa %}
+                                                        {% for mahasiswa in daftar_mahasiswa %}
+                                                        <tr>
+                                                            <td>{{ loop.index }}</td>
+                                                            <td>
+                                                                <strong>{{ mahasiswa.nama_ketua }}</strong>
+                                                                <br>
+                                                                <small class="text-muted">{{ mahasiswa.program_studi }}</small>
+                                                            </td>
+                                                            <td>{{ mahasiswa.nim }}</td>
+                                                            <td>
+                                                                <div class="judul-usaha">
+                                                                    {{ mahasiswa.judul_usaha }}
+                                                                </div>
+                                                            </td>
+                                                            <td>{{ mahasiswa.dosen_pembimbing }}</td>
+                                                            <td>
+                                                                <a href="{{ url_for('admin.admin_bimbingan_mahasiswa', mahasiswa_id=mahasiswa.id) }}" class="btn btn-circle btn-primary" title="Lihat Bimbingan">
+                                                                    <i class="bi bi-eye"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    {% else %}
+                                                        <tr>
+                                                            <td colspan="6" class="text-center py-4">
+                                                                <div class="text-muted">
+                                                                    <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                                                                    <p class="mt-2 mb-0">Belum ada data mahasiswa</p>
+                                                                    <small>Mahasiswa belum memiliki proposal yang disetujui</small>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+
+    <script>
+        $(document).ready(function() {
+            $('#tableBimbingan').DataTable({
+                language: {
+                    "sProcessing":   "Sedang memproses...",
+                    "sLengthMenu":   "Tampilkan _MENU_ data",
+                    "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                    "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                    "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Cari:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "Pertama",
+                        "sPrevious": "Sebelumnya",
+                        "sNext":     "Selanjutnya",
+                        "sLast":     "Terakhir"
+                    }
+                },
+                responsive: true,
+                pageLength: 5, // Kurangi pageLength agar pagination lebih mudah terlihat
+                lengthMenu: [[5, 10, 25, 50], [5, 10, 25, 50]], // Tambahkan opsi length menu
+                order: [[1, 'asc']],
+                columnDefs: [
+                    {
+                        targets: [0, 5], // No dan Aksi
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                dom: 'lfrtip', // Pastikan semua elemen DataTables muncul
+                paging: true, // Pastikan pagination aktif
+                info: true, // Pastikan info aktif
+                drawCallback: function(settings) {
+                    // Debug: log jumlah data
+                    console.log('Total records:', settings._iRecordsTotal);
+                    console.log('Page length:', settings._iDisplayLength);
+                    
+                    // Jika tidak ada data, sembunyikan pagination dan info
+                    if (settings._iRecordsTotal === 0) {
+                        $(this).closest('.dataTables_wrapper').find('.dataTables_paginate, .dataTables_info').hide();
+                    } else {
+                        $(this).closest('.dataTables_wrapper').find('.dataTables_paginate, .dataTables_info').show();
+                    }
+                }
+            });
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+</body>
+
+</html>

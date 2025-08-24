@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penilaian Proposal - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Quill Editor CSS -->
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='assets/css/quill-fix.css') }}" rel="stylesheet">
+    
+    <style>
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+            position: relative;
+            padding: 0 1rem;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 4rem;
+            position: relative;
+            text-align: center;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-number {
+            background: #10b981;
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background: #059669;
+            color: white;
+        }
+
+        .step.pending .step-number {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.875rem;
+            line-height: 1.2;
+        }
+
+        .step.active .step-title {
+            color: #10b981;
+        }
+
+        .step.completed .step-title {
+            color: #059669;
+        }
+
+        .step.pending .step-title {
+            color: #6b7280;
+        }
+
+        .step-connector {
+            position: absolute;
+            top: 20px;
+            left: 60px;
+            width: 120px;
+            height: 2px;
+            background: #e5e7eb;
+            z-index: -1;
+        }
+
+        .step-connector.active {
+            background: #10b981;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: none;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+            background: #f8fafc;
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            padding: 0.75rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25);
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #10b981;
+            border-color: #10b981;
+        }
+
+        .btn-primary:hover {
+            background: #059669;
+            border-color: #059669;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            border-color: #6b7280;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+            border-color: #4b5563;
+        }
+
+        .score-input {
+            width: 80px;
+            text-align: center;
+        }
+        
+        .score-input.invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        
+        .score-input.valid {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+
+        .total-row {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+        
+        .total-row.calculating {
+            background: #fef3c7;
+            position: relative;
+        }
+        
+        .total-row.calculating::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #10b981, #059669);
+            animation: loading 1s infinite;
+        }
+        
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .nilai-display {
+            font-weight: 600;
+            color: #10b981;
+            transition: all 0.3s ease;
+        }
+        
+        .nilai-display.updated {
+            background: #d1fae5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            animation: highlight 0.5s ease;
+        }
+        
+        @keyframes highlight {
+            0% { background: #10b981; color: white; }
+            100% { background: #d1fae5; color: #10b981; }
+        }
+
+        .quill-editor {
+            height: 300px;
+        }
+
+        .ql-editor {
+            min-height: 250px;
+        }
+
+        .card-footer {
+            background: #f8fafc;
+            border-top: 1px solid #e9ecef;
+            padding: 1rem 1.5rem;
+        }
+        
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #10b981;
+            transition: width 0.3s ease;
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Animation for step transitions */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .step-indicator {
+                flex-direction: column;
+                align-items: center;
+                padding: 0;
+            }
+            
+            .step {
+                margin: 1rem 0;
+                flex-direction: column;
+            }
+            
+            .step-connector {
+                display: none;
+            }
+            
+            .card-footer .d-flex {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .card-footer .d-flex > div {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .card-footer .btn {
+                width: 100%;
+                margin: 0.25rem 0;
+            }
+            
+            .navigation-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .navigation-buttons .btn {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('reviewer.dashboard') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('reviewer.dashboard') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('reviewer.proposal') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Proposal untuk Review</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('reviewer.daftar_mahasiswa_laporan_kemajuan') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Laporan Kemajuan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('reviewer.daftar_mahasiswa_laporan_akhir') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Laporan Akhir</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('index') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Penilaian Proposal</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Penilaian proposal: {{ proposal.judul_usaha }}</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('reviewer.dashboard') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url_for('reviewer.proposal') }}">Proposal untuk Review</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Penilaian Proposal</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="bi bi-star-fill me-2"></i>
+                                    Penilaian Proposal - {{ proposal.judul_usaha }}
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Step Indicator -->
+                                <div class="step-indicator">
+                                    <div class="step active" data-step="1">
+                                        <div class="step-number">1</div>
+                                        <div class="step-title">Proposal</div>
+                                        <div class="step-connector active"></div>
+                                    </div>
+                                    <div class="step pending" data-step="2">
+                                        <div class="step-number">2</div>
+                                        <div class="step-title">Catatan</div>
+                                        <div class="step-connector"></div>
+                                    </div>
+                                    <div class="step pending" data-step="3">
+                                        <div class="step-number">3</div>
+                                        <div class="step-title">Rekomendasi</div>
+                                    </div>
+                                </div>
+
+                                <!-- Progress Bar -->
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill" style="width: 33.33%"></div>
+                                </div>
+
+                                <!-- Step Content -->
+                                <div class="step-content active" id="step1">
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        <strong>Petunjuk:</strong> Berikan skor untuk setiap pertanyaan berdasarkan bobot yang telah ditentukan. Skor maksimal untuk setiap pertanyaan ditentukan oleh admin.
+                                    </div>
+                                    
+                                <div id="guardCard" class="alert alert-warning d-none" role="alert" style="border-radius: 12px;">
+                                    <i class="bi bi-clock-history me-2"></i>
+                                    <span id="guardMessage">Menunggu jadwal mulai penilaian...</span>
+                                </div>
+
+                                <div class="table-responsive" id="penilaianContainer">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th width="5%">No</th>
+                                                    <th width="45%">Pertanyaan</th>
+                                                    <th width="15%">Bobot (SKS)</th>
+                                                    <th width="15%">Skor</th>
+                                                    <th width="20%">Nilai</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="penilaianTable">
+                                                <!-- Data penilaian akan diisi melalui JavaScript -->
+                                            </tbody>
+                                            <tfoot>
+                                                <tr class="total-row">
+                                                    <td colspan="2"><strong>TOTAL</strong></td>
+                                                    <td><strong id="totalBobot">0</strong></td>
+                                                    <td><strong id="totalSkor">0</strong></td>
+                                                    <td><strong id="totalNilai">0%</strong></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="step-content" id="step2">
+                                    <div class="alert alert-warning">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        <strong>Catatan:</strong> Berikan catatan detail tentang penilaian yang telah Anda lakukan. Catatan ini akan membantu mahasiswa memahami penilaian yang diberikan.
+                                    </div>
+                                    
+                                    <div class="mb-3">
+                                        <label for="catatanEditor" class="form-label fw-bold">Catatan Penilaian</label>
+                                        <div id="catatanEditor" class="quill-editor"></div>
+                                    </div>
+                                </div>
+
+                                <div class="step-content" id="step3">
+                                    <div class="alert alert-success">
+                                        <i class="bi bi-check-circle me-2"></i>
+                                        <strong>Rekomendasi:</strong> Berdasarkan penilaian yang telah dilakukan, sistem akan memberikan rekomendasi nilai bantuan. Anda dapat menyesuaikan nilai tersebut.
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="mb-3">
+                                                <label for="nilaiBantuan" class="form-label fw-bold">Nilai Bantuan (Rp)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="text" class="form-control" id="nilaiBantuan" name="nilaiBantuan" 
+                                                           placeholder="Masukkan nilai bantuan" 
+                                                           value=""
+                                                           data-nilai-bantuan="{% if proposal.tahapan_usaha == 'Usaha Awal' %}{{ proposal.total_nilai_bantuan_awal or 0 }}{% elif proposal.tahapan_usaha == 'Usaha Bertumbuh' %}{{ proposal.total_nilai_bantuan_bertumbuh or 0 }}{% else %}{{ (proposal.total_nilai_bantuan_awal or 0) + (proposal.total_nilai_bantuan_bertumbuh or 0) }}{% endif %}">
+                                                </div>
+                                                <div class="form-text">Nilai bantuan yang sudah direview (otomatis terisi)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="mb-3">
+                                                <label class="form-label fw-bold">Informasi Anggaran</label>
+                                                <div class="table-responsive">
+                                                    <table class="table table-sm">
+                                                        <tbody>
+                                                            {% if proposal.tahapan_usaha == 'Usaha Awal' %}
+                                                                <tr>
+                                                                    <td><strong>Total Anggaran Awal:</strong></td>
+                                                                    <td>Rp {{ "{:,.0f}".format(proposal.total_anggaran_awal or 0).replace(',', '.') }}</td>
+                                                                </tr>
+                                                                <tr class="table-success">
+                                                                    <td><strong>Total Nilai Bantuan Direview:</strong></td>
+                                                                    <td><strong>Rp {{ "{:,.0f}".format(proposal.total_nilai_bantuan_awal or 0).replace(',', '.') }}</strong></td>
+                                                                </tr>
+                                                            {% elif proposal.tahapan_usaha == 'Usaha Bertumbuh' %}
+                                                                <tr>
+                                                                    <td><strong>Total Anggaran Bertumbuh:</strong></td>
+                                                                    <td>Rp {{ "{:,.0f}".format(proposal.total_anggaran_bertumbuh or 0).replace(',', '.') }}</td>
+                                                                </tr>
+                                                                <tr class="table-success">
+                                                                    <td><strong>Total Nilai Bantuan Direview:</strong></td>
+                                                                    <td><strong>Rp {{ "{:,.0f}".format(proposal.total_nilai_bantuan_bertumbuh or 0).replace(',', '.') }}</strong></td>
+                                                                </tr>
+                                                            {% else %}
+                                                                <tr>
+                                                                    <td><strong>Total Anggaran Awal:</strong></td>
+                                                                    <td>Rp {{ "{:,.0f}".format(proposal.total_anggaran_awal or 0).replace(',', '.') }}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td><strong>Total Anggaran Bertumbuh:</strong></td>
+                                                                    <td>Rp {{ "{:,.0f}".format(proposal.total_anggaran_bertumbuh or 0).replace(',', '.') }}</td>
+                                                                </tr>
+                                                                <tr class="table-success">
+                                                                    <td><strong>Total Nilai Bantuan Direview:</strong></td>
+                                                                    <td><strong>Rp {{ "{:,.0f}".format((proposal.total_nilai_bantuan_awal or 0) + (proposal.total_nilai_bantuan_bertumbuh or 0)).replace(',', '.') }}</strong></td>
+                                                                </tr>
+                                                            {% endif %}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Navigation Buttons -->
+                            <div class="card-footer">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <button type="button" class="btn btn-secondary" id="btnPrevious" style="display: none;">
+                                            <i class="bi bi-arrow-left me-2"></i>Sebelumnya
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <button type="button" class="btn btn-primary" id="btnNext">
+                                            Berikutnya<i class="bi bi-arrow-right ms-2"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-success" id="btnSave" style="display: none;">
+                                            <i class="bi bi-check-circle me-2"></i>{{ 'Update Penilaian' if existing_penilaian else 'Simpan Penilaian' }}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    
+    <!-- Deprecation Fix JS -->
+    <script src="{{ url_for('static', filename='assets/js/deprecation-fix.js') }}"></script>
+    
+    <!-- Quill Editor JS -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    
+    <script>
+        let currentStep = 1;
+        let totalSteps = 3;
+        let penilaianData = [];
+        let catatanContent = '';
+        let nilaiBantuan = 0;
+        let jadwalPenilaian = null;
+        
+        // Data pertanyaan penilaian dari database
+        const pertanyaanPenilaian = {{ pertanyaan_penilaian | tojson | safe }};
+        
+        // Data penilaian yang sudah ada (jika ada)
+        const existingPenilaian = {{ existing_penilaian | tojson | safe }};
+        const detailPenilaian = {{ detail_penilaian | tojson | safe }};
+
+        // Initialize Quill Editor
+        let quill;
+        
+        $(document).ready(function() {
+            loadJadwalPenilaian().always(function(){
+            initializeQuill();
+            loadPenilaianData();
+            updateStepIndicator();
+            updateProgressBar();
+            
+            // Event listeners
+            $('#btnNext').click(nextStep);
+            $('#btnPrevious').click(previousStep);
+            $('#btnSave').click(savePenilaian);
+            
+            // Event listener untuk nilai bantuan dengan format rupiah
+            $('#nilaiBantuan').on('input', function() {
+                formatRupiah(this);
+            });
+            
+            // Event listener untuk mencegah input karakter yang tidak valid pada skor
+            $(document).on('keypress', '.score-input', function(e) {
+                // Hanya izinkan angka (0-9)
+                if (e.which < 48 || e.which > 57) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Event listener untuk mencegah paste karakter yang tidak valid
+            $(document).on('paste', '.score-input', function(e) {
+                e.preventDefault();
+                const pastedText = (e.originalEvent.clipboardData || window.clipboardData).getData('text');
+                const numericValue = pastedText.replace(/[^\d]/g, '');
+                $(this).val(numericValue);
+                // Validasi dan hitung nilai secara real-time setelah paste
+                validateScoreInput(this);
+                calculateNilai(this);
+            });
+            
+            // Event listener untuk input real-time
+            $(document).on('input', '.score-input', function() {
+                validateScoreInput(this);
+                calculateNilai(this);
+            });
+            
+            // Event listener untuk perubahan nilai
+            $(document).on('change', '.score-input', function() {
+                calculateNilai(this);
+            });
+            
+            // Hitung total setelah semua data dimuat
+            calculateTotal();
+            
+            // Load existing data if available, otherwise initialize nilai bantuan
+            if (existingPenilaian) {
+                loadExistingData();
+            } else {
+                // Inisialisasi nilai bantuan dengan format yang benar jika tidak ada data existing
+                initializeNilaiBantuan();
+            }
+            });
+        });
+
+        function loadJadwalPenilaian(){
+            return $.get('{{ url_for('mahasiswa.get_pengaturan_jadwal_mhs') }}').done(function(resp){
+                if (!resp || !resp.success) return;
+                jadwalPenilaian = resp.data || {};
+                const mulai = jadwalPenilaian.reviewer_proposal_mulai;
+                const selesai = jadwalPenilaian.reviewer_proposal_selesai;
+                const now = new Date();
+                const isBefore = (mulai && new Date(mulai) > now);
+                const isAfter = (selesai && new Date(selesai) < now);
+                let showGuard = false;
+                let message = '';
+                if (isBefore) {
+                    showGuard = true; message = `Penilaian belum dibuka. Menunggu jadwal mulai: ${new Date(mulai).toLocaleString('id-ID')}`;
+                } else if (isAfter) {
+                    showGuard = true; message = `Masa penilaian telah berakhir pada ${new Date(selesai).toLocaleString('id-ID')}. Penilaian baru tidak dapat ditambahkan (nilai otomatis 0).`;
+                }
+                if (showGuard) {
+                    $('#guardMessage').text(message);
+                    $('#guardCard').removeClass('d-none');
+                    $('#btnNext, #btnSave').prop('disabled', true);
+                    $('#penilaianContainer').addClass('opacity-50');
+                    $(document).on('focus mousedown keydown', '.score-input, #btnNext, #btnSave', function(e){ e.preventDefault(); return false; });
+                    // Jika sudah lewat jadwal selesai: set skor=0, catatan kosong, rekomendasi/nilai bantuan=0
+                    if (isAfter) {
+                        $('.score-input').each(function(){ $(this).val(0); });
+                        try { calculateTotal(); } catch(e){}
+                        // Kosongkan catatan (Quill akan tetap di-readonly)
+                        try { if (window.quill) { quill.setText(''); } } catch(e){}
+                        // Set nilai bantuan 0
+                        $('#nilaiBantuan').val('0');
+                    }
+                }
+            });
+        }
+
+        function initializeQuill() {
+            quill = new Quill('#catatanEditor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['link', 'image'],
+                        ['clean']
+                    ]
+                },
+                placeholder: 'Tulis catatan penilaian Anda di sini...',
+                bounds: '#catatanEditor',
+                scrollingContainer: '#catatanEditor',
+                readOnly: false,
+                formats: ['bold', 'italic', 'underline', 'list', 'bullet', 'header', 'link', 'image']
+            });
+        }
+
+        function loadPenilaianData() {
+            const tableBody = $('#penilaianTable');
+            tableBody.empty();
+            
+            pertanyaanPenilaian.forEach((item, index) => {
+                const row = `
+                    <tr data-id="${item.id}">
+                        <td>${index + 1}</td>
+                        <td>${item.pertanyaan}</td>
+                        <td>${item.bobot}</td>
+                        <td>
+                            <input type="number" class="form-control score-input" 
+                                   data-bobot="${item.bobot}" data-id="${item.id}" data-skor-maksimal="${item.skor_maksimal}"
+                                   min="0" max="${item.skor_maksimal}" value="0" 
+                                   placeholder="0-${item.skor_maksimal}">
+                            <small class="form-text text-muted">Maksimal: ${item.skor_maksimal}</small>
+                        </td>
+                        <td>
+                            <span class="nilai-display" data-id="${item.id}">0</span>
+                        </td>
+                    </tr>
+                `;
+                tableBody.append(row);
+            });
+            
+            // Hitung total awal dengan delay untuk memastikan DOM sudah siap
+            calculateTotal();
+        }
+        
+        function loadExistingData() {
+            // Load existing penilaian data
+            if (existingPenilaian) {
+                // Set nilai bantuan dengan validasi untuk data corrupted
+                const existingNilaiBantuan = parseFloat(existingPenilaian.nilai_bantuan) || 0;
+                const totalNilaiBantuan = parseInt($('#nilaiBantuan').data('nilai-bantuan')) || 0;
+                
+                // Validasi: jika nilai existing lebih dari 2x total nilai bantuan, anggap data corrupted
+                // Karena rekomendasi seharusnya tidak melebihi 100% dari total nilai bantuan
+                const isDataCorrupted = existingNilaiBantuan > (totalNilaiBantuan * 2);
+                
+                console.log('Data validation check:', {
+                    existingNilaiBantuan: existingNilaiBantuan,
+                    totalNilaiBantuan: totalNilaiBantuan,
+                    threshold: totalNilaiBantuan * 2,
+                    isDataCorrupted: isDataCorrupted
+                });
+                
+                if (existingNilaiBantuan > 0 && !isDataCorrupted) {
+                    // Gunakan nilai tersimpan jika valid
+                    console.log('Using valid existing data:', existingNilaiBantuan);
+                    setRupiahValue('nilaiBantuan', existingNilaiBantuan);
+                } else {
+                    // Jika data corrupted atau tidak valid, gunakan nilai awal dari backend
+                    console.log('Data corrupted or invalid, using backend data. Reason:', 
+                        isDataCorrupted ? 'corrupted' : 'invalid/zero');
+                    initializeNilaiBantuan();
+                }
+                
+                // Set catatan
+                if (existingPenilaian.catatan) {
+                    quill.root.innerHTML = existingPenilaian.catatan;
+                    catatanContent = existingPenilaian.catatan;
+                }
+            }
+            
+            // Load detail penilaian
+            if (detailPenilaian && detailPenilaian.length > 0) {
+                detailPenilaian.forEach(detail => {
+                    const input = $(`.score-input[data-id="${detail.id_pertanyaan}"]`);
+                    if (input.length > 0) {
+                        input.val(detail.skor);
+                        calculateNilai(input[0]);
+                    }
+                });
+                
+                // Hitung total setelah semua detail dimuat
+                calculateTotal();
+            }
+        }
+
+        function validateScoreInput(input) {
+            const skorMaksimal = parseInt($(input).data('skor-maksimal'));
+            let value = $(input).val();
+            
+            // Hapus karakter non-digit kecuali tanda minus di awal
+            value = value.replace(/[^\d-]/g, '');
+            
+            // Hapus tanda minus jika ada
+            value = value.replace(/-/g, '');
+            
+            // Konversi ke integer
+            let skor = parseInt(value) || 0;
+            
+            // Reset visual feedback
+            $(input).removeClass('valid invalid');
+            
+            // Validasi skor tidak boleh melebihi maksimal
+            if (skor > skorMaksimal) {
+                $(input).val(skorMaksimal);
+                skor = skorMaksimal;
+                $(input).addClass('invalid');
+                
+                // Tampilkan pesan peringatan
+                Swal.fire({
+                    title: 'Peringatan!',
+                    text: `Skor tidak boleh melebihi ${skorMaksimal}`,
+                    icon: 'warning',
+                    confirmButtonColor: '#10b981',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+            
+            // Validasi skor tidak boleh negatif
+            if (skor < 0) {
+                $(input).val(0);
+                skor = 0;
+                $(input).addClass('invalid');
+            }
+            
+            // Jika skor valid, berikan visual feedback positif
+            if (skor >= 0 && skor <= skorMaksimal && skor > 0) {
+                $(input).addClass('valid');
+            }
+            
+            // Update nilai input
+            $(input).val(skor);
+        }
+
+                function calculateNilai(input) {
+            let skor = parseInt($(input).val()) || 0;
+            const bobot = parseInt($(input).data('bobot'));
+            const skorMaksimal = parseInt($(input).data('skor-maksimal'));
+            
+            // Validasi skor tidak boleh melebihi maksimal
+            if (skor > skorMaksimal) {
+                $(input).val(skorMaksimal);
+                skor = skorMaksimal;
+                
+                // Tampilkan pesan peringatan
+                Swal.fire({
+                    title: 'Peringatan!',
+                    text: `Skor tidak boleh melebihi ${skorMaksimal}`,
+                    icon: 'warning',
+                    confirmButtonColor: '#10b981',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+            
+            // Validasi skor tidak boleh negatif
+            if (skor < 0) {
+                $(input).val(0);
+                skor = 0;
+            }
+            
+            // RUMUS BARU: bobot × skor = nilai
+            const nilai = bobot * skor;
+            
+            // Update nilai dengan efek visual
+            const nilaiDisplay = $(`.nilai-display[data-id="${$(input).data('id')}"]`);
+            nilaiDisplay.text(nilai.toFixed(2));
+            nilaiDisplay.addClass('updated');
+            
+            // Hapus class updated setelah animasi selesai
+            setTimeout(() => {
+                nilaiDisplay.removeClass('updated');
+            }, 300);
+            
+            // Hitung total secara real-time
+            calculateTotal();
+        }
+
+        // Fungsi untuk menghitung total secara realtime
+        function calculateTotal() {
+            let totalBobot = 0;
+            let totalSkor = 0;
+            let totalNilai = 0;
+            let skorMaksimalTertinggi = 0;
+            
+            // Hitung total bobot, total skor, dan cari skor maksimal tertinggi
+            $('.score-input').each(function() {
+                const skor = parseInt($(this).val()) || 0;
+                const bobot = parseInt($(this).data('bobot'));
+                const skorMaksimal = parseInt($(this).data('skor-maksimal'));
+                
+                // RUMUS BARU: bobot × skor = nilai
+                const nilai = bobot * skor;
+                
+                totalBobot += bobot;
+                totalSkor += skor;
+                totalNilai += nilai;
+                
+                // Cari skor maksimal tertinggi
+                if (skorMaksimal > skorMaksimalTertinggi) {
+                    skorMaksimalTertinggi = skorMaksimal;
+                }
+            });
+            
+            // RUMUS BARU: total nilai akhir = (total nilai / (total bobot × skor maksimal tertinggi)) × 100
+            const nilaiAkhir = (totalBobot > 0 && skorMaksimalTertinggi > 0) ? 
+                (totalNilai / (totalBobot * skorMaksimalTertinggi)) * 100 : 0;
+            
+            // Update tampilan total secara realtime
+            $('#totalBobot').text(totalBobot);
+            $('#totalSkor').text(totalSkor);
+            $('#totalNilai').text(nilaiAkhir.toFixed(2) + '%');
+            
+            // Simpan data untuk step berikutnya
+            penilaianData = {
+                totalSkor: totalSkor,
+                totalNilai: totalNilai,
+                totalBobot: totalBobot,
+                skorMaksimalTertinggi: skorMaksimalTertinggi,
+                nilaiAkhir: nilaiAkhir,
+                detail: []
+            };
+            
+            $('.score-input').each(function() {
+                const id = $(this).data('id');
+                const skor = parseInt($(this).val()) || 0;
+                const bobot = parseInt($(this).data('bobot'));
+                const skorMaksimal = parseInt($(this).data('skor-maksimal'));
+                
+                // RUMUS BARU: bobot × skor = nilai
+                const nilai = bobot * skor;
+                
+                penilaianData.detail.push({
+                    id: id,
+                    skor: skor,
+                    bobot: bobot,
+                    nilai: nilai
+                });
+            });
+        }
+
+
+        // Fungsi untuk format rupiah
+        function formatRupiah(input) {
+            let value = input.value.replace(/[^\d]/g, '');
+            if (value === '') {
+                input.value = '';
+                return;
+            }
+            
+            // Format dengan separator ribuan
+            value = parseInt(value).toLocaleString('id-ID');
+            input.value = value;
+        }
+        
+        // Fungsi untuk mendapatkan nilai numerik dari input rupiah
+        function getNumericValue(inputId) {
+            const value = $('#' + inputId).val();
+            return parseInt(value.replace(/[^\d]/g, '')) || 0;
+        }
+        
+        // Fungsi untuk set nilai dengan format rupiah
+        function setRupiahValue(inputId, numericValue) {
+            if (numericValue > 0) {
+                $('#' + inputId).val(numericValue.toLocaleString('id-ID'));
+            } else {
+                $('#' + inputId).val('');
+            }
+        }
+        
+        // Fungsi untuk inisialisasi nilai bantuan dengan format yang benar
+        function initializeNilaiBantuan() {
+            const nilaiBantuan = parseInt($('#nilaiBantuan').data('nilai-bantuan')) || 0;
+            
+            console.log('Initialize nilai bantuan with backend data:', {
+                dataAttribute: $('#nilaiBantuan').data('nilai-bantuan'),
+                parsedValue: nilaiBantuan,
+                willSetValue: nilaiBantuan > 0
+            });
+            
+            // Jika ada nilai bantuan dari backend, format dan set ke input
+            if (nilaiBantuan > 0) {
+                setRupiahValue('nilaiBantuan', nilaiBantuan);
+                console.log('Initialized nilai bantuan to:', nilaiBantuan.toLocaleString('id-ID'));
+            } else {
+                $('#nilaiBantuan').val('0');
+                console.log('No backend data, set to 0');
+            }
+        }
+
+        function nextStep() {
+            if (currentStep === 1) {
+                // Validasi step 1 - cek apakah semua input terisi
+                let allFilled = true;
+                let emptyFields = [];
+                
+                $('.score-input').each(function() {
+                    const skor = parseInt($(this).val()) || 0;
+                    const pertanyaan = $(this).closest('tr').find('td:eq(1)').text();
+                    
+                    if (skor === 0) {
+                        allFilled = false;
+                        emptyFields.push(pertanyaan);
+                    }
+                });
+                
+                if (!allFilled) {
+                    Swal.fire({
+                        title: 'Peringatan!',
+                        text: 'Harap isi skor untuk semua pertanyaan penilaian',
+                        icon: 'warning',
+                        confirmButtonColor: '#10b981'
+                    });
+                    return;
+                }
+                
+                // Validasi total skor
+                if (penilaianData.totalSkor === 0) {
+                    Swal.fire({
+                        title: 'Peringatan!',
+                        text: 'Harap isi skor untuk semua pertanyaan penilaian',
+                        icon: 'warning',
+                        confirmButtonColor: '#10b981'
+                    });
+                    return;
+                }
+                
+                // Validasi skor tidak boleh melebihi maksimal
+                let isValid = true;
+                let errorMessage = '';
+                let hasError = false;
+                
+                $('.score-input').each(function() {
+                    if (hasError) return false; // Stop loop jika sudah ada error
+                    
+                    const skor = parseInt($(this).val()) || 0;
+                    const skorMaksimal = parseInt($(this).data('skor-maksimal'));
+                    const pertanyaan = $(this).closest('tr').find('td:eq(1)').text();
+                    
+                    if (skor > skorMaksimal) {
+                        isValid = false;
+                        hasError = true;
+                        errorMessage = `Skor untuk "${pertanyaan}" tidak boleh melebihi ${skorMaksimal}`;
+                        return false;
+                    }
+                    
+                    if (skor < 0) {
+                        isValid = false;
+                        hasError = true;
+                        errorMessage = `Skor untuk "${pertanyaan}" tidak boleh negatif`;
+                        return false;
+                    }
+                });
+                
+                if (!isValid) {
+                    Swal.fire({
+                        title: 'Peringatan!',
+                        text: errorMessage,
+                        icon: 'warning',
+                        confirmButtonColor: '#10b981'
+                    });
+                    return;
+                }
+            } else if (currentStep === 2) {
+                // Simpan catatan
+                catatanContent = quill.root.innerHTML;
+                if (catatanContent.trim() === '<p><br></p>' || catatanContent.trim() === '') {
+                    Swal.fire({
+                        title: 'Peringatan!',
+                        text: 'Harap isi catatan penilaian',
+                        icon: 'warning',
+                        confirmButtonColor: '#10b981'
+                    });
+                    return;
+                }
+                
+                // Auto-calculate nilai bantuan berdasarkan nilai akhir (seperti IPK)
+                const currentNilaiBantuan = getNumericValue('nilaiBantuan');
+                const totalNilaiBantuan = parseInt($('#nilaiBantuan').data('nilai-bantuan')) || 0;
+                
+                // Hanya auto-calculate jika input benar-benar kosong (nilai 0)
+                // Jangan override jika user sudah mengisi dengan nilai total bantuan direview
+                if (currentNilaiBantuan === 0) {
+                    if (totalNilaiBantuan > 0) {
+                        // Hitung rekomendasi berdasarkan persentase nilai akhir terhadap nilai bantuan yang direview
+                        // Menggunakan rumus baru: (nilai_akhir / 100) × total_nilai_bantuan
+                        const rekomendasiNilai = Math.round((penilaianData.nilaiAkhir / 100) * totalNilaiBantuan);
+                        setRupiahValue('nilaiBantuan', rekomendasiNilai);
+                    } else {
+                        // Jika tidak ada nilai bantuan yang direview, set ke 0
+                        setRupiahValue('nilaiBantuan', 0);
+                    }
+                }
+                // Jika user sudah mengisi nilai (bukan 0), biarkan nilai tersebut
+            }
+            
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateStepIndicator();
+                updateProgressBar();
+                showCurrentStep();
+            }
+        }
+
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateStepIndicator();
+                updateProgressBar();
+                showCurrentStep();
+            }
+        }
+
+        function updateStepIndicator() {
+            $('.step').removeClass('active completed pending');
+            
+            $('.step').each(function(index) {
+                const stepNumber = index + 1;
+                if (stepNumber < currentStep) {
+                    $(this).addClass('completed');
+                } else if (stepNumber === currentStep) {
+                    $(this).addClass('active');
+                } else {
+                    $(this).addClass('pending');
+                }
+            });
+            
+            // Update connectors
+            $('.step-connector').removeClass('active');
+            for (let i = 1; i < currentStep; i++) {
+                $(`.step[data-step="${i}"] .step-connector`).addClass('active');
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = (currentStep / totalSteps) * 100;
+            $('#progressFill').css('width', progress + '%');
+        }
+
+        function showCurrentStep() {
+            $('.step-content').removeClass('active');
+            $(`#step${currentStep}`).addClass('active fade-in');
+            
+            // Update navigation buttons
+            if (currentStep === 1) {
+                $('#btnPrevious').hide();
+                $('#btnNext').show();
+                $('#btnSave').hide();
+            } else if (currentStep === totalSteps) {
+                $('#btnPrevious').show();
+                $('#btnNext').hide();
+                $('#btnSave').show();
+            } else {
+                $('#btnPrevious').show();
+                $('#btnNext').show();
+                $('#btnSave').hide();
+            }
+        }
+
+        function savePenilaian() {
+            if (jadwalPenilaian && jadwalPenilaian.reviewer_proposal_selesai) {
+                const selesai = new Date(jadwalPenilaian.reviewer_proposal_selesai);
+                if (new Date() > selesai) {
+                    Swal.fire({ icon: 'error', title: 'Tidak Bisa Menyimpan', text: 'Masa penilaian telah berakhir. Nilai otomatis 0.' });
+                    return;
+                }
+            }
+            // Validasi step 3
+            const nilaiBantuan = getNumericValue('nilaiBantuan');
+            if (nilaiBantuan <= 0) {
+                Swal.fire({
+                    title: 'Peringatan!',
+                    text: 'Harap isi nilai bantuan yang direkomendasikan',
+                    icon: 'warning',
+                    confirmButtonColor: '#10b981'
+                });
+                return;
+            }
+            
+            // Tampilkan loading
+            Swal.fire({
+                title: 'Menyimpan Penilaian...',
+                text: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Prepare data
+            const data = {
+                proposal_id: {{ proposal.id_proposal }},
+                penilaian: penilaianData,
+                catatan: catatanContent,
+                nilai_bantuan: nilaiBantuan,
+                persentase_bantuan: parseFloat($('#persentaseBantuan').val()) || 0
+            };
+            
+            // Send to server
+            fetch('/reviewer/save_penilaian', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: result.message,
+                        icon: 'success',
+                        confirmButtonColor: '#10b981'
+                    }).then(() => {
+                        // Redirect using URL from server response or fallback to proposal page
+                        window.location.href = result.redirect_url || '{{ url_for("reviewer.proposal") }}';
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: result.message,
+                        icon: 'error',
+                        confirmButtonColor: '#10b981'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan saat menyimpan penilaian',
+                    icon: 'error',
+                    confirmButtonColor: '#10b981'
+                });
+            });
+        }
+    </script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+</body>
+
+</html>

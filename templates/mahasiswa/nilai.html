@@ -1,0 +1,1858 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nilai Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/iconly/bold.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-mahasiswa.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    
+    <style>
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+        .badge {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.35rem 0.65rem;
+        }
+        .badge.bg-success {
+            background-color: #28a745 !important;
+        }
+        .badge.bg-warning {
+            background-color: #ffc107 !important;
+            color: #212529 !important;
+        }
+        .badge.bg-danger {
+            background-color: #dc3545 !important;
+        }
+        .badge.bg-secondary {
+            background-color: #6c757d !important;
+        }
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-circle.btn-primary {
+            background: #435ebe;
+            color: white;
+        }
+        .btn-circle.btn-primary:hover {
+            background: #2c3e50;
+            color: white;
+        }
+        .btn-circle.btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-circle.btn-info:hover {
+            background: #138496;
+            color: white;
+        }
+        .btn-circle.btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-circle.btn-warning:hover {
+            background: #e0a800;
+            color: #212529;
+        }
+        .btn-circle.btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-circle.btn-success:hover {
+            background: #218838;
+            color: white;
+        }
+        .comment-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background-color: #ffffff;
+        }
+        .comment-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            color: #495057;
+        }
+        
+        /* Styling untuk modal yang lebih nyaman dilihat */
+        .modal-content {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .modal-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            border-radius: 12px 12px 0 0;
+            padding: 1.25rem 1.5rem;
+        }
+        
+        .modal-header .modal-title {
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+            background: #ffffff;
+        }
+        
+        .modal-footer {
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            border-radius: 0 0 12px 12px;
+            padding: 1rem 1.5rem;
+        }
+        
+        /* Styling untuk card dalam modal */
+        .modal-card {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-card:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Styling untuk tabel dalam modal */
+        .modal-body .table {
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .modal-body .table thead th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            color: #495057;
+            font-weight: 600;
+            padding: 0.75rem;
+        }
+        
+        .modal-body .table tbody td {
+            padding: 0.75rem;
+            border-color: #e9ecef;
+        }
+        
+        .modal-body .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Styling untuk tfoot tabel */
+        .modal-body .table tfoot th {
+            background: #f8f9fa;
+            border-top: 2px solid #dee2e6;
+            color: #495057;
+            font-weight: 600;
+            padding: 1rem 0.75rem;
+        }
+        
+        /* Styling untuk badge dalam tabel */
+        .modal-body .badge {
+            font-size: 0.8rem;
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+        }
+        
+        /* Styling untuk tombol dalam modal */
+        .modal-body .btn-circle {
+            width: 36px;
+            height: 36px;
+            font-size: 0.9rem;
+        }
+        
+        /* Styling untuk responsive modal */
+        @media (max-width: 768px) {
+            .modal-dialog {
+                margin: 0.5rem;
+            }
+            
+            .modal-body {
+                padding: 1rem;
+            }
+            
+            .modal-header, .modal-footer {
+                padding: 1rem;
+            }
+        }
+        
+        /* Styling untuk Quill content */
+        .quill-content {
+            font-family: 'Nunito', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .quill-content p {
+            margin-bottom: 0.75rem;
+        }
+        
+        .quill-content p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .quill-content strong, .quill-content b {
+            font-weight: 600;
+            color: #435ebe;
+        }
+        
+        .quill-content em, .quill-content i {
+            font-style: italic;
+            color: #6c757d;
+        }
+        
+        .quill-content ul, .quill-content ol {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+        }
+        
+        .quill-content li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .quill-content blockquote {
+            border-left: 4px solid #435ebe;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #6c757d;
+        }
+        
+        .quill-content h1, .quill-content h2, .quill-content h3, 
+        .quill-content h4, .quill-content h5, .quill-content h6 {
+            color: #435ebe;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        /* Clean table styling untuk modal penilaian mahasiswa */
+        #mhsTableSesi {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        #mhsTableSesi thead th {
+            background-color: #f8f9fa;
+            border: none;
+            border-bottom: 1px solid #dee2e6;
+            color: #495057;
+            font-weight: 600;
+            padding: 12px 8px;
+        }
+        
+        #mhsTableSesi tbody td {
+            border: none;
+            border-bottom: 1px solid #f1f3f4;
+            padding: 12px 8px;
+            vertical-align: middle;
+        }
+        
+        #mhsTableSesi tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        #mhsTableSesi tfoot th {
+            background-color: #f8f9fa;
+            border: none;
+            border-top: 2px solid #dee2e6;
+            color: #495057;
+            font-weight: 600;
+            padding: 12px 8px;
+        }
+        
+        /* Clean badge untuk status sesi */
+        .sesi-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            min-width: 40px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .sesi-badge.locked {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .sesi-badge.unlocked {
+            background-color: #f8f9fa;
+            color: #ffc107;
+            border-color: #ffc107;
+        }
+        
+        .sesi-badge.empty {
+            background-color: #f8f9fa;
+            color: #adb5bd;
+            border-color: #dee2e6;
+        }
+        
+        /* Status text yang lebih subtle */
+        .status-text {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 4px;
+            display: block;
+        }
+        /* Card Ringkasan Styling */
+        .summary-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: #ffffff;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--summary-color);
+            opacity: 0.8;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .summary-card .card-body {
+            padding: 2rem 1.5rem;
+        }
+        
+        .summary-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--summary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .summary-card:hover .summary-icon {
+            transform: scale(1.1);
+        }
+        
+        .summary-icon i {
+            font-size: 2rem;
+            color: var(--summary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            line-height: 1;
+            font-weight: normal;
+        }
+        
+        /* Memastikan ikon Bootstrap Icons dimuat dengan benar */
+        .bi {
+            display: inline-block !important;
+            font-family: "bootstrap-icons" !important;
+            font-style: normal !important;
+            font-weight: normal !important;
+            font-variant: normal !important;
+            text-transform: none !important;
+            line-height: 1 !important;
+            vertical-align: middle !important;
+            -webkit-font-smoothing: antialiased !important;
+            -moz-osx-font-smoothing: grayscale !important;
+        }
+        
+        /* Memastikan ikon Bootstrap Icons tampil dengan benar */
+        .summary-icon i {
+            position: relative;
+            font-size: 2rem !important;
+            color: var(--summary-color) !important;
+        }
+        
+        /* Memastikan ikon berada di tengah lingkaran */
+        .summary-icon {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+        }
+        
+        .summary-icon i {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            text-align: center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        
+        .summary-card .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #6c757d;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .summary-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+            line-height: 1;
+        }
+        
+        .summary-subtitle {
+            color: #95a5a6;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        /* Variasi warna untuk setiap card - tanpa gradient */
+        .summary-primary {
+            --summary-color: #3498db;
+            --summary-bg: #e3f2fd;
+        }
+        
+        .summary-info {
+            --summary-color: #17a2b8;
+            --summary-bg: #e0f2f1;
+        }
+        
+        .summary-warning {
+            --summary-color: #f39c12;
+            --summary-bg: #fff3e0;
+        }
+        
+        .summary-success {
+            --summary-color: #27ae60;
+            --summary-bg: #e8f5e8;
+        }
+        
+        @media (max-width: 768px) {
+            .btn-circle {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+            
+            .summary-card .card-body {
+                padding: 1.5rem 1rem;
+            }
+            
+            .summary-icon {
+                width: 50px;
+                height: 50px;
+                margin-bottom: 1rem;
+            }
+            
+            .summary-icon i {
+                font-size: 1.5rem;
+            }
+            
+            .summary-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}"><img
+                                    src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo"
+                                    srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        {% if has_lolos_proposal %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin = 'lolos' - lengkap -->
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                <span>Pendanaan Hibah</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_akhir') }}">Laporan Akhir</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span>Produksi</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.pengelolaan_bahan_baku_mahasiswa') }}">Bahan Baku</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.aktivitas_produksi_mahasiswa') }}">Produksi</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.pembelian_alat_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-tools"></i>
+                                <span>Alat Produksi</span>
+                            </a>
+                            
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.biaya_operasional_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-calculator"></i>
+                                <span>Biaya Operasional</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.biaya_non_operasional_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-wallet2"></i>
+                                <span>Biaya Lain-lain</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.laporan_penjualan_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-receipt"></i>
+                                    <span>Laporan Penjualan</span>
+                            </a>
+                            
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-graph-up"></i>
+                                    <span>Pelaporan Keuangan</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_laba_rugi_mahasiswa') }}">Laporan Laba Rugi</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_arus_kas_mahasiswa') }}">Laporan Arus Kas</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_neraca_mahasiswa') }}">Laporan Neraca</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% else %}
+                        <!-- Menu untuk mahasiswa dengan proposal status_admin != 'lolos' atau tanpa proposal - terbatas -->
+                        <li class="sidebar-item has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% endif %}
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.bimbingan') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.profile_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-person-circle"></i>
+                                <span>Profile Mahasiswa</span>
+                            </a>
+                                </li>
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('mahasiswa.nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-star-fill"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+
+            </header>
+
+            <div class="page-heading">
+                <h3>Nilai Mahasiswa</h3>
+                <p class="text-muted" style="font-size:1.2rem;">Lihat dan perbarui data nilai mahasiswa di AYMP UNJAYA.</p>
+            </div>
+            <div class="page-content">
+                <section class="row">
+                    <div class="col-12">
+                        <!-- Card Ringkasan Nilai -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card summary-card summary-primary">
+                                    <div class="card-body text-center">
+                                        <div class="summary-icon">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        <h4 class="card-title">Nilai Mahasiswa</h4>
+                                        <h2 id="nilaiMahasiswa" class="summary-value">-</h2>
+                                        <small class="summary-subtitle">Oleh Pembimbing</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card summary-card summary-info">
+                                    <div class="card-body text-center">
+                                        <div class="summary-icon">
+                                            <i class="bi bi-file-text-fill"></i>
+                                        </div>
+                                        <h4 class="card-title">Nilai Proposal</h4>
+                                        <h2 id="nilaiProposal" class="summary-value">-</h2>
+                                        <small class="summary-subtitle">Oleh Reviewer</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card summary-card summary-warning">
+                                    <div class="card-body text-center">
+                                        <div class="summary-icon">
+                                            <i class="bi bi-graph-up"></i>
+                                        </div>
+                                        <h4 class="card-title">Nilai Kemajuan</h4>
+                                        <h2 id="nilaiKemajuan" class="summary-value">-</h2>
+                                        <small class="summary-subtitle">Oleh Reviewer</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card summary-card summary-success">
+                                    <div class="card-body text-center">
+                                        <div class="summary-icon">
+                                            <i class="bi bi-check-circle-fill"></i>
+                                        </div>
+                                        <h4 class="card-title">Nilai Akhir</h4>
+                                        <h2 id="nilaiAkhir" class="summary-value">-</h2>
+                                        <small class="summary-subtitle">Oleh Reviewer</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tabel Detail Nilai -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="card-title">
+                                            <i class="bi bi-list-check me-2"></i>Detail Penilaian
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover" id="tableNilaiMahasiswa">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Jenis Penilaian</th>
+                                                        <th>Nilai</th>
+                                                        <th>Status</th>
+                                                        <th>Tanggal</th>
+                                                        <th>Aksi</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <!-- Data akan diisi melalui JavaScript -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Modal Detail Penilaian Mahasiswa -->
+            <div class="modal fade" id="modalDetailMahasiswa" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fas fa-user-graduate me-2"></i>Detail Penilaian Mahasiswa</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="card" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary"><i class="fas fa-id-card me-2"></i>Informasi Mahasiswa</h6>
+                                            <p class="mb-1"><strong>Nama:</strong> <span id="mhsNama">-</span></p>
+                                            <p class="mb-1"><strong>NIM:</strong> <span id="mhsNim">-</span></p>
+                                            <p class="mb-0"><strong>Judul Usaha:</strong> <span id="mhsJudul">-</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                        <div class="card-body">
+                                            <h6 class="card-title"><i class="fas fa-award me-2"></i>Hasil Penilaian</h6>
+                                            <h3 class="mb-0 text-success" id="mhsNilaiAkhir">0</h3>
+                                            <small>Nilai Akhir</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Tabel dengan kolom sesi -->
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="mhsTableSesi">
+                                    <thead class="table-light" id="mhsTableHeader">
+                                        <!-- Header akan diisi dinamis -->
+                                    </thead>
+                                    <tbody id="mhsDetail"></tbody>
+                                    <tfoot id="mhsTableFooter">
+                                        <!-- Footer akan diisi dinamis -->
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Detail Penilaian Proposal -->
+            <div class="modal fade" id="modalDetailProposal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Detail Penilaian Proposal</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="card" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary"><i class="fas fa-id-card me-2"></i>Informasi Mahasiswa</h6>
+                                            <p class="mb-1"><strong>Nama:</strong> <span id="propNama">-</span></p>
+                                            <p class="mb-1"><strong>NIM:</strong> <span id="propNim">-</span></p>
+                                            <p class="mb-0"><strong>Judul Usaha:</strong> <span id="propJudul">-</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                        <div class="card-body">
+                                            <h6 class="card-title"><i class="fas fa-award me-2"></i>Hasil Penilaian</h6>
+                                            <h3 class="mb-0 text-success" id="propNilaiAkhir">0</h3>
+                                            <small>Nilai Akhir</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width:6%">No</th>
+                                            <th>Pertanyaan</th>
+                                            <th style="width:12%">Bobot</th>
+                                            <th style="width:12%">Skor</th>
+                                            <th style="width:12%">Nilai</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="propDetail"></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="2" class="text-center">TOTAL</th>
+                                            <th id="propTotalBobot">0</th>
+                                            <th id="propTotalSkor">0</th>
+                                            <th id="propTotalNilai">0</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="card comment-card mt-3">
+                                <div class="card-header comment-header"><h6 class="mb-0"><i class="fas fa-comment-dots me-2"></i>Catatan Reviewer</h6></div>
+                                <div class="card-body">
+                                    <div id="propCatatan" class="quill-content">-</div>
+                                </div>
+                            </div>
+                            <div class="card comment-card mt-3">
+                                <div class="card-header comment-header"><h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Rekomendasi Nilai Bantuan</h6></div>
+                                <div class="card-body"><p id="propRekom" class="mb-0">-</p></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Detail Penilaian Laporan Kemajuan -->
+            <div class="modal fade" id="modalDetailKemajuan" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fas fa-chart-line me-2"></i>Detail Penilaian Laporan Kemajuan</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="card" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary"><i class="fas fa-id-card me-2"></i>Informasi Mahasiswa</h6>
+                                            <p class="mb-1"><strong>Nama:</strong> <span id="kemNama">-</span></p>
+                                            <p class="mb-1"><strong>NIM:</strong> <span id="kemNim">-</span></p>
+                                            <p class="mb-0"><strong>Judul Usaha:</strong> <span id="kemJudul">-</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                        <div class="card-body">
+                                            <h6 class="card-title"><i class="fas fa-award me-2"></i>Hasil Penilaian</h6>
+                                            <h3 class="mb-0 text-success" id="kemNilaiAkhir">0</h3>
+                                            <small>Nilai Akhir</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width:6%">No</th>
+                                            <th>Pertanyaan</th>
+                                            <th style="width:12%">Bobot</th>
+                                            <th style="width:12%">Skor</th>
+                                            <th style="width:12%">Nilai</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="kemDetail"></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="2" class="text-center">TOTAL</th>
+                                            <th id="kemTotalBobot">0</th>
+                                            <th id="kemTotalSkor">0</th>
+                                            <th id="kemTotalNilai">0</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="card comment-card mt-3">
+                                <div class="card-header comment-header"><h6 class="mb-0"><i class="fas fa-comment-dots me-2"></i>Catatan Reviewer</h6></div>
+                                <div class="card-body"><p id="kemCatatan" class="mb-0">-</p></div>
+                            </div>
+                            <div class="card comment-card mt-3">
+                                <div class="card-header comment-header"><h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Rekomendasi Pendanaan</h6></div>
+                                <div class="card-body"><p id="kemRekom" class="mb-0">-</p></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Detail Penilaian Laporan Akhir -->
+            <div class="modal fade" id="modalDetailAkhir" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title"><i class="fas fa-flag-checkered me-2"></i>Detail Penilaian Laporan Akhir</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="card" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                        <div class="card-body">
+                                            <h6 class="card-title text-primary"><i class="fas fa-id-card me-2"></i>Informasi Mahasiswa</h6>
+                                            <p class="mb-1"><strong>Nama:</strong> <span id="akhNama">-</span></p>
+                                            <p class="mb-1"><strong>NIM:</strong> <span id="akhNim">-</span></p>
+                                            <p class="mb-0"><strong>Judul Usaha:</strong> <span id="akhJudul">-</span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card" style="background-color: #f8f9fa; border: 1px solid #dee2e6;">
+                                        <div class="card-body">
+                                            <h6 class="card-title"><i class="fas fa-award me-2"></i>Hasil Penilaian</h6>
+                                            <h3 class="mb-0 text-success" id="akhNilaiAkhir">0</h3>
+                                            <small>Nilai Akhir</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width:6%">No</th>
+                                            <th>Pertanyaan</th>
+                                            <th style="width:12%">Bobot</th>
+                                            <th style="width:12%">Skor</th>
+                                            <th style="width:12%">Nilai</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="akhDetail"></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="2" class="text-center">TOTAL</th>
+                                            <th id="akhTotalBobot">0</th>
+                                            <th id="akhTotalSkor">0</th>
+                                            <th id="akhTotalNilai">0</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="card comment-card mt-3">
+                                <div class="card-header comment-header"><h6 class="mb-0"><i class="fas fa-comment-dots me-2"></i>Catatan Reviewer</h6></div>
+                                <div class="card-body"><p id="akhCatatan" class="mb-0">-</p></div>
+                            </div>
+                            <div class="card comment-card mt-3">
+                                <div class="card-header comment-header"><h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Rekomendasi Kelulusan</h6></div>
+                                <div class="card-body"><p id="akhRekom" class="mb-0">-</p></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+
+    <!-- ApexCharts -->
+    <script src="{{ url_for('static', filename='assets/vendors/apexcharts/apexcharts.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/js/pages/dashboard.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Memastikan ikon Bootstrap Icons dimuat dengan benar
+            setTimeout(function() {
+                $('.summary-icon i').each(function() {
+                    const $icon = $(this);
+                    // Bersihkan konten yang tidak diinginkan
+                    $icon.contents().filter(function() {
+                        return this.nodeType === 3; // Text nodes
+                    }).remove();
+                });
+            }, 200);
+            
+            // Load data nilai mahasiswa
+            loadNilaiMahasiswa();
+            
+            function badgeByScore(x) {
+                if (x >= 75) return 'success';
+                if (x >= 60) return 'warning';
+                if (x > 0) return 'danger';
+                return 'secondary';
+            }
+            
+            function loadNilaiMahasiswa() {
+                $.getJSON('{{ url_for("mahasiswa.get_nilai_mahasiswa") }}', function(resp) {
+                    if (resp.success) {
+                        const data = resp.data;
+                        
+                        // Update card ringkasan
+                        $('#nilaiMahasiswa').text(data.nilai_mahasiswa !== undefined && data.nilai_mahasiswa !== null ? Math.round(data.nilai_mahasiswa) : '-');
+                        $('#nilaiProposal').text(data.nilai_proposal !== undefined && data.nilai_proposal !== null ? Math.round(data.nilai_proposal) : '-');
+                        $('#nilaiKemajuan').text(data.nilai_kemajuan !== undefined && data.nilai_kemajuan !== null ? Math.round(data.nilai_kemajuan) : '-');
+                        $('#nilaiAkhir').text(data.nilai_akhir !== undefined && data.nilai_akhir !== null ? Math.round(data.nilai_akhir) : '-');
+                        
+                        // Update tabel detail
+                        const table = $('#tableNilaiMahasiswa tbody');
+                        table.empty();
+                        
+                        // Mahasiswa
+                        if (data.nilai_mahasiswa !== undefined && data.nilai_mahasiswa !== null) {
+                        
+                            const status = data.nilai_mahasiswa >= 75 ? 'Lulus' : 'Tidak Lulus';
+                            const badgeClass = data.nilai_mahasiswa >= 75 ? 'bg-success' : 'bg-danger';
+                            table.append(`
+                                <tr>
+                                    <td><strong>Penilaian Mahasiswa</strong><br><small class="text-muted">Oleh Pembimbing</small></td>
+                                    <td><span class="badge ${badgeClass}">${Math.round(data.nilai_mahasiswa)}</span></td>
+                                    <td><span class="badge ${badgeClass}">${status}</span></td>
+                                    <td>${data.tanggal_mahasiswa || '-'}</td>
+                                    <td>
+                                        <button class="btn-circle btn-primary" title="Detail Penilaian Mahasiswa" onclick="showDetailMahasiswa()">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+                        }
+                        
+                        // Proposal
+                        if (data.nilai_proposal !== undefined && data.nilai_proposal !== null) {
+                            const status = data.nilai_proposal >= 75 ? 'Lulus' : 'Tidak Lulus';
+                            const badgeClass = data.nilai_proposal >= 75 ? 'bg-success' : 'bg-danger';
+                            table.append(`
+                                <tr>
+                                    <td><strong>Penilaian Proposal</strong><br><small class="text-muted">Oleh Reviewer</small></td>
+                                    <td><span class="badge ${badgeClass}">${Math.round(data.nilai_proposal)}</span></td>
+                                    <td><span class="badge ${badgeClass}">${status}</span></td>
+                                    <td>${data.tanggal_proposal || '-'}</td>
+                                    <td>
+                                        <button class="btn-circle btn-info" title="Detail Penilaian Proposal" onclick="showDetailProposal()">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+                        }
+                        
+                        // Kemajuan
+                        if (data.nilai_kemajuan !== undefined && data.nilai_kemajuan !== null) {
+                            const status = data.nilai_kemajuan >= 75 ? 'Lulus' : 'Tidak Lulus';
+                            const badgeClass = data.nilai_kemajuan >= 75 ? 'bg-success' : 'bg-danger';
+                            table.append(`
+                                <tr>
+                                    <td><strong>Penilaian Laporan Kemajuan</strong><br><small class="text-muted">Oleh Reviewer</small></td>
+                                    <td><span class="badge ${badgeClass}">${Math.round(data.nilai_kemajuan)}</span></td>
+                                    <td><span class="badge ${badgeClass}">${status}</span></td>
+                                    <td>${data.tanggal_kemajuan || '-'}</td>
+                                    <td>
+                                        <button class="btn-circle btn-warning" title="Detail Penilaian Kemajuan" onclick="showDetailKemajuan()">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+                        }
+                        
+                        // Akhir
+                        if (data.nilai_akhir !== undefined && data.nilai_akhir !== null) {
+                            // ✅ PERBAIKAN: Logika status berdasarkan rekomendasi reviewer
+                            let status, badgeClass;
+                            
+                            if (data.rekomendasi_akhir === 'lulus sempurna') {
+                                // Jika rekomendasi lulus sempurna, cek apakah nilai memenuhi syarat
+                                if (data.nilai_akhir >= 75) {
+                                    status = 'Lulus';
+                                    badgeClass = 'bg-success';
+                                } else {
+                                    status = 'Tidak Lulus';
+                                    badgeClass = 'bg-danger';
+                                }
+                            } else if (data.rekomendasi_akhir === 'tidak lolos') {
+                                // Jika rekomendasi tidak lolos, status tidak lulus (meskipun nilai tinggi)
+                                status = 'Tidak Lulus';
+                                badgeClass = 'bg-danger';
+                            } else {
+                                // Fallback: gunakan nilai sebagai penentu
+                                status = data.nilai_akhir >= 75 ? 'Lulus' : 'Tidak Lulus';
+                                badgeClass = data.nilai_akhir >= 75 ? 'bg-success' : 'bg-danger';
+                            }
+                            
+                            table.append(`
+                                <tr>
+                                    <td>
+                                        <strong>Penilaian Laporan Akhir</strong><br>
+                                        <small class="text-muted">Oleh Reviewer</small><br>
+                                        <small class="text-info">
+                                            <i class="bi bi-info-circle me-1"></i>
+                                            Rekomendasi: ${data.rekomendasi_akhir || 'Belum ada'}
+                                        </small>
+                                    </td>
+                                    <td><span class="badge bg-info">${Math.round(data.nilai_akhir)}</span></td>
+                                    <td><span class="badge ${badgeClass}">${status}</span></td>
+                                    <td>${data.tanggal_akhir || '-'}</td>
+                                    <td>
+                                        <button class="btn-circle btn-success" title="Detail Penilaian Akhir" onclick="showDetailAkhir()">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `);
+                        }
+                        
+                        // Jika tidak ada data sama sekali
+                        if ((data.nilai_mahasiswa === undefined || data.nilai_mahasiswa === null) && 
+                            (data.nilai_proposal === undefined || data.nilai_proposal === null) && 
+                            (data.nilai_kemajuan === undefined || data.nilai_kemajuan === null) && 
+                            (data.nilai_akhir === undefined || data.nilai_akhir === null)) {
+                            table.append(`
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">
+                                        <i class="bi bi-info-circle me-2"></i>Belum ada data penilaian
+                                    </td>
+                                </tr>
+                            `);
+                        }
+                    } else {
+                        console.error('Gagal memuat data nilai:', resp.message);
+                    }
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.error('AJAX Error:', textStatus, errorThrown);
+                });
+            }
+            
+            // Fungsi untuk menampilkan detail penilaian mahasiswa
+            window.showDetailMahasiswa = function() {
+                $.getJSON('{{ url_for("mahasiswa.get_detail_penilaian_mahasiswa") }}', function(resp) {
+                    if (resp.success) {
+                        const data = resp.data;
+                        $('#mhsNama').text(data.mahasiswa.nama_mahasiswa || '-');
+                        $('#mhsNim').text(data.mahasiswa.nim_mahasiswa || '-');
+                        $('#mhsJudul').text(data.mahasiswa.judul_usaha || '-');
+                        $('#mhsNilaiAkhir').text(Math.round(parseFloat(data.penilaian.nilai_akhir || 0)));
+                        
+                        // Debug: Log data jadwal untuk memastikan data diterima
+                        console.log('Jadwal info received:', data.jadwal_info);
+                        console.log('Detail penilaian:', data.detail_penilaian);
+                        
+                        // Render tabel dengan sesi
+                        renderMhsTableWithSesi(data);
+                        
+                        $('#modalDetailMahasiswa').modal('show');
+                    } else {
+                        alert('Gagal memuat detail penilaian mahasiswa: ' + resp.message);
+                    }
+                });
+            };
+            
+            // Fungsi untuk menampilkan detail penilaian proposal
+            window.showDetailProposal = function() {
+                $.getJSON('{{ url_for("mahasiswa.get_detail_penilaian_proposal") }}', function(resp) {
+                    if (resp.success) {
+                        const data = resp.data;
+                        $('#propNama').text(data.mahasiswa.nama_mahasiswa || '-');
+                        $('#propNim').text(data.mahasiswa.nim || '-');
+                        $('#propJudul').text(data.mahasiswa.judul_usaha || '-');
+                        $('#propNilaiAkhir').text(Math.round(parseFloat(data.penilaian.nilai_akhir || 0)));
+                        
+                        let tb = $('#propDetail'); tb.empty();
+                        let tB = 0, tS = 0, tN = 0;
+                        
+                        if (data.detail_penilaian && data.detail_penilaian.length > 0) {
+                            data.detail_penilaian.forEach((it, i) => {
+                                // Null check dan default values
+                                const bobot = parseFloat(it.bobot || 0);
+                                const skor = parseFloat(it.skor || 0);
+                                const nilai = parseFloat(it.nilai || 0);
+                                const skorMaksimal = it.skor_maksimal ? parseInt(it.skor_maksimal) : 0;
+                                const pertanyaan = it.pertanyaan || '-';
+                                
+                                tB += bobot;
+                                tS += skor;
+                                tN += nilai;
+                                
+                                tb.append(`<tr>
+                                    <td class="text-center">${i+1}</td>
+                                    <td>${pertanyaan}</td>
+                                    <td class="text-center">${bobot.toFixed(1)}</td>
+                                    <td class="text-center">${skor}${skorMaksimal ? ('/' + skorMaksimal) : ''}</td>
+                                    <td class="text-center">${nilai.toFixed(2)}</td>
+                                </tr>`);
+                            });
+                        } else {
+                            tb.append(`<tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    <i class="bi bi-info-circle me-2"></i>Tidak ada detail penilaian
+                                </td>
+                            </tr>`);
+                        }
+                        
+                        $('#propTotalBobot').text(tB.toFixed(1));
+                        $('#propTotalSkor').text(tS.toFixed(0));
+                        $('#propTotalNilai').text(tN.toFixed(2));
+                        
+                        // Fill catatan reviewer (HTML dari Quill editor)
+                        if (data.catatan && data.catatan.length > 0) {
+                            const catatanHTML = data.catatan[0];
+                            if (catatanHTML) {
+                                $('#propCatatan').html(catatanHTML);
+                            } else {
+                                $('#propCatatan').html('<em class="text-muted">Tidak ada catatan</em>');
+                            }
+                        } else {
+                            $('#propCatatan').html('<em class="text-muted">Tidak ada catatan</em>');
+                        }
+                        
+                        // Fill rekomendasi nilai bantuan
+                        if (data.rekomendasi && data.rekomendasi.length > 0) {
+                            const rekom = data.rekomendasi[0];
+                            if (rekom.rekomendasi) {
+                                $('#propRekom').html(`> ${rekom.rekomendasi}`);
+                            } else {
+                                $('#propRekom').html('<em class="text-muted">Tidak ada rekomendasi</em>');
+                            }
+                        } else {
+                            $('#propRekom').html('<em class="text-muted">Tidak ada rekomendasi</em>');
+                        }
+                        
+                        $('#modalDetailProposal').modal('show');
+                    } else {
+                        alert('Gagal memuat detail penilaian proposal: ' + resp.message);
+                    }
+                });
+            };
+            
+            // Fungsi untuk menampilkan detail penilaian kemajuan
+            window.showDetailKemajuan = function() {
+                $.getJSON('{{ url_for("mahasiswa.get_detail_penilaian_kemajuan") }}', function(resp) {
+                    if (resp.success) {
+                        const data = resp.data;
+                        $('#kemNama').text(data.mahasiswa.nama_mahasiswa || '-');
+                        $('#kemNim').text(data.mahasiswa.nim || '-');
+                        $('#kemJudul').text(data.mahasiswa.judul_usaha || '-');
+                        $('#kemNilaiAkhir').text(Math.round(parseFloat(data.penilaian.nilai_akhir || 0)));
+                        
+                        let tb = $('#kemDetail'); tb.empty();
+                        let tB = 0, tS = 0, tN = 0;
+                        
+                        if (data.detail_penilaian && data.detail_penilaian.length > 0) {
+                            data.detail_penilaian.forEach((it, i) => {
+                                // Null check dan default values sesuai dengan struktur database
+                                const bobot = parseFloat(it.bobot_pertanyaan || 0);
+                                const skor = parseFloat(it.skor_diberikan || 0);
+                                const nilai = parseFloat(it.nilai_terbobot || 0);
+                                const skorMaksimal = it.skor_maksimal ? parseInt(it.skor_maksimal) : 0;
+                                const pertanyaan = it.pertanyaan || '-';
+                                
+                                tB += bobot;
+                                tS += skor;
+                                tN += nilai;
+                                
+                                tb.append(`<tr>
+                                    <td class="text-center">${i+1}</td>
+                                    <td>${pertanyaan}</td>
+                                    <td class="text-center">${bobot.toFixed(1)}</td>
+                                    <td class="text-center">${skor}${skorMaksimal ? ('/' + skorMaksimal) : ''}</td>
+                                    <td class="text-center">${nilai.toFixed(2)}</td>
+                                </tr>`);
+                            });
+                        } else {
+                            tb.append(`<tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    <i class="bi bi-info-circle me-2"></i>Tidak ada detail penilaian
+                                </td>
+                            </tr>`);
+                        }
+                        
+                        $('#kemTotalBobot').text(tB.toFixed(1));
+                        $('#kemTotalSkor').text(tS.toFixed(0));
+                        $('#kemTotalNilai').text(tN.toFixed(2));
+                        
+                        // Fill catatan reviewer
+                        if (data.catatan && data.catatan.length > 0) {
+                            $('#kemCatatan').html(data.catatan[0]);
+                        } else {
+                            $('#kemCatatan').html('<em class="text-muted">Tidak ada catatan</em>');
+                        }
+                        
+                        // Fill rekomendasi pendanaan
+                        if (data.rekomendasi && data.rekomendasi.length > 0) {
+                            const rekom = data.rekomendasi[0];
+                            const rekomHTML = `
+                                <strong>Rekomendasi Pendanaan:</strong> ${rekom.rekomendasi_pendanaan || '-'}<br>
+                                <strong>Alasan Rekomendasi:</strong> ${rekom.alasan_rekomendasi || '-'}
+                            `;
+                            $('#kemRekom').html(rekomHTML);
+                        } else {
+                            $('#kemRekom').html('<em class="text-muted">Tidak ada rekomendasi</em>');
+                        }
+                        
+                        $('#modalDetailKemajuan').modal('show');
+                    } else {
+                        alert('Gagal memuat detail penilaian kemajuan: ' + resp.message);
+                    }
+                });
+            };
+            
+            // Fungsi untuk menampilkan detail penilaian akhir
+            window.showDetailAkhir = function() {
+                $.getJSON('{{ url_for("mahasiswa.get_detail_penilaian_akhir") }}', function(resp) {
+                    if (resp.success) {
+                        const data = resp.data;
+                        $('#akhNama').text(data.mahasiswa.nama_mahasiswa || '-');
+                        $('#akhNim').text(data.mahasiswa.nim || '-');
+                        $('#akhJudul').text(data.mahasiswa.judul_usaha || '-');
+                        $('#akhNilaiAkhir').text(Math.round(parseFloat(data.penilaian.nilai_akhir || 0)));
+                        
+                        let tb = $('#akhDetail'); tb.empty();
+                        let tB = 0, tS = 0, tN = 0;
+                        
+                        if (data.detail_penilaian && data.detail_penilaian.length > 0) {
+                            data.detail_penilaian.forEach((it, i) => {
+                                // Null check dan default values sesuai dengan struktur database yang benar
+                                const bobot = parseFloat(it.bobot_pertanyaan || 0);
+                                const skor = parseFloat(it.skor_diberikan || 0);
+                                const nilai = parseFloat(it.nilai_terbobot || 0);
+                                const skorMaksimal = it.skor_maksimal ? parseInt(it.skor_maksimal) : 0;
+                                const pertanyaan = it.pertanyaan || '-';
+                                
+                                tB += bobot;
+                                tS += skor;
+                                tN += nilai;
+                                
+                                tb.append(`<tr>
+                                    <td class="text-center">${i+1}</td>
+                                    <td>${pertanyaan}</td>
+                                    <td class="text-center">${bobot.toFixed(1)}</td>
+                                    <td class="text-center">${skor}${skorMaksimal ? ('/' + skorMaksimal) : ''}</td>
+                                    <td class="text-center">${nilai.toFixed(2)}</td>
+                                </tr>`);
+                            });
+                        } else {
+                            tb.append(`<tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    <i class="bi bi-info-circle me-2"></i>Tidak ada detail penilaian
+                                </td>
+                            </tr>`);
+                        }
+                        
+                        $('#akhTotalBobot').text(tB.toFixed(1));
+                        $('#akhTotalSkor').text(tS.toFixed(0));
+                        $('#akhTotalNilai').text(tN.toFixed(2));
+                        
+                        // Fill catatan reviewer (HTML dari Quill editor)
+                        if (data.catatan && data.catatan.length > 0) {
+                            const catatanHTML = data.catatan[0];
+                            if (catatanHTML) {
+                                $('#akhCatatan').html(catatanHTML);
+                            } else {
+                                $('#akhCatatan').html('<em class="text-muted">Tidak ada catatan</em>');
+                            }
+                        } else {
+                            $('#akhCatatan').html('<em class="text-muted">Tidak ada catatan</em>');
+                        }
+                        
+                        // Fill rekomendasi kelulusan
+                        if (data.rekomendasi && data.rekomendasi.length > 0) {
+                            const rekom = data.rekomendasi[0];
+                            const rekomHTML = `
+                                <strong>Rekomendasi Kelulusan:</strong> ${rekom.rekomendasi_kelulusan || '-'}<br>
+                                <strong>Alasan Rekomendasi:</strong> ${rekom.alasan_rekomendasi || '-'}
+                            `;
+                            $('#akhRekom').html(rekomHTML);
+                        } else {
+                            $('#akhRekom').html('<em class="text-muted">Tidak ada rekomendasi</em>');
+                        }
+                        
+                        $('#modalDetailAkhir').modal('show');
+                    } else {
+                        alert('Gagal memuat detail penilaian akhir: ' + resp.message);
+                    }
+                });
+            };
+            
+            // Fungsi untuk render tabel dengan kolom sesi dan kategori (sama seperti admin)
+            function renderMhsTableWithSesi(data) {
+                const kategoriList = data.detail_penilaian || [];
+                const jadwalInfo = data.jadwal_info || {};
+                const metadataPerSesi = data.metadata_per_sesi || {};
+                
+                // Debug: Log data yang akan di-render
+                console.log('Rendering table with data:', { kategoriList, jadwalInfo, metadataPerSesi });
+                
+                // Validasi data jadwal - gunakan fallback jika tidak lengkap
+                if (!jadwalInfo || Object.keys(jadwalInfo).length === 0) {
+                    console.warn('Data jadwal tidak lengkap, menggunakan fallback:', jadwalInfo);
+                    // Gunakan data dari metadata_per_sesi sebagai fallback
+                    if (Object.keys(metadataPerSesi).length > 0) {
+                        jadwalInfo.interval_tipe = metadataPerSesi[1]?.interval_tipe || 'setiap_jam';
+                        jadwalInfo.jam_mulai = '08:00';
+                        jadwalInfo.jam_selesai = '17:00';
+                        jadwalInfo.interval_nilai = 1;
+                    } else {
+                        // Fallback default
+                        jadwalInfo.interval_tipe = 'setiap_jam';
+                        jadwalInfo.jam_mulai = '08:00';
+                        jadwalInfo.jam_selesai = '17:00';
+                        jadwalInfo.interval_nilai = 1;
+                    }
+                }
+                
+                if (kategoriList.length === 0) {
+                    $('#mhsDetail').html(`
+                        <tr><td colspan="5" class="text-center text-muted">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Tidak ada data penilaian
+                        </td></tr>
+                    `);
+                    return;
+                }
+                
+                // Hitung max sesi dari semua pertanyaan di semua kategori
+                let maxSesi = 1;
+                kategoriList.forEach(kategori => {
+                    kategori.pertanyaan_list.forEach(pertanyaan => {
+                        const sesiKeys = Object.keys(pertanyaan.sesi_data || {});
+                        if (sesiKeys.length > 0) {
+                            maxSesi = Math.max(maxSesi, Math.max(...sesiKeys.map(Number)));
+                        }
+                    });
+                });
+                
+                console.log('Max sesi calculated:', maxSesi);
+                
+                // Render header dengan kolom sesi
+                renderMhsTableHeader(maxSesi, jadwalInfo);
+                
+                // Render body dengan kategori
+                renderMhsTableBodyWithKategori(kategoriList, maxSesi);
+                
+                // Render footer
+                renderMhsTableFooterWithKategori(kategoriList, maxSesi);
+            }
+            
+            // Render header tabel dengan kolom sesi
+            function renderMhsTableHeader(maxSesi, jadwalInfo) {
+                console.log('Rendering header with maxSesi:', maxSesi, 'jadwalInfo:', jadwalInfo);
+                
+                let headerHtml = `
+                    <tr>
+                        <th style="width:6%">No</th>
+                        <th>Pertanyaan</th>
+                        <th style="width:8%">Bobot</th>
+                        <th style="width:8%">Skor Max</th>
+                        <th colspan="${maxSesi}" class="text-center">Skor Per </th>
+                        <th style="width:8%">Rata-rata</th>
+                        <th style="width:8%">Nilai</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                `;
+                
+                // Sub-header untuk setiap sesi
+                for (let i = 1; i <= maxSesi; i++) {
+                    let sesiLabel = getMhsSesiLabel(i, jadwalInfo);
+                    console.log(`Sesi ${i} label:`, sesiLabel);
+                    headerHtml += `<th class="text-center" style="width:8%">
+                        <div class="fw-semibold">${sesiLabel}</div>
+                        <small class="text-muted">Sesi ${i}</small>
+                    </th>`;
+                }
+                
+                headerHtml += `
+                        <th></th>
+                        <th></th>
+                    </tr>
+                `;
+                
+                $('#mhsTableHeader').html(headerHtml);
+            }
+            
+            // Render body tabel dengan kategori
+            function renderMhsTableBodyWithKategori(kategoriList, maxSesi) {
+                let tbodyHtml = '';
+                
+                kategoriList.forEach((kategori, kategoriIndex) => {
+                    // Header kategori
+                    tbodyHtml += `
+                        <tr class="table-primary">
+                            <td colspan="${maxSesi + 7}" class="fw-bold">
+                                <i class="bi bi-folder-fill me-2"></i>${kategori.nama_kategori}
+                                <span class="float-end">
+                                    <small class="text-muted">
+                                        Total Bobot: ${kategori.total_bobot_kategori.toFixed(1)} | 
+                                        Total Nilai: ${kategori.total_nilai_kategori.toFixed(2)}
+                                    </small>
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                    
+                    // Pertanyaan dalam kategori (nomor di-reset untuk setiap kategori)
+                    kategori.pertanyaan_list.forEach((pertanyaan, pertanyaanIndex) => {
+                        const bobot = parseFloat(pertanyaan.bobot) || 0;
+                        const skorMax = parseInt(pertanyaan.skor_maksimal) || 4;
+                        const sesiData = pertanyaan.sesi_data || {};
+                        
+                        // ✅ PERBAIKAN: Hitung rata-rata skor dari semua sesi yang ada
+                        let totalSkorPertanyaan = 0;
+                        let jumlahSesi = 0;
+                        
+                        // Hitung dari semua sesi yang ada (termasuk skor 0)
+                        for (let sesi = 1; sesi <= maxSesi; sesi++) {
+                            if (sesiData[sesi]) {
+                                const skor = parseFloat(sesiData[sesi].skor) || 0;
+                                totalSkorPertanyaan += skor;  // ✅ PERBAIKAN: Hitung semua sesi (termasuk skor 0)
+                                jumlahSesi++;
+                            }
+                        }
+                        
+                        // ✅ PERBAIKAN: Rata-rata = total skor / jumlah sesi (semua sesi)
+                        const rataRataSkor = jumlahSesi > 0 ? (totalSkorPertanyaan / jumlahSesi) : 0;
+                        const nilaiAkhir = (rataRataSkor / skorMax) * bobot;
+                        
+                        // Nomor pertanyaan di-reset untuk setiap kategori (1, 2, 3...)
+                        const nomorPertanyaan = pertanyaanIndex + 1;
+                        
+                        let rowHtml = `
+                            <tr>
+                                <td class="text-center">${nomorPertanyaan}</td>
+                                <td>${pertanyaan.pertanyaan}</td>
+                                <td class="text-center">${bobot.toFixed(1)}</td>
+                                <td class="text-center">${skorMax}</td>
+                        `;
+                        
+                        // Kolom skor per sesi dengan styling clean
+                        for (let sesi = 1; sesi <= maxSesi; sesi++) {
+                            if (sesiData[sesi]) {
+                                const skor = sesiData[sesi].skor;
+                                const isLocked = sesiData[sesi].is_locked;
+                                const badgeClass = isLocked ? 'locked' : 'unlocked';
+                                const lockText = isLocked ? 'Terkunci' : 'Belum Kunci';
+                                
+                                rowHtml += `
+                                    <td class="text-center">
+                                        <div class="sesi-badge ${badgeClass}">${skor}</div>
+                                        <span class="status-text">${lockText}</span>
+                                    </td>
+                                `;
+                            } else {
+                                rowHtml += `
+                                    <td class="text-center">
+                                        <div class="sesi-badge empty">-</div>
+                                        <span class="status-text">Belum ada</span>
+                                    </td>
+                                `;
+                            }
+                        }
+                        
+                        // Kolom rata-rata dan nilai
+                        rowHtml += `
+                            <td class="text-center fw-semibold">${rataRataSkor.toFixed(1)}</td>
+                            <td class="text-center fw-semibold">${nilaiAkhir.toFixed(2)}</td>
+                        </tr>`;
+                        
+                        tbodyHtml += rowHtml;
+                    });
+                    
+                    // Separator antar kategori (kecuali kategori terakhir)
+                    if (kategoriIndex < kategoriList.length - 1) {
+                        tbodyHtml += `
+                            <tr class="table-light">
+                                <td colspan="${maxSesi + 7}" style="height: 8px; background-color: #f8f9fa;"></td>
+                            </tr>
+                        `;
+                    }
+                });
+                
+                $('#mhsDetail').html(tbodyHtml);
+            }
+            
+            // Render footer tabel dengan kategori
+            function renderMhsTableFooterWithKategori(kategoriList, maxSesi) {
+                let footerHtml = `
+                    <tr class="table-dark">
+                        <th colspan="3" class="fw-bold text-white">Total Keseluruhan</th>
+                        <th></th>
+                `;
+                
+                // Total per sesi
+                for (let sesi = 1; sesi <= maxSesi; sesi++) {
+                    let totalSesi = 0;
+                    kategoriList.forEach(kategori => {
+                        kategori.pertanyaan_list.forEach(pertanyaan => {
+                            const sesiData = pertanyaan.sesi_data || {};
+                            if (sesiData[sesi]) {
+                                totalSesi += parseInt(sesiData[sesi].skor) || 0;
+                            }
+                        });
+                    });
+                    footerHtml += `<th class="text-center fw-bold text-white">${totalSesi}</th>`;
+                }
+                
+                // Total rata-rata dan nilai akhir
+                let totalRataRata = 0;
+                let totalNilaiAkhir = 0;
+                let totalBobot = 0;
+                
+                kategoriList.forEach(kategori => {
+                    kategori.pertanyaan_list.forEach(pertanyaan => {
+                        const sesiData = pertanyaan.sesi_data || {};
+                        const bobot = parseFloat(pertanyaan.bobot) || 0;
+                        const skorMax = parseInt(pertanyaan.skor_maksimal) || 4;
+                        
+                        // ✅ PERBAIKAN: Hitung rata-rata skor dari semua sesi yang ada
+                        let totalSkorPertanyaan = 0;
+                        let jumlahSesi = 0;
+                        
+                        // Hitung dari semua sesi yang ada (termasuk skor 0)
+                        for (let sesi = 1; sesi <= maxSesi; sesi++) {
+                            if (sesiData[sesi]) {
+                                const skor = parseFloat(sesiData[sesi].skor) || 0;
+                                totalSkorPertanyaan += skor;  // ✅ PERBAIKAN: Hitung semua sesi (termasuk skor 0)
+                                jumlahSesi++;
+                            }
+                        }
+                        
+                        // ✅ PERBAIKAN: Rata-rata = total skor / jumlah sesi (semua sesi)
+                        const rataRataSkor = jumlahSesi > 0 ? (totalSkorPertanyaan / jumlahSesi) : 0;
+                        const nilaiAkhir = (rataRataSkor / skorMax) * bobot;
+                        
+                        totalRataRata += rataRataSkor;
+                        totalNilaiAkhir += nilaiAkhir;
+                        totalBobot += bobot;
+                    });
+                });
+                
+                footerHtml += `
+                    <th class="text-center fw-bold text-white">${totalRataRata.toFixed(1)}</th>
+                    <th class="text-center fw-bold text-white">${totalNilaiAkhir.toFixed(2)}</th>
+                </tr>
+                <tr class="table-info">
+                    <td colspan="${maxSesi + 7}" class="text-center fw-bold">
+                        <i class="bi bi-calculator me-2"></i>
+                        Total Bobot: ${totalBobot.toFixed(1)} | 
+                        Total Nilai: ${totalNilaiAkhir.toFixed(2)} | 
+                        Nilai Akhir: ${((totalNilaiAkhir / totalBobot) * 100).toFixed(1)}%
+                    </td>
+                </tr>`;
+                
+                $('#mhsTableFooter').html(footerHtml);
+            }
+            
+            // Helper function untuk label interval
+            function getMhsIntervalLabel(jadwalInfo) {
+                if (!jadwalInfo) return 'Sesi';
+                
+                if (jadwalInfo.interval_tipe === 'setiap_jam') return 'Jam';
+                if (jadwalInfo.interval_tipe === 'harian') return 'Hari';
+                if (jadwalInfo.interval_tipe === 'mingguan') return 'Minggu';
+                if (jadwalInfo.interval_tipe === 'bulanan') return 'Bulan';
+                
+                return 'Sesi';
+            }
+            
+            // Helper function untuk label sesi
+            function getMhsSesiLabel(sesi, jadwalInfo) {
+                if (!jadwalInfo) {
+                    console.error('Jadwal info tidak tersedia');
+                    return `Sesi ${sesi}`;
+                }
+                
+                // Prioritas 1: Gunakan metadata_kolom dari database jika tersedia
+                if (jadwalInfo.metadata_kolom && jadwalInfo.metadata_kolom.length > 0) {
+                    const metadata = jadwalInfo.metadata_kolom.find(m => m.urutan_kolom === sesi);
+                    if (metadata) {
+                        console.log(`Sesi ${sesi} from metadata:`, metadata.nama_kolom);
+                        return metadata.nama_kolom;
+                    }
+                }
+                
+                // Prioritas 2: Gunakan jam_list dari pengaturan jadwal untuk interval setiap_jam
+                if (jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list && jadwalInfo.jam_list[sesi - 1]) {
+                    return jadwalInfo.jam_list[sesi - 1];
+                }
+                
+                // Prioritas 3: Untuk interval setiap_jam tanpa jam_list, generate berdasarkan jam_mulai dan jam_selesai
+                if (jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_mulai && jadwalInfo.jam_selesai) {
+                    try {
+                        const jamMulai = jadwalInfo.jam_mulai;
+                        const jamSelesai = jadwalInfo.jam_selesai;
+                        const interval = parseInt(jadwalInfo.interval_nilai) || 1;
+                        
+                        console.log('Calculating session time with:', { jamMulai, jamSelesai, interval, sesi });
+                        
+                        // Parse jam mulai dan selesai
+                        let currentHour, currentMinute, endHour, endMinute, startHour;
+                        
+                        // Handle format datetime lengkap (YYYY-MM-DD HH:mm:ss) atau format jam saja (HH:mm)
+                        if (jamMulai.includes(' ')) {
+                            // Format datetime lengkap: '2025-08-19 21:20:00'
+                            const jamMulaiParts = jamMulai.split(' ')[1].split(':');
+                            const jamSelesaiParts = jamSelesai.split(' ')[1].split(':');
+                            
+                            currentHour = parseInt(jamMulaiParts[0]);
+                            currentMinute = parseInt(jamMulaiParts[1]);
+                            endHour = parseInt(jamSelesaiParts[0]);
+                            endMinute = parseInt(jamSelesaiParts[1]);
+                            startHour = parseInt(jamMulaiParts[0]);
+                        } else {
+                            // Format jam saja: '21:20'
+                            currentHour = parseInt(jamMulai.split(':')[0]);
+                            currentMinute = parseInt(jamMulai.split(':')[1]);
+                            endHour = parseInt(jamSelesai.split(':')[0]);
+                            endMinute = parseInt(jamSelesai.split(':')[1]);
+                            startHour = parseInt(jamMulai.split(':')[0]);
+                        }
+                        
+                        console.log('Parsed values:', { currentHour, currentMinute, endHour, endMinute, startHour });
+                        
+                        // PERBAIKAN: Hitung jam untuk sesi tertentu dengan validasi batas
+                        for (let i = 1; i < sesi; i++) {
+                            currentHour += interval;
+                            console.log(`After adding interval ${interval}: currentHour = ${currentHour}`);
+                            
+                            // PERBAIKAN: Validasi batas jam 0-23 (cross-midnight)
+                            if (currentHour >= 24) {
+                                currentHour = currentHour % 24; // Reset ke 0-23
+                                console.log(`After modulo 24: currentHour = ${currentHour}`);
+                            }
+                            
+                            // PERBAIKAN: Cek apakah sudah melewati batas waktu (perbaikan untuk cross-midnight)
+                            let isOverLimit = false;
+                            
+                            // Jika jam selesai lebih kecil dari jam mulai, berarti cross-midnight
+                            if (endHour < startHour) {
+                                console.log('Cross-midnight detected:', { endHour, startHour });
+                                // Cross-midnight case: jam selesai < jam mulai
+                                // Contoh: jam mulai 21:20, jam selesai 00:25
+                                // Valid range: 21:20 - 23:59, 00:00 - 00:25
+                                // PERBAIKAN: Hanya batasi jika melewati jam selesai (termasuk menit)
+                                if (currentHour > endHour || (currentHour === endHour && currentMinute > endMinute)) {
+                                    isOverLimit = true;
+                                    console.log(`Over limit detected: currentHour ${currentHour}:${currentMinute} > endHour ${endHour}:${endMinute}`);
+                                }
+                            } else {
+                                console.log('Normal case detected:', { endHour, startHour });
+                                // Normal case: jam selesai > jam mulai
+                                // Contoh: jam mulai 08:00, jam selesai 17:00
+                                if (currentHour > endHour || (currentHour === endHour && currentMinute > endMinute)) {
+                                    isOverLimit = true;
+                                    console.log(`Over limit detected: currentHour ${currentHour} > endHour ${endHour}`);
+                                }
+                            }
+                            
+                            if (isOverLimit) {
+                                // Jika melewati batas, gunakan jam terakhir yang valid
+                                currentHour = endHour;
+                                currentMinute = endMinute;
+                                console.log(`Using end time: ${currentHour}:${currentMinute}`);
+                                break;
+                            }
+                        }
+                        
+                        // PERBAIKAN: Pastikan jam dalam range 0-23
+                        if (currentHour < 0) currentHour = 0;
+                        if (currentHour > 23) currentHour = 23;
+                        
+                        // Format jam dengan leading zero
+                        const formattedHour = currentHour.toString().padStart(2, '0');
+                        const formattedMinute = currentMinute.toString().padStart(2, '0');
+                        
+                        const result = `Jam ${formattedHour}:${formattedMinute}`;
+                        console.log(`Sesi ${sesi} calculated as: ${result}`);
+                        return result;
+                    } catch (e) {
+                        console.error('Error calculating session time:', e);
+                        return `Sesi ${sesi}`;
+                    }
+                }
+                
+                // Prioritas 4: Fallback ke label generik berdasarkan interval
+                if (jadwalInfo.interval_tipe) {
+                    return `${getMhsIntervalLabel(jadwalInfo)} ${sesi}`;
+                }
+                
+                // Jika semua gagal, return default
+                console.warn('Tidak bisa generate label sesi, menggunakan default:', jadwalInfo);
+                return `Sesi ${sesi}`;
+            }
+        });
+    </script>
+</body>
+
+</html>
+

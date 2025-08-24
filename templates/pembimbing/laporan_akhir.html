@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Laporan Akhir Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <!-- <link rel="stylesheet" href="assets/vendors/jquery-datatables/jquery.dataTables.min.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+
+        .modal-body .row.g-3 {
+            row-gap: 18px;
+        }
+
+        @media (max-width: 575.98px) {
+
+            .modal-header,
+            .modal-footer,
+            .modal-body {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .modal-body {
+                padding-top: 16px;
+                padding-bottom: 6px;
+            }
+        }
+
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-circle:active,
+        .btn-circle:focus {
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.13);
+        }
+
+        .btn-circle i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.1em;
+            line-height: 1;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 7px;
+            vertical-align: middle;
+        }
+
+        .status-draft {
+            background: #facc15;
+        }
+
+        .status-active {
+            background: #22c55e;
+        }
+
+        .status-inactive {
+            background: #ef4444;
+        }
+
+        .status-text {
+            font-weight: 500;
+            color: #444;
+        }
+
+        .approval-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .status-display {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-rejected {
+            background: #ef4444;
+        }
+
+        /* Styling dasar untuk tabel */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Responsive table */
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Info box styling */
+        .text-muted small {
+            font-size: 13px;
+        }
+
+        /* Modal styling */
+        .modal-lg {
+            max-width: 800px;
+        }
+
+        .modal-body .form-label {
+            font-weight: 600;
+            color: #3b3f5c;
+            margin-bottom: 8px;
+        }
+
+        .modal-body .form-control,
+        .modal-body .form-select {
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            padding: 10px 15px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .modal-body .form-control:focus,
+        .modal-body .form-select:focus {
+            border-color: #435ebe;
+            box-shadow: 0 0 0 0.2rem rgba(67, 94, 190, 0.25);
+            outline: none;
+        }
+
+        .modal-footer .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+
+        /* Fix untuk DataTables */
+        .dataTables_wrapper .dataTable {
+            width: 100% !important;
+        }
+
+        .dataTables_wrapper .dataTable th,
+        .dataTables_wrapper .dataTable td {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .dataTables_wrapper .dataTable tbody tr {
+            height: auto;
+        }
+
+        /* Tab styling */
+        .nav-tabs {
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 12px 20px;
+            transition: all 0.2s;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-color: transparent;
+            color: #435ebe;
+            background-color: rgba(67, 94, 190, 0.05);
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #435ebe;
+            background-color: transparent;
+            border-bottom: 3px solid #435ebe;
+            font-weight: 600;
+        }
+
+        .nav-tabs .nav-link i {
+            font-size: 1.1em;
+        }
+
+        /* Tab content styling */
+        .tab-content {
+            padding-top: 20px;
+        }
+
+        .tab-pane {
+            min-height: 300px;
+        }
+
+        /* Table styling for anggota */
+        .table-hover tbody tr:hover {
+            background-color: rgba(67, 94, 190, 0.05);
+        }
+
+        .table-light {
+            background-color: #f8f9fa;
+        }
+
+        /* Badge styling */
+        .badge {
+            font-size: 0.85em;
+            padding: 6px 12px;
+        }
+
+        /* Empty state styling */
+        .text-muted .bi {
+            color: #dee2e6;
+        }
+
+        /* Approve/Reject button styling */
+        .btn-circle.btn-success {
+            background-color: #22c55e;
+            border-color: #22c55e;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .btn-circle.btn-success:hover {
+            background-color: #16a34a;
+            border-color: #16a34a;
+            transform: scale(1.05);
+        }
+
+        .btn-circle.btn-danger {
+            background-color: #ef4444;
+            border-color: #ef4444;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .btn-circle.btn-danger:hover {
+            background-color: #dc2626;
+            border-color: #dc2626;
+            transform: scale(1.05);
+        }
+
+        .btn-circle.btn-success:active,
+        .btn-circle.btn-danger:active {
+            transform: scale(0.95);
+        }
+
+        .btn-circle .bi-check-lg,
+        .btn-circle .bi-x-lg {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        /* Approval badge styling */
+        .badge.bg-success {
+            background-color: #22c55e !important;
+            color: white;
+            font-weight: 500;
+            border-radius: 15px;
+            transition: all 0.2s;
+        }
+
+        .badge.bg-success:hover {
+            background-color: #16a34a !important;
+            transform: scale(1.02);
+        }
+
+        .badge .bi-check-circle {
+            font-size: 1.1em;
+        }
+
+        .btn-circle.btn-success i,
+        .btn-circle.btn-danger i,
+        .btn-circle.btn-warning i {
+            color: #fff !important;
+            font-size: 1.4em;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .btn-circle.btn-warning {
+            background-color: #f59e0b;
+            border-color: #f59e0b;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .btn-circle.btn-warning:hover {
+            background-color: #d97706;
+            border-color: #d97706;
+            transform: scale(1.05);
+        }
+
+        .btn-circle.btn-warning:active {
+            transform: scale(0.95);
+        }
+
+        /* Konfirmasi button styling */
+        .btn-konfirmasi {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-konfirmasi:hover {
+            background: #138496;
+            color: white;
+        }
+
+        /* Dropdown Konfirmasi Styling */
+        .dropdown-toggle::after {
+            display: none;
+        }
+
+        .dropdown-menu {
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 1px solid #dee2e6;
+            padding: 0.5rem 0;
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            transform: translateX(2px);
+        }
+
+        .dropdown-item.text-success:hover {
+            background-color: #d1e7dd;
+        }
+
+        .dropdown-item.text-danger:hover {
+            background-color: #f8d7da;
+        }
+
+        .dropdown-item.text-warning:hover {
+            background-color: #fff3cd;
+        }
+
+        .btn-circle {
+            vertical-align: middle;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-circle.btn-success,
+        .btn-circle.btn-danger {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-pembimbing.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item active has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                <span>Pendanaan Hibah</span>
+                            </a>
+                            <ul class="submenu active">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                </li>
+                                <li class="submenu-item active">
+                                        <a href="{{ url_for('pembimbing.pembimbing_laporan_akhir') }}">Laporan Akhir</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                                                <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('pembimbing.daftar_penilaian_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-pencil-square"></i>
+                                <span>Penilaian Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Laporan Akhir</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Pantau laporan akhir mahasiswa bimbinganmu di AYMP UNJAYA.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.das_pembimbing') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Laporan Akhir</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Tables start -->
+                <section class="section">
+                    <div class="container-fluid mt-4">
+
+                        <div class="card"
+                            style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:24px 18px 10px 18px;">
+                           
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+                                <div>
+                                    <div style="font-weight:700;font-size:1.25rem;">Data Mahasiswa yang Dibimbing</div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table mb-0" id="table1">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama</th>
+                                            <th>Judul</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if mahasiswa_list %}
+                                            {% for mahasiswa in mahasiswa_list %}
+                                                <tr>
+                                                    <td>{{ loop.index }}</td>
+                                                    <td>
+                                                        <div class="fw-bold">{{ mahasiswa.nama_ketua }}</div>
+                                                        <small class="text-muted">NIM: {{ mahasiswa.nim }}</small>
+                                                    </td>
+                                                    <td>
+                                                        <div class="fw-bold">{{ mahasiswa.judul_usaha or 'Belum ada proposal' }}</div>
+                                                        <small class="text-muted">{{ mahasiswa.program_studi }}</small>
+                                                    </td>
+                                                    <td>
+                                                        <button class="btn btn-circle" style="background:#a78bfa;color:#fff;" 
+                                                            onclick="window.location.href='{{ url_for('pembimbing.pembimbing_laporan_akhir_awal_bertumbuh', mahasiswa_id=mahasiswa.id) }}'" 
+                                                            title="Lihat Laporan Akhir">
+                                                        <i class="bi bi-file-earmark-check"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="4" class="text-center py-4">
+                                                    <div class="text-muted">
+                                                        <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                                        <p class="mb-0">Belum ada mahasiswa yang dibimbing</p>
+                                                        <small>Atau semua mahasiswa belum memiliki proposal yang disetujui</small>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Basic Tables end -->
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script>
+        // Jquery Datatable dengan error handling
+        $(document).ready(function() {
+            try {
+                let jquery_datatable = $("#table1").DataTable({
+                    language: {
+                        "sProcessing":   "Sedang memproses...",
+                        "sLengthMenu":   "Tampilkan _MENU_ entri",
+                        "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                        "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                        "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+                        "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                        "sInfoPostFix":  "",
+                        "sSearch":       "Cari:",
+                        "sUrl":          "",
+                        "oPaginate": {
+                            "sFirst":    "Pertama",
+                            "sPrevious": "Sebelumnya",
+                            "sNext":     "Selanjutnya",
+                            "sLast":     "Terakhir"
+                        }
+                    },
+                    responsive: true,
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]]
+                });
+            } catch (error) {
+                console.error('Error initializing DataTable:', error);
+            }
+
+
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+</body>
+
+</html>
+

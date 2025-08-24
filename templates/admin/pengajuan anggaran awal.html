@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengajuan Anggaran Awal Admin - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <!-- <link rel="stylesheet" href="assets/vendors/jquery-datatables/jquery.dataTables.min.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+    <style>
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        /* Modal Styles */
+        .modal-xl {
+            max-width: 1200px;
+        }
+
+        .modal-header {
+            background: #435ebe;
+            color: white;
+            border-bottom: none;
+        }
+
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+
+        .barang-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .barang-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .barang-item h6 {
+            color: #435ebe !important;
+            font-weight: 600;
+        }
+
+        .form-label.fw-bold {
+            color: #3b3f5c;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #435ebe;
+            box-shadow: 0 0 0 0.2rem rgba(67, 94, 190, 0.25);
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-color: #d1d5db;
+            color: #6c757d;
+        }
+
+        .btn-outline-danger {
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-danger:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-outline-primary {
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 94, 190, 0.3);
+        }
+
+        .modal-footer .btn {
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-weight: 500;
+        }
+
+        .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+
+        /* Animation for modal */
+        .modal.fade .modal-dialog {
+            transition: transform 0.3s ease-out;
+            transform: translate(0, -50px);
+        }
+
+        .modal.show .modal-dialog {
+            transform: none;
+        }
+
+        .kegiatan-item {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .kegiatan-item:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-color: #435ebe;
+            transform: translateY(-3px);
+        }
+
+        .kegiatan-item h6 {
+            color: #435ebe !important;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .kegiatan-item .card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .kegiatan-item .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .barang-item h6 {
+            color: #22c55e !important;
+            font-weight: 600;
+        }
+
+        /* Enhanced Table Responsiveness */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .table {
+            margin-bottom: 0;
+            min-width: 1200px; /* Ensure minimum width for readability */
+        }
+
+        .table th, .table td {
+            padding: 12px 8px;
+            vertical-align: middle;
+            word-wrap: break-word;
+            white-space: normal;
+            border: 1px solid #dee2e6;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            color: #495057;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table td {
+            font-size: 0.85rem;
+            line-height: 1.3;
+            color: #212529;
+        }
+
+        /* Status column styling */
+        .table th:last-child,
+        .table td:last-child {
+            width: 8%;
+        }
+
+        /* Enhanced Responsive Breakpoints */
+        @media (max-width: 1600px) {
+            .table th, .table td {
+                font-size: 0.8rem;
+                padding: 10px 6px;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .table th, .table td {
+                font-size: 0.75rem;
+                padding: 8px 5px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .table th, .table td {
+                font-size: 0.7rem;
+                padding: 6px 4px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .table th, .table td {
+                font-size: 0.65rem;
+                padding: 5px 3px;
+            }
+            
+            .table {
+                min-width: 1000px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .table th, .table td {
+                font-size: 0.6rem;
+                padding: 4px 2px;
+            }
+            
+            .table {
+                min-width: 900px;
+            }
+            
+            /* Optimize button sizes for mobile */
+            .btn-lihat-link {
+                font-size: 0.7rem !important;
+                padding: 0.2rem 0.6rem !important;
+            }
+            
+            .badge {
+                font-size: 0.6rem;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .table th, .table td {
+                font-size: 0.55rem;
+                padding: 3px 1px;
+            }
+            
+            .table {
+                min-width: 800px;
+            }
+            
+            /* Stack info in mobile */
+            .card-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .page-heading .row {
+                flex-direction: column;
+            }
+            
+            .page-heading .col-12 {
+                order: 1;
+                margin-bottom: 15px;
+            }
+        }
+
+        /* Mobile-first table improvements */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Ensure table fits without horizontal scroll on larger screens */
+        @media (min-width: 1600px) {
+            .card-body .table-responsive {
+                overflow-x: visible;
+            }
+            
+            .table {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+
+        /* Action Buttons with Circle Background */
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .action-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(67, 94, 190, 0.25);
+        }
+
+        .btn-edit {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563EB;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #EF4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #DC2626;
+            color: white;
+        }
+
+        .btn-konfirmasi {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-konfirmasi:hover {
+            background: #059669;
+            color: white;
+        }
+        
+        /* Mencegah scroll saat SweetAlert muncul */
+        .swal-no-scroll {
+            overflow: hidden !important;
+        }
+        
+        body.swal2-shown {
+            overflow: hidden !important;
+            padding-right: 0 !important;
+        }
+        
+        /* Mencegah scroll tambahan */
+        html.swal2-shown {
+            overflow: hidden !important;
+        }
+        
+        /* Mencegah scroll pada container */
+        .swal2-container {
+            overflow: hidden !important;
+        }
+        
+        /* Mencegah scroll pada body saat SweetAlert aktif */
+        body.swal2-height-auto {
+            overflow: hidden !important;
+        }
+        
+        /* Mencegah scroll pada html saat SweetAlert aktif */
+        html.swal2-height-auto {
+            overflow: hidden !important;
+        }
+
+        /* Action column styling */
+        .table td:last-child {
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* Enhanced button styling */
+        .action-btn i {
+            transition: transform 0.2s ease;
+        }
+
+        .action-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Total Row Styling */
+        .total-row {
+            background: #f8f9fa;
+            font-weight: 700;
+        }
+
+        .total-row td {
+            border-top: 2px solid #dee2e6;
+        }
+
+        #totalJumlah {
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* SweetAlert2 Custom Styling */
+        .swal2-popup {
+            border-radius: 15px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .swal2-title {
+            color: #3b3f5c;
+            font-weight: 700;
+        }
+
+        .swal2-content {
+            color: #6c757d;
+        }
+
+        .swal2-confirm {
+            background: #435ebe !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-cancel {
+            background: #6c757d !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-success-circular-line-left,
+        .swal2-success-circular-line-right,
+        .swal2-success-fix {
+            background-color: transparent !important;
+        }
+
+        .swal2-icon.swal2-success {
+            border-color: #435ebe !important;
+        }
+
+        .swal2-icon.swal2-success [class^='swal2-success-line'] {
+            background-color: #435ebe !important;
+        }
+
+        .swal2-icon.swal2-success .swal2-success-ring {
+            border-color: #435ebe !important;
+        }
+
+        /* Modal Edit Header - Neutral Color */
+        #modalEditAnggaran .modal-header {
+            background: #f8f9fa;
+            color: #3b3f5c;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        #modalEditAnggaran .modal-header .btn-close {
+            filter: none;
+        }
+
+        /* Modal Tambah Kegiatan Header - Neutral Color */
+        #modalTambahKegiatan .modal-header {
+            background: #f8f9fa;
+            color: #3b3f5c;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        #modalTambahKegiatan .modal-header .btn-close {
+            filter: none;
+        }
+
+        .action-btn-group {
+            min-width: 48px;
+            gap: 16px !important;
+        }
+        .action-btn {
+            margin: 0 !important;
+        }
+
+        .input-group .form-control {
+            border-radius: 8px 0 0 8px;
+            font-size: 0.95rem;
+            padding: 0.5rem 0.75rem;
+        }
+        .input-group .btn {
+            border-radius: 0;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .input-group .btn-primary {
+            border-radius: 0 8px 8px 0;
+        }
+        .input-group .btn-outline-primary {
+            border-right: none;
+        }
+        @media (max-width: 500px) {
+            .input-group .form-control, .input-group .btn {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.5rem;
+            }
+        }
+        /* Styling untuk informasi mahasiswa */
+        .table td small {
+            line-height: 1.1;
+            display: block;
+            margin-top: 1px;
+        }
+
+        .table td small:first-of-type {
+            margin-top: 2px;
+        }
+
+        /* Card hover effect */
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-admin.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    </head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('admin.das_admin') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.das_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.admin_daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.mahasiswa_belum_diverifikasi') }}">Belum Diverifikasi</a>
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.mahasiswa_sudah_diverifikasi') }}">Sudah Diverifikasi</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi-bar-chart-line"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-clock-history"></i>
+                                <span>Log Aktivitas</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_mahasiswa') }}">Mahasiswa</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_pembimbing') }}">Pembimbing</a> 
+                                </li>
+                                
+                            </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.daftar_nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-award"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('admin.pengajuan_proposal') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Pengajuan Proposal</span>
+                            </a>
+                                </li>
+                                <li class="sidebar-item  ">
+                                    <a href="{{ url_for('admin.admin_laporan_kemajuan') }}" class='sidebar-link'>
+                                        <i class="bi bi-graph-up"></i>
+                                        <span>Laporan Kemajuan</span>
+                                    </a>
+                                </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_akhir') }}" class='sidebar-link'>
+                                <i class="bi bi-clipboard-data"></i>
+                                <span>Laporan Akhir</span>
+                            </a>
+                                </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Pembimbing</span>
+                            </a>
+                                </li>
+                                <li class="sidebar-item  ">
+                                    <a href="{{ url_for('admin.reviewer') }}" class='sidebar-link'>
+                                        <i class="bi bi-person-badge"></i>
+                                        <span>Reviewer</span>
+                                    </a>
+                                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.data_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Admin</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.pengaturan') }}" class='sidebar-link'>
+                                <i class="bi bi-gear"></i>
+                                <span>Pengaturan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Pengajuan Anggaran Awal</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Kelola pengajuan anggaran awal mahasiswa di AYMP UNJAYA.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('admin.das_admin') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url_for('admin.pengajuan_proposal') }}">Pengajuan Proposal</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Pengajuan Anggaran Awal</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Tables start -->
+                <section class="section">
+                    {% if proposal_info %}
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-info-circle me-2"></i>Informasi Proposal
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Judul Usaha:</strong> {{ proposal_info.judul_usaha|e }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Tahapan Usaha:</strong> {{ proposal_info.tahapan_usaha|e }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Pengajuan Anggaran Awal</span>
+                            <button class="btn btn-success btn-sm rounded-circle" onclick="downloadExcelAnggaran('awal')" title="Download Excel Anggaran Awal" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa fa-download" style="font-size: 16px;"></i>
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle text-center" style="width: 100%; font-size: 0.85rem;">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" style="vertical-align:middle; width: 15%;">Kegiatan Utama</th>
+                                            <th colspan="6" style="width: 55%;">Rencana</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 10%;">Keterangan/<br>Ref. Harga</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 10%;">Target Capaian<br>H = Output A</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 10%;">Penanggung Jawab</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 8%;">Status Reviewer</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 8%;">Nilai Bantuan</th>
+                                        </tr>
+                                        <tr>
+                                            <th style="width: 10%;">Kegiatan<br>A</th>
+                                            <th style="width: 12%;">Nama Barang<br>B</th>
+                                            <th style="width: 8%;">Kuantitas<br>C</th>
+                                            <th style="width: 8%;">Satuan<br>D</th>
+                                            <th style="width: 12%;">Harga Satuan<br>E</th>
+                                            <th style="width: 10%;">Jumlah (Rp)<br>F=C×E</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in anggaran_data_flat %}
+                                            <tr data-row-id="{{ row.id }}">
+                                                {% if row.show_kegiatan_utama %}
+                                                    <td rowspan="{{ row.kegiatan_utama_rowspan }}">{{ row.kegiatan_utama|e }}</td>
+                                                    {% endif %}
+                                                {% if row.show_kegiatan %}
+                                                    <td rowspan="{{ row.kegiatan_rowspan }}">{{ row.kegiatan|e }}</td>
+                                                {% endif %}
+                                                <td>{{ row.nama_barang|e }}</td>
+                                                <td>{{ row.kuantitas }}</td>
+                                                <td>{{ row.satuan|e }}</td>
+                                                <td>Rp {{ "{:,}".format(row.harga_satuan|int) }}</td>
+                                                <td class="cell-jumlah">Rp {{ "{:,}".format(row.jumlah|int) }}</td>
+                                                <td>
+                                                    {% if row.keterangan %}
+                                                        {% set keterangan_lower = row.keterangan|lower %}
+                                                        {% if 'http' in keterangan_lower or 'www' in keterangan_lower or '.com' in keterangan_lower or '.id' in keterangan_lower or '.org' in keterangan_lower or '.net' in keterangan_lower or '.co' in keterangan_lower or '.ac' in keterangan_lower or '.go' in keterangan_lower %}
+                                                            <button class="btn btn-primary btn-sm btn-lihat-link lihat-keterangan-btn" 
+                                                                    data-keterangan="{{ row.keterangan|e }}" 
+                                                                    data-link="{{ row.keterangan|e }}"
+                                                                    style="border-radius: 1.5rem; padding: 0.25rem 0.9rem; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                                                <i class="fa fa-external-link-alt me-1"></i>Lihat
+                                                            </button>
+                                                        {% else %}
+                                                            <span class="text-muted">{{ row.keterangan|e }}</span>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                                {% if row.show_target_capaian %}
+                                                    <td rowspan="{{ row.target_capaian_rowspan }}">{{ row.target_capaian|e }}</td>
+                                                {% endif %}
+                                                {% if row.show_penanggung_jawab %}
+                                                    <td rowspan="{{ row.penanggung_jawab_rowspan }}">{{ row.penanggung_jawab }}</td>
+                                                {% endif %}
+                                                <td>
+                                                    {% if row.status_reviewer == 'belum_direview' %}
+                                                        <span class="badge bg-warning text-dark" title="Belum direview oleh reviewer">BELUM DIREVIEW</span>
+                                                    {% elif row.status_reviewer == 'sudah_direview' %}
+                                                        <span class="badge bg-success" title="Sudah direview dan disetujui dengan nilai bantuan">SUDAH DIREVIEW</span>
+                                                    {% elif row.status_reviewer == 'tolak_bantuan' %}
+                                                        <span class="badge bg-danger" title="Bantuan ditolak oleh reviewer">TOLAK BANTUAN</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">BELUM DIREVIEW</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if row.nilai_bantuan and row.nilai_bantuan > 0 %}
+                                                        <span class="fw-bold text-success">Rp {{ "{:,.0f}".format(row.nilai_bantuan) }}</span>
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="total-row">
+                                            <td colspan="6" class="text-end fw-bold">TOTAL ANGGARAN:
+                                                <span id="badgeTotalStatus" class="badge ms-2" style="display:none"></span>
+                                            </td>
+                                            <td id="totalJumlah" class="fw-bold">Rp 0</td>
+                                            <td colspan="5"></td>
+                                        </tr>
+                                        <tr class="total-row" style="background:#e8f5e8;">
+                                            <td colspan="6" class="text-end fw-bold text-success">
+                                                <i class="fa-solid fa-money-bill-wave me-1"></i>TOTAL NILAI BANTUAN:
+                                            </td>
+                                            <td id="totalNilaiBantuan" class="fw-bold text-success">Rp 0</td>
+                                            <td colspan="5"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Modal Keterangan/Ref. Harga -->
+                <div class="modal fade" id="modalKeterangan" tabindex="-1" aria-labelledby="modalKeteranganLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header" style="background: #f8f9fa; color: #3b3f5c; border-bottom: 1px solid #dee2e6;">
+                        <h5 class="modal-title" id="modalKeteranganLabel">Keterangan / Ref. Harga</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup" style="filter: none;"></button>
+                      </div>
+                      <div class="modal-body">
+                        <p id="isiKeterangan"></p>
+                        <div id="linkContainer" style="display:none;">
+                            <hr>
+                            <div class="input-group">
+                                <input type="text" id="linkKeterangan" class="form-control" readonly>
+                                <button class="btn btn-outline-primary" type="button" onclick="copyLink()">
+                                    <i class="fa fa-copy me-1"></i>Copy
+                                </button>
+                                <a id="linkKeteranganBtn" href="#" target="_blank" class="btn btn-primary">
+                                    <i class="fa fa-external-link-alt me-1"></i>Buka
+                                </a>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                            </div>
+                <!-- Basic Tables end -->
+            </div>
+
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.all.min.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            // Handle lihat keterangan button (samakan dengan template mahasiswa)
+            $(document).on('click', '.lihat-keterangan-btn', function() {
+                var keterangan = $(this).data('keterangan');
+                var link = $(this).data('link');
+                var isLink = false;
+                var linkLower = link ? String(link).toLowerCase() : '';
+                if (linkLower.includes('http') || linkLower.includes('www') || linkLower.includes('.com') || linkLower.includes('.id') || linkLower.includes('.org') || linkLower.includes('.net') || linkLower.includes('.co') || linkLower.includes('.ac') || linkLower.includes('.go')) {
+                    isLink = true;
+                }
+                if (isLink) {
+                    $('#isiKeterangan').text('');
+                    $('#linkKeterangan').val(linkLower);
+                    $('#linkKeteranganBtn').attr('href', link);
+                    $('#linkContainer').show();
+                } else {
+                    $('#isiKeterangan').text(keterangan);
+                    $('#linkContainer').hide();
+                }
+                $('#modalKeterangan').modal('show');
+            });
+
+            // Function to copy link
+            window.copyLink = function() {
+                var linkInput = document.getElementById('linkKeterangan');
+                linkInput.select();
+                linkInput.setSelectionRange(0, 99999); // For mobile devices
+                
+                try {
+                    navigator.clipboard.writeText(linkInput.value);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Link berhasil disalin ke clipboard',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } catch (err) {
+                    // Fallback for older browsers
+                    document.execCommand('copy');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Link berhasil disalin ke clipboard',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            };
+
+            function updateTotalJumlah() {
+                let total = 0;
+                document.querySelectorAll('td.cell-jumlah').forEach(function(cell) {
+                    let text = cell.textContent.trim();
+                    if (/^Rp\s*[\d,.]+$/.test(text)) {
+                        let val = text.replace(/[^\d]/g, '');
+                        total += parseInt(val || '0');
+                    }
+                });
+                document.getElementById('totalJumlah').textContent = 'Rp ' + total.toLocaleString('id-ID');
+                const minBatas = {{ (batas_min_awal or 0)|int }};
+                const maxBatas = {{ (batas_max_awal or 0)|int }};
+                const badge = document.getElementById('badgeTotalStatus');
+                if (badge) {
+                    badge.style.display = 'inline-block';
+                    badge.className = 'badge ms-2';
+                    if (minBatas && total < minBatas) {
+                        badge.classList.add('bg-warning', 'text-dark');
+                        badge.textContent = 'Kurang dari minimal';
+                    } else if (maxBatas && total > maxBatas) {
+                        badge.classList.add('bg-danger');
+                        badge.textContent = 'Melebihi maksimal';
+                    } else {
+                        badge.classList.add('bg-success');
+                        badge.textContent = 'Dalam batas';
+                    }
+                    let info = [];
+                    if (minBatas) info.push('Minimal: Rp ' + minBatas.toLocaleString('id-ID'));
+                    if (maxBatas) info.push('Maksimal: Rp ' + maxBatas.toLocaleString('id-ID'));
+                    badge.setAttribute('title', info.length ? info.join(' | ') : 'Tidak dibatasi');
+                    try { var tt = bootstrap.Tooltip.getInstance(badge); if (tt) tt.dispose(); new bootstrap.Tooltip(badge); } catch(e) {}
+                }
+            }
+
+            function updateTotalNilaiBantuan() {
+                let total = 0;
+                document.querySelectorAll('td:nth-last-child(1), td.cell-nilai-bantuan').forEach(function(cell) {
+                    // try find marked span
+                    const span = cell.querySelector('.fw-bold.text-success, .nilai-bantuan, .text-danger');
+                    let text = span ? span.textContent.trim() : cell.textContent.trim();
+                    if (/^Rp\s*[\d,.]+$/.test(text)) {
+                        let val = text.replace(/[^\d]/g, '');
+                        total += parseInt(val || '0');
+                    }
+                });
+                const el = document.getElementById('totalNilaiBantuan');
+                if (el) el.textContent = 'Rp ' + total.toLocaleString('id-ID');
+            }
+
+            // Initial call
+            updateTotalJumlah();
+            updateTotalNilaiBantuan();
+        });
+    </script>
+    <script>
+        // Fungsi untuk download Excel anggaran
+        function downloadExcelAnggaran(jenis) {
+            // Ambil ID proposal dari path URL (admin menggunakan path parameter)
+            const pathSegments = window.location.pathname.split('/');
+            const proposalId = pathSegments[pathSegments.length - 1]; // Ambil segment terakhir
+            
+            if (!proposalId || isNaN(proposalId)) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'ID Proposal tidak ditemukan'
+                });
+                return;
+            }
+            
+            // Show loading
+            Swal.fire({
+                title: 'Memproses...',
+                text: 'Sedang membuat file Excel',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Download Excel
+            const downloadUrl = `/admin/download_excel_anggaran?id_proposal=${proposalId}&jenis=${jenis}`;
+            
+            fetch(downloadUrl)
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    }
+                    throw new Error('Network response was not ok');
+                })
+                .then(blob => {
+                    // Buat URL untuk download
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `Anggaran_${jenis.charAt(0).toUpperCase() + jenis.slice(1)}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'File Excel berhasil didownload',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat mendownload file Excel'
+                    });
+                });
+        }
+    </script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Penilaian Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-pembimbing.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+    
+    <style>
+        /* Custom button styles for penilaian */
+        .btn-rounded-circle {
+            border-radius: 50% !important;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-rounded-circle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-rounded-pill {
+            border-radius: 50px !important;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-rounded-pill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        /* Table Styling */
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+        .table th, .table td {
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        @media (max-width: 1200px) {
+            .table th, .table td {
+                font-size: 0.85rem;
+                padding: 7px 3px;
+            }
+        }
+        
+        /* Styling untuk badge status */
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        
+        /* Styling untuk progress bar */
+        .progress {
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .progress-bar {
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+        
+        /* Styling untuk nilai display */
+        .nilai-display {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .nilai-display.belum-dinilai {
+            color: #6c757d;
+        }
+        
+        .nilai-display.draft {
+            color: #fd7e14;
+        }
+        
+        .nilai-display.selesai {
+            color: #198754;
+        }
+        
+        /* DataTable Pagination Styling */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1.1rem;
+            line-height: 40px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+        
+        /* Card Styling */
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+        .judul-usaha {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .judul-usaha:hover {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        
+        /* Styling untuk jadwal status pembimbing */
+        .jadwal-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .status-indicator.active {
+            border: 2px solid #10b981;
+        }
+        
+        .status-indicator.inactive {
+            border: 2px solid #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+        }
+        
+        .jadwal-time {
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            border-left: 3px solid #22c55e;
+        }
+        
+        /* Styling untuk badge status jadwal */
+        .badge {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Styling untuk modal yang lebih nyaman */
+        .modal-content {
+            border-radius: 20px !important;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Styling untuk kategori di tabel detail */
+        .table-primary {
+            background-color: #e3f2fd !important;
+            border-color: #2196f3 !important;
+        }
+        
+        .table-primary td, .table-primary th {
+            color: #1565c0 !important;
+            font-weight: 600;
+        }
+        
+        .table-dark {
+            background-color: #343a40 !important;
+            border-color: #495057 !important;
+        }
+        
+        .table-info {
+            background-color: #d1ecf1 !important;
+            border-color: #bee5eb !important;
+        }
+        
+        .table-info td {
+            color: #0c5460 !important;
+        }
+        
+        .table-success {
+            background-color: #d4edda !important;
+            border-color: #c3e6cb !important;
+        }
+        
+        .table-success td, .table-success th {
+            color: #155724 !important;
+            font-weight: 600;
+        }
+        
+        .table-light {
+            background-color: #f8f9fa !important;
+        }
+        
+        /* Styling untuk separator antar kategori */
+        .table-light td {
+            padding: 4px !important;
+            border: none !important;
+        }
+        
+        /* Styling khusus untuk footer tabel */
+        #detailPenilaianFooter .table-primary th {
+            background-color: #e3f2fd !important;
+            color: #1565c0 !important;
+            border-color: #2196f3 !important;
+        }
+        
+        #detailPenilaianFooter .table-success td {
+            background-color: #d4edda !important;
+            color: #155724 !important;
+            border-color: #c3e6cb !important;
+        }
+        
+        .modal-header {
+            border-radius: 20px 20px 0 0 !important;
+            border-bottom: none;
+        }
+        
+        .modal-footer {
+            border-radius: 0 0 20px 20px !important;
+            border-top: none;
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+        
+        /* Styling untuk card di dalam modal */
+        .modal .card {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Styling untuk info mahasiswa */
+        .modal .p-3.border.rounded {
+            border-radius: 12px !important;
+            border: 1px solid #e9ecef !important;
+            transition: all 0.3s ease;
+        }
+        
+        .modal .p-3.border.rounded:hover {
+            border-color: #435ebe !important;
+            box-shadow: 0 4px 15px rgba(67, 94, 190, 0.1);
+            transform: translateY(-2px);
+        }
+        
+
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                <span>Pendanaan Hibah</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_laporan_akhir') }}">Laporan Akhir</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('pembimbing.daftar_penilaian_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-pencil-square"></i>
+                                <span>Penilaian Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Daftar Penilaian Mahasiswa</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">
+                                Daftar mahasiswa bimbingan yang dapat dinilai di AYMP UNJAYA.
+                            </p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.das_pembimbing') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Daftar Penilaian Mahasiswa</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informasi Status Jadwal Penilaian Pembimbing -->
+                {% if jadwal_bimbingan %}
+                <div class="card border-0 shadow-sm mb-4" style="background: #f0fdf4; border-left: 4px solid #22c55e;">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <div class="jadwal-icon mb-2">
+                                    <i class="bi bi-calendar-event text-success" style="font-size: 2.5rem;"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <h5 class="text-dark mb-3 fw-bold">
+                                    📅 Status Jadwal Penilaian Mahasiswa
+                                </h5>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="badge fs-6 px-3 py-2 me-3" style="
+                                        background-color: {% if jadwal_bimbingan.bisa_nilai %}#10b981{% elif jadwal_bimbingan.status == 'belum_mulai' %}#f59e0b{% elif jadwal_bimbingan.status == 'sudah_selesai' %}#ef4444{% elif jadwal_bimbingan.status == 'tidak ada jadwal' %}#dc3545{% else %}#6b7280{% endif %};
+                                        color: white;">
+                                        {% if jadwal_bimbingan.status == 'aktif' %}
+                                            🟢 Aktif
+                                        {% elif jadwal_bimbingan.status == 'belum_mulai' %}
+                                            ⏰ Menunggu
+                                        {% elif jadwal_bimbingan.status == 'sudah_selesai' %}
+                                            🔴 Berakhir
+                                        {% elif jadwal_bimbingan.status == 'tidak ada jadwal' %}
+                                            ❌ Tidak Ada Jadwal
+                                        {% else %}
+                                            {{ jadwal_bimbingan.status|title }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <p class="text-muted mb-2 fw-medium">{{ jadwal_bimbingan.pesan }}</p>
+                                {% if jadwal_bimbingan.jadwal_mulai and jadwal_bimbingan.jadwal_selesai %}
+                                <div class="jadwal-time text-muted">
+                                    <i class="bi bi-clock me-2"></i>
+                                    <strong>Jadwal:</strong> 
+                                    <span class="fw-bold text-dark">{{ jadwal_bimbingan.jadwal_mulai.strftime('%d %B %Y, %H:%M') }}</span> - 
+                                    <span class="fw-bold text-dark">{{ jadwal_bimbingan.jadwal_selesai.strftime('%d %B %Y, %H:%M') }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 text-center">
+                                {% if jadwal_bimbingan.bisa_nilai %}
+                                    <div class="status-indicator active">
+                                        <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                                        <p class="text-success mt-2 mb-0 fw-bold">Bisa Nilai</p>
+                                    </div>
+                                {% else %}
+                                    <div class="status-indicator inactive">
+                                        <i class="bi bi-x-circle-fill text-danger" style="font-size: 3rem;"></i>
+                                        <p class="text-danger mt-2 mb-0 fw-bold">Tidak Bisa Nilai</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- ✅ PERBAIKAN: Status indicator "Tidak Bisa" ketika tidak ada jadwal -->
+                {% if not jadwal_bimbingan %}
+                <div class="card border-0 shadow-sm mb-4" style="background: #fef2f2; border-left: 4px solid #ef4444;">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <div class="jadwal-icon mb-2">
+                                    <i class="bi bi-calendar-x text-danger" style="font-size: 2.5rem;"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <h5 class="text-dark mb-3 fw-bold">
+                                    📅 Status Jadwal Penilaian Mahasiswa
+                                </h5>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="badge fs-6 px-3 py-2 me-3" style="
+                                        background-color: #6b7280; color: white;">
+                                        ⚠️ Tidak Ada Jadwal
+                                    </span>
+                                </div>
+                                <p class="text-muted mb-2 fw-medium">
+                                    Tidak ada jadwal penilaian yang aktif saat ini. Mohon hubungi admin untuk mengatur jadwal penilaian.
+                                </p>
+                            </div>
+                            <div class="col-md-3 text-center">
+                                <div class="status-indicator inactive">
+                                    <i class="bi bi-x-circle-fill text-danger" style="font-size: 3rem;"></i>
+                                    <p class="text-danger mt-2 mb-0 fw-bold">Tidak Bisa</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <div class="card" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h5 style="font-weight:700;font-size:1.25rem;color:#435ebe;">
+                                        <i class="bi bi-list-check me-2"></i>Daftar Mahasiswa Bimbingan
+                                    </h5>
+                                    <p class="text-muted mb-0">Pilih mahasiswa untuk melakukan penilaian</p>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="tableDaftarMahasiswa">
+                                                                    <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Mahasiswa</th>
+                                        <th>Judul Usaha</th>
+                                        <th>Tanggal Dibuat</th>
+                                        <th>Tanggal Dikirim</th>
+                                        <th>Nilai</th>
+                                        <th>Progress Nilai</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                    <tbody>
+                                        <!-- Data akan diisi melalui AJAX -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Detail Penilaian -->
+    <div class="modal fade" id="modalDetailPenilaian" tabindex="-1" aria-labelledby="modalDetailPenilaianLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <!-- Header dengan gradient biru -->
+                <div class="modal-header text-white">
+                    <h5 class="modal-title" id="modalDetailPenilaianLabel">
+                        <i class="bi bi-eye me-2"></i>Detail Penilaian Mahasiswa
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <!-- Body dengan info mahasiswa, tabel, dan chart -->
+                <div class="modal-body p-4">
+                    <!-- Loading indicator -->
+                    <div id="detailLoading" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Memuat detail penilaian...</p>
+                    </div>
+                    
+                    <!-- Content yang akan diisi -->
+                    <div id="detailContent" style="display: none;">
+                        <!-- Info Mahasiswa -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <h6 class="card-title text-primary">
+                                            <i class="bi bi-person-badge me-2"></i>Info Mahasiswa
+                                        </h6>
+                                        <div id="detailInfoMahasiswa">
+                                            <!-- Akan diisi oleh JavaScript -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tabel Detail Penilaian -->
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body">
+                                <h6 class="card-title text-info">
+                                    <i class="bi bi-table me-2"></i>Detail Skor Per
+                                </h6>
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="detailPenilaianTable">
+                                        <thead id="detailPenilaianHeader">
+                                            <!-- Header akan diisi dinamis -->
+                                        </thead>
+                                        <tbody id="detailPenilaianBody">
+                                            <!-- Body akan diisi dinamis -->
+                                        </tbody>
+                                        <tfoot id="detailPenilaianFooter">
+                                            <!-- Footer akan diisi dinamis -->
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+
+                    </div>
+                </div>
+                
+                <!-- Footer dengan tombol tutup -->
+                <div class="modal-footer border-top-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Inisialisasi DataTable
+            var daftarMahasiswaTable = $('#tableDaftarMahasiswa').DataTable({
+                language: {
+                    "sProcessing":   "Sedang memproses...",
+                    "sLengthMenu":   "Tampilkan _MENU_ data",
+                    "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                    "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                    "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Cari:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "Pertama",
+                        "sPrevious": "Sebelumnya",
+                        "sNext":     "Selanjutnya",
+                        "sLast":     "Terakhir"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                        "sSortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                    }
+                },
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
+                columnDefs: [
+                    { orderable: false, targets: [7] } // Kolom aksi tidak bisa diurutkan (sekarang index 7)
+                ]
+            });
+
+            // Load data mahasiswa
+            loadDaftarMahasiswa();
+
+            function loadDaftarMahasiswa() {
+                $.ajax({
+                    url: '{{ url_for("pembimbing.get_daftar_mahasiswa_penilaian") }}',
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            console.log('Data mahasiswa:', response.data); // Debug log
+                            daftarMahasiswaTable.clear();
+                            
+                            if (!response.data || response.data.length === 0) {
+                                // Tampilkan pesan jika tidak ada data
+                                daftarMahasiswaTable.row.add([
+                                    '1', 'Tidak ada data', 'Tidak ada data', '-', '-', '-', '-', '-'
+                                ]).draw();
+                                
+                                // Tampilkan notifikasi
+                                Swal.fire({
+                                    icon: 'info',
+                                    title: 'Tidak Ada Data',
+                                    text: 'Belum ada mahasiswa yang dapat dinilai saat ini.'
+                                });
+                                return;
+                            }
+                            
+                            response.data.forEach(function(item, index) {
+                                console.log('Item mahasiswa:', item); // Debug log untuk setiap item
+                                // Progress bar dan nilai berdasarkan status penilaian
+                                var progressClass = '';
+                                var progressText = '';
+                                var nilaiDisplay = '';
+                                var progressBar = '';
+                                
+                                // Pastikan nilai adalah angka yang valid
+                                var nilai = parseFloat(item.nilai) || 0;
+                                var status = item.status_penilaian || 'Belum Dinilai';
+                                
+                                // Pastikan nilai tidak melebihi 100% dan tidak negatif
+                                nilai = Math.min(Math.max(nilai, 0), 100);
+                                
+                                // Jika nilai adalah NaN atau Infinity, set ke 0
+                                if (isNaN(nilai) || !isFinite(nilai)) {
+                                    nilai = 0;
+                                }
+                                
+                                // Debug log untuk nilai dan status
+                                console.log(`Mahasiswa ${item.nama_mahasiswa}: nilai=${item.nilai}, status=${status}, parsed_nilai=${nilai}, clamped_nilai=${nilai}`);
+                                
+                                if (status === 'Belum Dinilai') {
+                                    // Jika belum dinilai
+                                    progressClass = 'bg-secondary';
+                                    progressText = 'Belum Dinilai';
+                                    nilaiDisplay = '<span class="nilai-display belum-dinilai">-</span>';
+                                    progressBar = `
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                <div class="progress-bar ${progressClass}" role="progressbar" 
+                                                     style="width: 0%" aria-valuenow="0" 
+                                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <small class="text-muted">0%</small>
+                                        </div>
+                                        <small class="text-muted">${progressText}</small>
+                                    `;
+                                } else if (status === 'Draft') {
+                                    // ✅ PERBAIKAN: Jika status Draft, cek nilai
+                                    if (nilai > 0) {
+                                        // Ada nilai real
+                                        if (nilai >= 85) {
+                                            progressClass = 'bg-success';
+                                            progressText = 'Sangat Baik';
+                                        } else if (nilai >= 70) {
+                                            progressClass = 'bg-info';
+                                            progressText = 'Baik';
+                                        } else if (nilai >= 55) {
+                                            progressClass = 'bg-warning';
+                                            progressText = 'Cukup';
+                                        } else if (nilai >= 40) {
+                                            progressClass = 'bg-danger';
+                                            progressText = 'Kurang';
+                                        } else {
+                                            progressClass = 'bg-secondary';
+                                            progressText = 'Sangat Kurang';
+                                        }
+                                        
+                                        nilaiDisplay = `<span class="nilai-display selesai">${nilai.toFixed(1)}%</span>`;
+                                        progressBar = `
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar ${progressClass}" role="progressbar" 
+                                                         style="width: ${Math.min(nilai, 100)}%" aria-valuenow="${nilai}" 
+                                                         aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                                <small class="text-muted">${nilai.toFixed(1)}%</small>
+                                            </div>
+                                            <small class="text-muted">${progressText}</small>
+                                        `;
+                                    } else {
+                                        // Status Draft tapi nilai 0 (auto-fill) - TAMPILKAN NILAI 0
+                                        progressClass = 'bg-secondary';
+                                        progressText = 'Belum Dinilai';
+                                        nilaiDisplay = '<span class="nilai-display belum-dinilai">0.0%</span>';
+                                        progressBar = `
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar ${progressClass}" role="progressbar" 
+                                                         style="width: 0%" aria-valuenow="0" 
+                                                         aria-valuemin="0" aria-valuemax="100"></div>
+                                                </div>
+                                                <small class="text-muted">0.0%</small>
+                                            </div>
+                                            <small class="text-muted">${progressText}</small>
+                                        `;
+                                    }
+                                } else if (status === 'Selesai') {
+                                    // Jika sudah selesai dinilai (final)
+                                    if (nilai >= 85) {
+                                        progressClass = 'bg-success';
+                                        progressText = 'Sangat Baik';
+                                    } else if (nilai >= 70) {
+                                        progressClass = 'bg-info';
+                                        progressText = 'Baik';
+                                    } else if (nilai >= 55) {
+                                        progressClass = 'bg-warning';
+                                        progressText = 'Cukup';
+                                    } else if (nilai >= 40) {
+                                        progressClass = 'bg-danger';
+                                        progressText = 'Kurang';
+                                    } else {
+                                        progressClass = 'bg-secondary';
+                                        progressText = 'Sangat Kurang';
+                                    }
+                                    
+                                    nilaiDisplay = `<span class="nilai-display selesai">${nilai.toFixed(1)}%</span>`;
+                                    progressBar = `
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                <div class="progress-bar ${progressClass}" role="progressbar" 
+                                                     style="width: ${Math.min(nilai, 100)}%" aria-valuenow="${nilai}" 
+                                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <small class="text-muted">${nilai.toFixed(1)}%</small>
+                                        </div>
+                                        <small class="text-muted">${progressText} </small>
+                                    `;
+                                } else {
+                                    // Status lain
+                                    progressClass = 'bg-secondary';
+                                    progressText = status;
+                                    nilaiDisplay = `<span class="text-muted">${nilai.toFixed(1)}%</span>`;
+                                    progressBar = `
+                                        <div class="d-flex align-items-center">
+                                            <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                <div class="progress-bar ${progressClass}" role="progressbar" 
+                                                     style="width: ${Math.min(nilai, 100)}%" aria-valuenow="${nilai}" 
+                                                     aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                            <small class="text-muted">${nilai.toFixed(1)}%</small>
+                                        </div>
+                                        <small class="text-muted">${progressText}</small>
+                                    `;
+                                }
+
+                                // ✅ PERBAIKAN: Logika tombol berdasarkan status mahasiswa
+                                var actionButton = '';
+                                var jadwalInfo = item.jadwal_info || {};
+                                var jadwalBisaNilai = jadwalInfo.bisa_nilai || false;
+                                var jadwalAktif = jadwalInfo.status === 'aktif';
+                                var jadwalSelesai = jadwalInfo.status === 'sudah_selesai';
+                                var totalSesi = jadwalInfo.total_sesi || 1;
+                                
+                                // ✅ PERBAIKAN: Cek status penilaian mahasiswa
+                                var penilaianSelesai = (status === 'Selesai');      // Status final/selesai
+                                var penilaianDraft = (status === 'Draft');          // Status draft/masih bisa diedit
+                                var penilaianBelumDinilai = (status === 'Belum Dinilai'); // Belum ada penilaian
+                                
+                                // ✅ PERBAIKAN TAMBAHAN: Cek status mahasiswa
+                                var statusMahasiswa = item.status_mahasiswa || 'aktif'; // Default aktif jika tidak ada
+                                var mahasiswaSelesai = (statusMahasiswa === 'selesai' || statusMahasiswa === 'Selesai');
+                                
+                                // Debug log untuk troubleshooting
+                                console.log(`Mahasiswa ${item.nama_mahasiswa}:`, {
+                                    status_penilaian: status,
+                                    status_mahasiswa: statusMahasiswa,
+                                    mahasiswaSelesai: mahasiswaSelesai,
+                                    penilaianSelesai: penilaianSelesai,
+                                    penilaianDraft: penilaianDraft,
+                                    penilaianBelumDinilai: penilaianBelumDinilai,
+                                    jadwalBisaNilai: jadwalBisaNilai,
+                                    jadwalAktif: jadwalAktif,
+                                    jadwalSelesai: jadwalSelesai
+                                });
+                                
+                                // ✅ PERBAIKAN: KONDISI 1: Jika mahasiswa status selesai, HANYA tampilkan tombol detail
+                                if (mahasiswaSelesai) {
+                                    // Mahasiswa selesai = hanya bisa lihat detail, tidak bisa nilai lagi
+                                    if (penilaianDraft || penilaianSelesai || (!penilaianBelumDinilai && status !== 'Belum Dinilai')) {
+                                        actionButton = `
+                                            <button type="button" class="btn btn-info btn-rounded-circle" 
+                                                    onclick="lihatDetailNilai('${item.nim_mahasiswa}')"
+                                                    title="Lihat Detail Penilaian (Mahasiswa Selesai)">
+                                                <i class="bi bi-eye" style="font-size: 1rem;"></i>
+                                            </button>
+                                        `;
+                                    } else {
+                                        // Mahasiswa selesai tapi belum ada data penilaian
+                                        actionButton = `
+                                            <button class="btn btn-secondary btn-rounded-circle" disabled 
+                                                    title="Mahasiswa sudah selesai, tidak ada data penilaian">
+                                                <i class="bi bi-x-circle" style="font-size: 1rem;"></i>
+                                            </button>
+                                        `;
+                                    }
+                                }
+                                // ✅ PERBAIKAN: KONDISI 2: Jika penilaian status Selesai, HANYA tampilkan tombol detail
+                                else if (penilaianSelesai) {
+                                    actionButton = `
+                                        <button type="button" class="btn btn-info btn-rounded-circle" 
+                                                onclick="lihatDetailNilai('${item.nim_mahasiswa}')"
+                                                title="Lihat Detail Penilaian (Status: Selesai)">
+                                            <i class="bi bi-eye" style="font-size: 1rem;"></i>
+                                        </button>
+                                    `;
+                                }
+                                // ✅ PERBAIKAN: KONDISI 3: Jika jadwal aktif dan bisa nilai DAN mahasiswa masih aktif
+                                else if (jadwalBisaNilai && jadwalAktif && !mahasiswaSelesai) {
+                                    // Selalu tampilkan tombol nilai untuk jadwal aktif dan mahasiswa aktif
+                                    actionButton = `
+                                        <button type="button" class="btn btn-primary btn-rounded-circle me-1" 
+                                                onclick="window.location.href='{{ url_for("pembimbing.penilaian_mahasiswa") }}?nim=${item.nim_mahasiswa}'"
+                                                title="Nilai Mahasiswa - Jadwal ${jadwalInfo.jadwal_id || 'Aktif'} - Sesi ${getCurrentSesi(jadwalInfo) || 'Aktif'}">
+                                            <i class="bi bi-pencil" style="font-size: 1rem;"></i>
+                                        </button>
+                                    `;
+                                    
+                                    // Jika ada data penilaian (Draft atau sudah ada nilai), tambahkan tombol detail
+                                    if (penilaianDraft || (!penilaianBelumDinilai && status !== 'Belum Dinilai')) {
+                                        actionButton += `
+                                            <button type="button" class="btn btn-info btn-rounded-circle" 
+                                                    onclick="lihatDetailNilai('${item.nim_mahasiswa}')"
+                                                    title="Lihat Detail Penilaian">
+                                                <i class="bi bi-eye" style="font-size: 1rem;"></i>
+                                            </button>
+                                        `;
+                                    }
+                                }
+                                // ✅ PERBAIKAN: KONDISI 4: Jika jadwal sudah selesai dan ada data penilaian (Draft), tampilkan tombol detail saja
+                                else if (jadwalSelesai && penilaianDraft) {
+                                    actionButton = `
+                                        <button type="button" class="btn btn-info btn-rounded-circle" 
+                                                onclick="lihatDetailNilai('${item.nim_mahasiswa}')"
+                                                title="Lihat Detail Penilaian (Jadwal Selesai - Status: Draft)">
+                                            <i class="bi bi-eye" style="font-size: 1rem;"></i>
+                                        </button>
+                                    `;
+                                }
+                                // ✅ PERBAIKAN: KONDISI 5: Jika jadwal belum mulai atau tidak ada jadwal
+                                else if (jadwalInfo.status === 'belum_mulai' || jadwalInfo.status === 'tidak ada jadwal') {
+                                    actionButton = `
+                                        <button class="btn btn-secondary btn-rounded-circle" disabled 
+                                                title="Jadwal penilaian belum dimulai">
+                                            <i class="fa fa-clock" style="font-size: 1rem;"></i>
+                                        </button>
+                                    `;
+                                }
+                                // ✅ PERBAIKAN: KONDISI 6: Jika jadwal sudah selesai dan belum ada data penilaian
+                                else if (jadwalSelesai && penilaianBelumDinilai) {
+                                    actionButton = `
+                                        <button class="btn btn-warning btn-rounded-circle" disabled 
+                                                title="Jadwal penilaian sudah berakhir, tidak ada data penilaian">
+                                            <i class="fa fa-exclamation-triangle" style="font-size: 1rem;"></i>
+                                        </button>
+                                    `;
+                                }
+                                // ✅ PERBAIKAN: KONDISI 7: Fallback untuk kasus lain
+                                else {
+                                    actionButton = `
+                                        <button class="btn btn-secondary btn-rounded-circle" disabled 
+                                                title="Tidak dapat melakukan penilaian">
+                                            <i class="fa fa-ban" style="font-size: 1rem;"></i>
+                                        </button>
+                                    `;
+                                }
+
+                                // Format tanggal untuk display
+                                var tanggalDibuat = item.tanggal_buat ? new Date(item.tanggal_buat).toLocaleDateString('id-ID', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) : '-';
+                                
+                                var tanggalDikirim = item.tanggal_kirim ? new Date(item.tanggal_kirim).toLocaleDateString('id-ID', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) : '-';
+                                
+                                daftarMahasiswaTable.row.add([
+                                    index + 1,
+                                    item.nama_mahasiswa,
+                                    item.judul_usaha,
+                                    tanggalDibuat,
+                                    tanggalDikirim,
+                                    nilaiDisplay,
+                                    progressBar,
+                                    actionButton
+                                ]);
+                            });
+                            daftarMahasiswaTable.draw();
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: response.message
+                            });
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', xhr, status, error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Terjadi kesalahan saat memuat data mahasiswa: ' + error
+                        });
+                    }
+                });
+            }
+        });
+
+        // NEW: Fungsi untuk melihat detail nilai mahasiswa dengan modal
+        function lihatDetailNilai(nim) {
+            // Buka modal
+            $('#modalDetailPenilaian').modal('show');
+            
+            // Reset modal content
+            $('#detailLoading').show();
+            $('#detailContent').hide();
+            
+            // Load data detail dari backend
+            loadDetailPenilaian(nim);
+        }
+
+        // Load data detail penilaian dari backend
+        function loadDetailPenilaian(nim) {
+            $.ajax({
+                url: '{{ url_for("pembimbing.get_detail_penilaian_mahasiswa") }}',
+                type: 'GET',
+                data: { nim: nim },
+                success: function(response) {
+                    if (response.success) {
+                        // Hide loading, show content
+                        $('#detailLoading').hide();
+                        $('#detailContent').show();
+                        
+                        // ✅ PERBAIKAN: Simpan jadwal_info sebagai variabel global
+                        window.jadwalInfo = response.data.jadwal_info || {};
+                        
+                        // Update UI dengan data yang diterima
+                        updateDetailInfoMahasiswa(response.data);
+                        renderDetailPenilaianTable(response.data);
+                    } else {
+                        // Show error
+                        $('#detailLoading').hide();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message || 'Gagal memuat detail penilaian'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', xhr, status, error);
+                    $('#detailLoading').hide();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat memuat detail penilaian: ' + error
+                    });
+                }
+            });
+        }
+
+        // Update info mahasiswa di modal
+        function updateDetailInfoMahasiswa(data) {
+            const infoHtml = `
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded">
+                            <small class="text-muted d-block mb-1">NIM</small>
+                            <strong class="text-dark">${data.nim_mahasiswa || '-'}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded">
+                            <small class="text-muted d-block mb-1">Nama</small>
+                            <strong class="text-dark">${data.nama_mahasiswa || '-'}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded">
+                            <small class="text-muted d-block mb-1">Judul Usaha</small>
+                            <strong class="text-dark">${data.judul_usaha || '-'}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded">
+                            <small class="text-muted d-block mb-1">Program Studi</small>
+                            <strong class="text-dark">${data.program_studi || '-'}</strong>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('#detailInfoMahasiswa').html(infoHtml);
+        }
+
+
+
+        // Render tabel detail penilaian dengan kategori
+        function renderDetailPenilaianTable(data) {
+            const detailPenilaian = data.detail_penilaian || [];
+            const jadwalInfo = data.jadwal_info || {};
+            const metadataPerSesi = data.metadata_per_sesi || {};
+            
+            if (detailPenilaian.length === 0) {
+                $('#detailPenilaianBody').html(`
+                    <tr><td colspan="5" class="text-center text-muted">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Tidak ada data penilaian
+                    </td></tr>
+                `);
+                return;
+            }
+            
+            // ✅ PERBAIKAN: Hitung max sesi berdasarkan data yang ada, bukan dari jadwal baru
+            let maxSesi = 1;
+            detailPenilaian.forEach(kategori => {
+                kategori.pertanyaan_list.forEach(pertanyaan => {
+                    const sesiKeys = Object.keys(pertanyaan.sesi_data || {});
+                if (sesiKeys.length > 0) {
+                    maxSesi = Math.max(maxSesi, Math.max(...sesiKeys.map(Number)));
+                }
+                });
+            });
+            
+            // ✅ PERBAIKAN: Update header kolom skor dengan metadata yang sesuai data lama
+            updateDetailSkorHeader(maxSesi, metadataPerSesi);
+            
+            // ✅ PERBAIKAN: Render body tabel dengan metadata yang sesuai data lama
+            renderDetailTableBodyWithKategori(detailPenilaian, maxSesi, metadataPerSesi);
+            
+            // ✅ PERBAIKAN: Render footer dengan metadata yang sesuai data lama
+            renderDetailFooterWithKategori(detailPenilaian, maxSesi, metadataPerSesi);
+        }
+
+        // ✅ PERBAIKAN: Update header kolom skor untuk detail dengan metadata yang sesuai data lama
+        function updateDetailSkorHeader(maxSesi, metadataPerSesi) {
+            let headerHtml = `
+                <tr>
+                    <th rowspan="2">No</th>
+                    <th rowspan="2">Pertanyaan</th>
+                    <th rowspan="2">Bobot</th>
+                    <th rowspan="2">Skor Max</th>
+                    <th colspan="${maxSesi}" class="text-center">Skor Per</th>
+                    <th rowspan="2">Rata-rata</th>
+                    <th rowspan="2">Nilai</th>
+                </tr>
+                <tr>
+            `;
+            
+            // ✅ PERBAIKAN: Sub-header untuk setiap sesi berdasarkan metadata data lama
+            for (let i = 1; i <= maxSesi; i++) {
+                let sesiLabel = '';
+                
+                // Prioritas 1: Gunakan metadata kolom dari data lama (metadata_per_sesi)
+                if (metadataPerSesi[i] && metadataPerSesi[i].nama_kolom) {
+                    sesiLabel = metadataPerSesi[i].nama_kolom;
+                    console.log(`Sesi ${i}: Using metadata nama_kolom = ${sesiLabel}`);
+                }
+                // Prioritas 2: Fallback ke perhitungan jam jika tidak ada metadata
+                else {
+                    sesiLabel = getSesiLabelFromJadwal(i);
+                    console.log(`Sesi ${i}: Using fallback = ${sesiLabel}`);
+                }
+                
+                headerHtml += `<th class="text-center">${sesiLabel}</th>`;
+            }
+            
+            headerHtml += '</tr>';
+            $('#detailPenilaianHeader').html(headerHtml);
+        }
+        
+        // ✅ PERBAIKAN: Fungsi helper untuk mendapatkan label sesi dari jadwal
+        function getSesiLabelFromJadwal(sesi) {
+            // Ambil data jadwal dari variabel global atau dari backend
+            const jadwalInfo = window.jadwalInfo || {};
+            
+            console.log(`getSesiLabelFromJadwal(${sesi}):`, jadwalInfo);
+            
+            // ✅ PERBAIKAN: Jika ini data lama, jangan gunakan jadwal terbaru
+            if (jadwalInfo.interval_tipe === 'data_lama') {
+                console.log(`Data lama detected, returning Sesi ${sesi} as fallback`);
+                return `Sesi ${sesi}`;
+            }
+            
+            if (!jadwalInfo || !jadwalInfo.interval_tipe) {
+                console.log(`No jadwal info available, returning Sesi ${sesi}`);
+                return `Sesi ${sesi}`;
+            }
+            
+            // Prioritas 1: Gunakan jam_list jika tersedia
+            if (jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list && jadwalInfo.jam_list[sesi - 1]) {
+                console.log(`Using jam_list[${sesi - 1}]:`, jadwalInfo.jam_list[sesi - 1]);
+                return jadwalInfo.jam_list[sesi - 1];
+            }
+            
+            // Prioritas 2: Generate berdasarkan jam_mulai dan jam_selesai
+            if (jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_mulai && jadwalInfo.jam_selesai) {
+                try {
+                    const jamMulai = jadwalInfo.jam_mulai;
+                    const jamSelesai = jadwalInfo.jam_selesai;
+                    const interval = parseInt(jadwalInfo.interval_nilai) || 1;
+                    
+                    console.log(`Calculating session ${sesi} with:`, { jamMulai, jamSelesai, interval });
+                    
+                    // Parse jam mulai dan selesai
+                    let currentHour, currentMinute, endHour, endMinute, startHour;
+                    
+                    // Handle format datetime lengkap (YYYY-MM-DD HH:mm:ss) atau format jam saja (HH:mm)
+                    if (jamMulai.includes(' ')) {
+                        // Format datetime lengkap: '2025-08-19 21:20:00'
+                        const jamMulaiParts = jamMulai.split(' ')[1].split(':');
+                        const jamSelesaiParts = jamSelesai.split(' ')[1].split(':');
+                        
+                        currentHour = parseInt(jamMulaiParts[0]);
+                        currentMinute = parseInt(jamMulaiParts[1]);
+                        endHour = parseInt(jamSelesaiParts[0]);
+                        endMinute = parseInt(jamSelesaiParts[1]);
+                        startHour = parseInt(jamMulaiParts[0]);
+                    } else {
+                        // Format jam saja: '21:20'
+                        currentHour = parseInt(jamMulai.split(':')[0]);
+                        currentMinute = parseInt(jamMulai.split(':')[1]);
+                        endHour = parseInt(jamSelesai.split(':')[0]);
+                        endMinute = parseInt(jamSelesai.split(':')[1]);
+                        startHour = parseInt(jamMulai.split(':')[0]);
+                    }
+                    
+                    console.log(`Parsed values:`, { currentHour, currentMinute, endHour, endMinute, startHour });
+                    
+                    // Hitung jam untuk sesi tertentu dengan validasi batas
+                    for (let i = 1; i < sesi; i++) {
+                        currentHour += interval;
+                        
+                        // Validasi batas jam 0-23 (cross-midnight)
+                        if (currentHour >= 24) {
+                            currentHour = currentHour % 24; // Reset ke 0-23
+                        }
+                        
+                        // Cek apakah sudah melewati batas waktu
+                        let isOverLimit = false;
+                        
+                        // Jika jam selesai lebih kecil dari jam mulai, berarti cross-midnight
+                        if (endHour < startHour) {
+                            // Cross-midnight case: jam selesai < jam mulai
+                            if (currentHour > endHour || (currentHour === endHour && currentMinute > endMinute)) {
+                                isOverLimit = true;
+                            }
+                        } else {
+                            // Normal case: jam selesai > jam mulai
+                            if (currentHour > endHour || (currentHour === endHour && currentMinute > endMinute)) {
+                                isOverLimit = true;
+                            }
+                        }
+                        
+                        if (isOverLimit) {
+                            // Jika melewati batas, gunakan jam terakhir yang valid
+                            currentHour = endHour;
+                            currentMinute = endMinute;
+                            break;
+                        }
+                    }
+                    
+                    // Pastikan jam dalam range 0-23
+                    if (currentHour < 0) currentHour = 0;
+                    if (currentHour > 23) currentHour = 23;
+                    
+                    // Format jam dengan leading zero
+                    const formattedHour = currentHour.toString().padStart(2, '0');
+                    const formattedMinute = currentMinute.toString().padStart(2, '0');
+                    
+                    const result = `Jam ${formattedHour}:${formattedMinute}`;
+                    console.log(`Sesi ${sesi} calculated as: ${result}`);
+                    return result;
+                } catch (e) {
+                    console.error('Error calculating session time:', e);
+                    return `Sesi ${sesi}`;
+                }
+            }
+            
+            // Prioritas 3: Fallback ke label generik berdasarkan interval_tipe
+            if (jadwalInfo.interval_tipe === 'setiap_jam') return `Jam ${sesi}`;
+            if (jadwalInfo.interval_tipe === 'harian') return `Hari ${sesi}`;
+            if (jadwalInfo.interval_tipe === 'mingguan') return `Minggu ${sesi}`;
+            if (jadwalInfo.interval_tipe === 'bulanan') return `Bulan ${sesi}`;
+            
+            return `Sesi ${sesi}`;
+        }
+
+        // ✅ PERBAIKAN: Render body tabel dengan kategori dan metadata yang sesuai data lama
+        function renderDetailTableBodyWithKategori(detailPenilaian, maxSesi, metadataPerSesi) {
+            let tbodyHtml = '';
+            
+            detailPenilaian.forEach((kategori, kategoriIndex) => {
+                // Header kategori
+                tbodyHtml += `
+                    <tr class="table-primary">
+                        <td colspan="${maxSesi + 7}" class="fw-bold">
+                            <i class="bi bi-folder-fill me-2"></i>${kategori.nama_kategori}
+                            <span class="float-end">
+                                <small class="text-muted">
+                                    Total Bobot: ${kategori.total_bobot_kategori.toFixed(1)} | 
+                                    Total Nilai: ${kategori.total_nilai_kategori.toFixed(2)}
+                                </small>
+                            </span>
+                        </td>
+                    </tr>
+                `;
+                
+                // Pertanyaan dalam kategori (nomor di-reset untuk setiap kategori)
+                kategori.pertanyaan_list.forEach((pertanyaan, pertanyaanIndex) => {
+            const bobot = parseFloat(pertanyaan.bobot) || 0;
+            const skorMax = parseInt(pertanyaan.skor_maksimal) || 4;
+                    const sesiData = pertanyaan.sesi_data || {};
+                    
+                    // ✅ PERBAIKAN: Hitung rata-rata skor dari semua sesi yang ada
+                    let totalSkorPertanyaan = 0;
+                    let jumlahSesi = 0;
+                    
+                    // Hitung dari semua sesi yang ada (termasuk skor 0)
+                    for (let sesi = 1; sesi <= maxSesi; sesi++) {
+                        if (sesiData[sesi]) {
+                            const skor = parseFloat(sesiData[sesi].skor) || 0;
+                            totalSkorPertanyaan += skor;  // ✅ PERBAIKAN: Hitung semua sesi (termasuk skor 0)
+                            jumlahSesi++;
+                        }
+                    }
+                    
+                    // ✅ PERBAIKAN: Rata-rata = total skor / jumlah sesi (semua sesi)
+                    const rataRataSkor = jumlahSesi > 0 ? (totalSkorPertanyaan / jumlahSesi) : 0;
+                    const nilaiAkhir = (rataRataSkor / skorMax) * bobot;
+                    
+                    // Nomor pertanyaan di-reset untuk setiap kategori (1, 2, 3...)
+                    const nomorPertanyaan = pertanyaanIndex + 1;
+            
+            let rowHtml = `
+                <tr>
+                            <td class="text-center">${nomorPertanyaan}</td>
+                    <td>${pertanyaan.pertanyaan}</td>
+                            <td class="text-center">${bobot.toFixed(1)}</td>
+                            <td class="text-center">${skorMax}</td>
+            `;
+            
+                    // ✅ PERBAIKAN: Kolom skor per sesi berdasarkan data yang ada
+            for (let sesi = 1; sesi <= maxSesi; sesi++) {
+                        if (sesiData[sesi]) {
+                            const skor = sesiData[sesi].skor;
+                            rowHtml += `<td class="text-center fw-semibold">${skor}</td>`;
+                        } else {
+                            rowHtml += `<td class="text-center text-muted">-</td>`;
+                        }
+                    }
+                    
+                    // Kolom rata-rata dan nilai
+            rowHtml += `
+                        <td class="text-center fw-semibold">${rataRataSkor.toFixed(1)}</td>
+                        <td class="text-center fw-semibold">${nilaiAkhir.toFixed(2)}</td>
+            </tr>`;
+            
+                    tbodyHtml += rowHtml;
+                });
+                
+                // Separator antar kategori (kecuali kategori terakhir)
+                if (kategoriIndex < detailPenilaian.length - 1) {
+                    tbodyHtml += `
+                        <tr class="table-light">
+                            <td colspan="${maxSesi + 7}" style="height: 8px; background-color: #f8f9fa;"></td>
+                        </tr>
+                    `;
+                }
+            });
+            
+            $('#detailPenilaianBody').html(tbodyHtml);
+        }
+
+        // ✅ PERBAIKAN: Render footer untuk detail dengan kategori dan metadata yang sesuai data lama
+        function renderDetailFooterWithKategori(detailPenilaian, maxSesi, metadataPerSesi) {
+            let footerHtml = `
+                <tr class="table-primary">
+                    <td colspan="4" class="fw-bold text-end">Total Kategori:</td>
+            `;
+            
+            // ✅ PERBAIKAN: Kolom total per sesi berdasarkan data yang ada
+            for (let sesi = 1; sesi <= maxSesi; sesi++) {
+                let totalSesi = 0;
+                let totalBobotSesi = 0;
+                
+                detailPenilaian.forEach(kategori => {
+                    kategori.pertanyaan_list.forEach(pertanyaan => {
+                        if (pertanyaan.sesi_data[sesi]) {
+                            const bobot = parseFloat(pertanyaan.bobot) || 0;
+                            const skor = pertanyaan.sesi_data[sesi].skor || 0;
+                            const skorMax = parseInt(pertanyaan.skor_maksimal) || 4;
+                            
+                            // ✅ PERBAIKAN: Hitung semua sesi (termasuk skor 0)
+                            totalSesi += (skor / skorMax) * bobot;
+                            totalBobotSesi += bobot;
+                        }
+                    });
+                });
+                
+                const rataRataSesi = totalBobotSesi > 0 ? totalSesi / totalBobotSesi : 0;
+                footerHtml += `<td class="text-center fw-bold">${rataRataSesi.toFixed(2)}</td>`;
+            }
+            
+            // Hitung total keseluruhan
+            let totalNilaiKeseluruhan = 0;
+            let totalBobotKeseluruhan = 0;
+            
+            detailPenilaian.forEach(kategori => {
+                kategori.pertanyaan_list.forEach(pertanyaan => {
+                    const sesiData = pertanyaan.sesi_data || {};
+                    const bobot = parseFloat(pertanyaan.bobot) || 0;
+                    const skorMax = parseInt(pertanyaan.skor_maksimal) || 4;
+                    
+                    // ✅ PERBAIKAN: Hitung rata-rata skor dari semua sesi yang ada
+                    let totalSkorPertanyaan = 0;
+                    let jumlahSesi = 0;
+                    
+                    // Hitung dari semua sesi yang ada (termasuk skor 0)
+                    for (let sesi = 1; sesi <= maxSesi; sesi++) {
+                        if (sesiData[sesi]) {
+                            const skor = parseFloat(sesiData[sesi].skor) || 0;
+                            totalSkorPertanyaan += skor;  // ✅ PERBAIKAN: Hitung semua sesi (termasuk skor 0)
+                            jumlahSesi++;
+                        }
+                    }
+                    
+                    // ✅ PERBAIKAN: Rata-rata = total skor / jumlah sesi (semua sesi)
+                    const rataRataSkor = jumlahSesi > 0 ? (totalSkorPertanyaan / jumlahSesi) : 0;
+                    const nilaiAkhir = (rataRataSkor / skorMax) * bobot;
+                    
+                    totalNilaiKeseluruhan += nilaiAkhir;
+                    totalBobotKeseluruhan += bobot;
+                });
+            });
+            
+            const nilaiAkhirKeseluruhan = totalBobotKeseluruhan > 0 ? totalNilaiKeseluruhan / totalBobotKeseluruhan : 0;
+            
+            footerHtml += `
+                <td class="text-center fw-bold table-info">${nilaiAkhirKeseluruhan.toFixed(2)}</td>
+                <td class="text-center fw-bold table-success">${totalNilaiKeseluruhan.toFixed(2)}</td>
+            </tr>
+            `;
+            
+            $('#detailPenilaianFooter').html(footerHtml);
+        }
+
+
+
+        // Helper function untuk label interval di detail
+        function getDetailIntervalLabel(jadwalInfo) {
+            if (!jadwalInfo) return 'Sesi';
+            
+            if (jadwalInfo.interval_tipe === 'setiap_jam') return 'Jam';
+            if (jadwalInfo.interval_tipe === 'harian') return 'Hari';
+            if (jadwalInfo.interval_tipe === 'mingguan') return 'Minggu';
+            if (jadwalInfo.interval_tipe === 'bulanan') return 'Bulan';
+            
+            return 'Sesi';
+        }
+        
+        // ✅ PERBAIKAN: Function untuk mendapatkan sesi saat ini berdasarkan jadwal mahasiswa
+        function getCurrentSesi(jadwalInfo) {
+            if (!jadwalInfo || !jadwalInfo.bisa_nilai) {
+                return null;
+            }
+            
+            // Jika jadwal aktif, hitung sesi saat ini
+            var now = new Date();
+            var currentHour = now.getHours();
+            var currentMinute = now.getMinutes();
+            
+            // Ambil jam mulai dan selesai dari jadwal
+            var jamMulai = jadwalInfo.jam_mulai || 8; // Default jam 8
+            var jamSelesai = jadwalInfo.jam_selesai || 17; // Default jam 17
+            
+            // Hitung sesi berdasarkan jam saat ini
+            if (currentHour >= jamMulai && currentHour <= jamSelesai) {
+                var sesi = currentHour - jamMulai + 1;
+                return sesi;
+            }
+            
+            return null;
+        }
+    </script>
+</body>
+
+</html>

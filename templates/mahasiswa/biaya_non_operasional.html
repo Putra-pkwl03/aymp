@@ -1,0 +1,1308 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengelolaan Biaya Lain-lain Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+    <style>
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+
+        .modal-body .row.g-3 {
+            row-gap: 18px;
+        }
+
+        @media (max-width: 575.98px) {
+
+            .modal-header,
+            .modal-footer,
+            .modal-body {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .modal-body {
+                padding-top: 16px;
+                padding-bottom: 6px;
+            }
+        }
+
+        .btn-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1rem;
+            border: none;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+            transition: box-shadow 0.2s;
+        }
+
+        .btn-circle:active,
+        .btn-circle:focus {
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.13);
+        }
+
+        .btn-circle i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.1em;
+            line-height: 1;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 7px;
+            vertical-align: middle;
+        }
+
+        .status-draf {
+            background: #facc15;
+        }
+
+        .status-text {
+            font-weight: 500;
+            color: #444;
+        }
+
+        /* Styling untuk alert notifications */
+        .alert {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .alert-warning {
+            border-left-color: #ffc107;
+        }
+        
+        .alert-success {
+            border-left-color: #28a745;
+        }
+        
+        .alert-danger {
+            border-left-color: #dc3545;
+        }
+        
+        .alert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .alert .btn-close {
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .alert .btn-close:hover {
+            opacity: 1;
+        }
+        
+        .alert i {
+            flex-shrink: 0;
+        }
+        
+        /* Styling untuk modal dan form */
+        .modal-dialog.modal-lg {
+            max-width: 800px;
+        }
+        
+        .modal-content {
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header .modal-title {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+        
+        .modal-header .btn-close {
+            filter: invert(1);
+            opacity: 0.8;
+        }
+        
+        .modal-header .btn-close:hover {
+            opacity: 1;
+        }
+        
+        .modal-body {
+            padding: 2rem;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #e9ecef;
+            padding: 1.5rem 2rem;
+        }
+        
+        .form-label {
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-label i {
+            color: #6c757d;
+        }
+        
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .form-control-lg {
+            padding: 1rem 1.25rem;
+            font-size: 1.1rem;
+        }
+        
+        .input-group-text {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            color: #6c757d;
+            font-weight: 500;
+        }
+        
+        .input-group .form-control {
+            border-left: none;
+        }
+        
+        .input-group .form-control:focus {
+            border-left: none;
+        }
+        
+        .input-group:focus-within .input-group-text {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn {
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #435ebe;
+            border: none;
+        }
+        
+        .btn-primary:hover {
+            background: #3a4f9e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 94, 190, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        /* Styling untuk validasi */
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        .input-group .form-control.is-invalid {
+            border-left: none;
+        }
+        
+        .input-group .form-control.is-invalid + .input-group-text {
+            border-color: #dc3545;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .modal-body {
+                padding: 1.5rem;
+            }
+            
+            .modal-footer {
+                padding: 1rem 1.5rem;
+            }
+            
+            .form-control-lg {
+                font-size: 1rem;
+                padding: 0.875rem 1rem;
+            }
+        }
+        
+        /* Styling untuk tombol tambah Biaya Lain-lain */
+        .btn-tambah-bahan-custom {
+            background: #28a745;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-tambah-bahan-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            color: white;
+        }
+        
+        .icon-circle {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Styling untuk tombol aksi */
+        .btn-edit-bahan {
+            background: #435ebe;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+        }
+        
+        .btn-hapus-bahan {
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+        }
+        
+        .btn-edit-bahan:hover {
+            background: #25396f;
+            color: white;
+        }
+        
+        .btn-hapus-bahan:hover {
+            background: #c82333;
+            color: white;
+        }
+        
+        /* Styling untuk pesan no data */
+        .no-data-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .no-data-message i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .no-data-message h5 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .no-data-message p {
+            margin-bottom: 0;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .alert {
+                padding: 12px 16px;
+            }
+            
+            .alert .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            
+            .alert i {
+                margin-bottom: 8px;
+                margin-right: 0 !important;
+            }
+        }
+
+        .proposal-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .proposal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-color: #22c55e !important;
+        }
+
+        .proposal-card .card-header {
+            transition: all 0.3s ease;
+            background: #f8f9fa !important;
+            color: #495057;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .btn-tambah-bahan {
+            background: #22c55e !important;
+            border: 2px solid #22c55e !important;
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .btn-tambah-bahan:hover {
+            background: #16a34a !important;
+            border-color: #16a34a !important;
+            transform: scale(1.05);
+        }
+
+        .btn-edit-bahan {
+            background: #435ebe !important;
+            color: white !important;
+            border-radius: 50% !important;
+            width: 30px !important;
+            height: 30px !important;
+            padding: 0 !important;
+        }
+
+        .btn-edit-bahan:hover {
+            background: #25396f !important;
+            transform: scale(1.1);
+        }
+
+        .btn-hapus-bahan {
+            background: #dc3545 !important;
+            color: white !important;
+            border-radius: 50% !important;
+            width: 30px !important;
+            height: 30px !important;
+            padding: 0 !important;
+        }
+
+        .btn-hapus-bahan:hover {
+            background: #c82333 !important;
+            transform: scale(1.1);
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .no-data-message i {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .btn-tambah-bahan-custom {
+            display: inline-flex;
+            align-items: center;
+            background: #4b7c5a;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 6px 22px 6px 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            gap: 10px;
+        }
+        .btn-tambah-bahan-custom:hover {
+            background: #356346;
+        }
+        .btn-tambah-bahan-custom .icon-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            color: #388e3c;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            margin-right: 8px;
+            font-size: 1.4em;
+            font-weight: bold;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            line-height: 1;
+        }
+
+        .btn-tambah-bahan-custom .bi-plus {
+            font-weight: bold !important;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+    </style>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-mahasiswa.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}"><img
+                                    src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo"
+                                    srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        {% if has_lolos_proposal %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin = 'lolos' - lengkap -->
+                            <li class="sidebar-item  has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                                <ul class="submenu ">
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_akhir') }}">Laporan Akhir</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-item  has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span>Produksi</span>
+                                </a>
+                                <ul class="submenu ">
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.pengelolaan_bahan_baku_mahasiswa') }}">Bahan Baku</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.aktivitas_produksi_mahasiswa') }}">Produksi</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li class="sidebar-item ">
+                                <a href="{{ url_for('mahasiswa.pembelian_alat_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-tools"></i>
+                                    <span>Alat Produksi</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item ">
+                                <a href="{{ url_for('mahasiswa.biaya_operasional_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-calculator"></i>
+                                    <span>Biaya Operasional</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item active">
+                                <a href="{{ url_for('mahasiswa.biaya_non_operasional_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-wallet2"></i>
+                                    <span>Biaya Lain-lain</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-item ">
+                                <a href="{{ url_for('mahasiswa.laporan_penjualan_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-receipt"></i>
+                                    <span>Laporan Penjualan</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-item  has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-graph-up"></i>
+                                    <span>Pelaporan Keuangan</span>
+                                </a>
+                                <ul class="submenu ">
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_laba_rugi_mahasiswa') }}">Laporan Laba Rugi</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_arus_kas_mahasiswa') }}">Laporan Arus Kas</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_neraca_mahasiswa') }}">Laporan Neraca</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin != 'lolos' atau tanpa proposal - terbatas -->
+                            <li class="sidebar-item active has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                                <ul class="submenu active">
+                                    <li class="submenu-item active">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.bimbingan') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.profile_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-person-circle"></i>
+                                <span>Profile Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-star-fill"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Pengelolaan Biaya Lain-lain</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Catat dan kelola Biaya Lain-lain usahamu di AYMP UNJAYA.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Pengelolaan Biaya Lain-lain</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Tables start -->
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        {% if proposal_data %}
+                            {% for proposal_id, data in proposal_data.items() %}
+                            <div class="card proposal-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-0">{{ data.proposal.judul_usaha }}</h5>
+                                        <small class="text-muted">{{ data.proposal.kategori }} - Tahun NIB: {% if data.proposal.tahun_nib and data.proposal.tahun_nib != '0' %}{{ data.proposal.tahun_nib }}{% else %}Tidak ada{% endif %}</small>
+                                    </div>
+                                    <button class="btn btn-tambah-bahan-custom" onclick="tambahBiayaNonOperasional({{ data.proposal.id }})" {% if status_mahasiswa == 'selesai' %}disabled style="opacity:0.6;cursor:not-allowed;"{% endif %}>
+                                        <span class="icon-circle">
+                                            <i class="bi bi-plus"></i>
+                                        </span>
+                                        Tambah Non Operasional
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    {% if data.biaya_non_operasional %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="tableBiayaNonOperasional{{ data.proposal.id }}">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Tanggal Transaksi</th>
+                                                    <th>Nama Biaya</th>
+                                                    <th>Quantity</th>
+                                                    <th>Harga Satuan</th>
+                                                    <th>Total Harga</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for biaya in data.biaya_non_operasional %}
+                                                <tr>
+                                                    <td>{{ loop.index }}</td>
+                                                    <td>{{ biaya.tanggal_transaksi.strftime('%d/%m/%Y') if biaya.tanggal_transaksi else '-' }}</td>
+                                                    <td>{{ biaya.nama_biaya|e }}</td>
+                                                    <td>{{ biaya.quantity }}</td>
+                                                    <td>Rp {{ "{:,.0f}".format(biaya.harga_satuan) }}</td>
+                                                    <td>Rp {{ "{:,.0f}".format(biaya.total_harga) }}</td>
+                                                    <td>
+                                                        <div class="d-flex gap-2">
+                                                            <button class="btn btn-circle btn-edit-bahan" onclick="editBiayaNonOperasional({{ biaya.id }})" title="Edit">
+                                                                <i class="bi bi-pencil-fill"></i>
+                                                            </button>
+                                                            <button class="btn btn-circle btn-hapus-bahan" onclick="hapusBiayaNonOperasional({{ biaya.id }})" title="Hapus">
+                                                                <i class="bi bi-trash-fill"></i>
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th colspan="5" class="text-end">Total Semua</th>
+                                                    <th id="grandTotal_{{ data.proposal.id }}">Rp {{ "{:,.0f}".format(data.biaya_non_operasional | sum(attribute='total_harga')) }}</th>
+                                                    <th></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="no-data-message">
+                                        <i class="bi bi-wallet2"></i>
+                                        <h5>Belum ada data Biaya Lain-lain</h5>
+                                        <p>Klik tombol "Tambah Non Operasional" untuk menambahkan data Biaya Lain-lain pertama Anda.</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="no-data-message">
+                                    <i class="bi bi-wallet2"></i>
+                                    <h5>Tidak ada proposal yang lolos</h5>
+                                    <p>Anda harus memiliki proposal yang sudah disetujui untuk dapat mengelola Biaya Lain-lain.</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+                <!-- Basic Tables end -->
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Tambah Biaya Lain-lain -->
+    <div class="modal fade" id="modalBiayaNonOperasional" tabindex="-1" aria-labelledby="modalBiayaNonOperasionalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalBiayaNonOperasionalLabel">Tambah Biaya Lain-lain</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formBiayaNonOperasional">
+                    <div class="modal-body">
+                        <input type="hidden" id="proposalId" name="proposal_id">
+
+                        <div class="row g-3">
+                            <!-- Nama Biaya - Full Width -->
+                            <div class="col-12">
+                                <label for="namaBiaya" class="form-label fw-semibold">
+                                    Nama Biaya <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="namaBiaya" name="nama_biaya" required placeholder="Contoh: Biaya Listrik Bulanan">
+                            </div>
+                            
+                            <!-- Tanggal Transaksi dan Quantity - 2 Kolom -->
+                            <div class="col-md-6">
+                                <label for="tanggalTransaksi" class="form-label fw-semibold">
+                                    Tanggal Transaksi <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" class="form-control" id="tanggalTransaksi" name="tanggal_transaksi" required>
+                                <small class="text-muted">Tanggal transaksi</small>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="quantity" class="form-label fw-semibold">
+                                    Quantity <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" min="1" step="1" required placeholder="1">
+                                <small class="text-muted">Jumlah item yang dibeli (bilangan bulat)</small>
+                            </div>
+                            
+                            <!-- Harga Satuan - Full Width -->
+                            <div class="col-12">
+                                <label for="hargaSatuan" class="form-label fw-semibold">
+                                    Harga Satuan <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number" class="form-control" id="hargaSatuan" name="harga_satuan" min="0" step="1" required placeholder="500000">
+                                </div>
+                                <small class="text-muted">Harga per unit dalam rupiah (bilangan bulat)</small>
+                            </div>
+                            
+                            <!-- Info Perhitungan -->
+                            <div class="col-12">
+                                <div class="alert alert-info" style="margin-bottom: 0;">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <strong>Info Perhitungan:</strong>
+                                            <br><small>Total Harga = Quantity × Harga Satuan</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Preview Total -->
+                            <div class="col-12">
+                                <div id="previewTotal" class="alert alert-success" style="display:none; margin-bottom:0;">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <strong>Total Harga:</strong>
+                                        </div>
+                                        <span id="totalValue" class="fs-5 fw-bold">Rp 0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Biaya Lain-lain</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Biaya Lain-lain -->
+    <div class="modal fade" id="modalEditBiayaNonOperasional" tabindex="-1" aria-labelledby="modalEditBiayaNonOperasionalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditBiayaNonOperasionalLabel">Edit Biaya Lain-lain</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formEditBiayaNonOperasional">
+                    <div class="modal-body">
+                        <input type="hidden" id="editBiayaId" name="biaya_non_operasional_id">
+                        <input type="hidden" id="editProposalId" name="proposal_id">
+
+                        <div class="row g-3">
+                            <!-- Nama Biaya - Full Width -->
+                            <div class="col-12">
+                                <label for="editNamaBiaya" class="form-label fw-semibold">
+                                    Nama Biaya <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="editNamaBiaya" name="nama_biaya" required placeholder="Contoh: Biaya Listrik Bulanan">
+                            </div>
+                            
+                            <!-- Tanggal Transaksi dan Quantity - 2 Kolom -->
+                            <div class="col-md-6">
+                                <label for="editTanggalTransaksi" class="form-label fw-semibold">
+                                    Tanggal Transaksi <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" class="form-control" id="editTanggalTransaksi" name="tanggal_transaksi" required>
+                                <small class="text-muted">Tanggal transaksi</small>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="editQuantity" class="form-label fw-semibold">
+                                    Quantity <span class="text-danger">*</span>
+                                </label>
+                                <input type="number" class="form-control" id="editQuantity" name="quantity" min="1" step="1" required placeholder="1">
+                                <small class="text-muted">Jumlah item yang dibeli (bilangan bulat)</small>
+                            </div>
+                            
+                            <!-- Harga Satuan - Full Width -->
+                            <div class="col-12">
+                                <label for="editHargaSatuan" class="form-label fw-semibold">
+                                    Harga Satuan <span class="text-danger">*</span>
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number" class="form-control" id="editHargaSatuan" name="harga_satuan" min="0" step="1" required placeholder="500000">
+                                </div>
+                                <small class="text-muted">Harga per unit dalam rupiah (bilangan bulat)</small>
+                            </div>
+                            
+                            <!-- Info Perhitungan -->
+                            <div class="col-12">
+                                <div class="alert alert-info" style="margin-bottom: 0;">
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <strong>Info Perhitungan:</strong>
+                                            <br><small>Total Harga = Quantity × Harga Satuan</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Preview Total -->
+                            <div class="col-12">
+                                <div id="previewEditTotal" class="alert alert-success" style="display:none; margin-bottom:0;">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <strong>Total Harga:</strong>
+                                        </div>
+                                        <span id="editTotalValue" class="fs-5 fw-bold">Rp 0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Update Biaya Lain-lain</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}">
+    </script>
+    <script
+        src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.all.js') }}"></script>
+
+    <script>
+        // Inisialisasi DataTable untuk setiap tabel
+        $(document).ready(function() {
+            {% for proposal_id, data in proposal_data.items() %}
+                {% if data.biaya_non_operasional %}
+                $('#tableBiayaNonOperasional{{ data.proposal.id }}').DataTable({
+                    responsive: true,
+                    language: {
+                        "sProcessing":   "Sedang memproses...",
+                        "sLengthMenu":   "Tampilkan _MENU_ data",
+                        "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                        "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                        "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                        "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                        "sInfoPostFix":  "",
+                        "sSearch":       "Cari:",
+                        "sUrl":          "",
+                        "oPaginate": {
+                            "sFirst":    "Pertama",
+                            "sPrevious": "Sebelumnya",
+                            "sNext":     "Selanjutnya",
+                            "sLast":     "Terakhir"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                            "sSortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                        }
+                    }
+                });
+                
+                // Hitung total harga Biaya Lain-lain
+                let total = 0;
+                {% for biaya_non_operasional in data.biaya_non_operasional %}
+                    total += {{ biaya_non_operasional.total_harga }};
+                {% endfor %}
+                $('#grandTotal_{{ data.proposal.id }}').text('Rp ' + total.toLocaleString('id-ID'));
+                
+                // Update total saat data difilter
+                $('#tableBiayaNonOperasional{{ data.proposal.id }}').on('search.dt', function() {
+                    let table = $(this).DataTable();
+                    let visibleData = table.rows({search: 'applied'}).data();
+                    let filteredTotal = 0;
+                    
+                    visibleData.each(function(value, index) {
+                        // Parse total harga dari kolom ke-5 (index 5)
+                        let totalHarga = value[5].replace(/[^\d]/g, '');
+                        filteredTotal += parseInt(totalHarga) || 0;
+                    });
+                    
+                    $('#grandTotal_{{ data.proposal.id }}').text('Rp ' + filteredTotal.toLocaleString('id-ID'));
+                });
+                {% endif %}
+            {% endfor %}
+        });
+
+        // Fungsi untuk menambah Biaya Lain-lain
+        function tambahBiayaNonOperasional(proposalId) {
+            {% if status_mahasiswa == 'selesai' %}
+            Swal.fire('Akses Dibatasi', 'Anda tidak dapat menambahkan Biaya Lain-lain karena status akun Anda adalah "selesai".', 'warning');
+            return;
+            {% endif %}
+            
+            $('#modalBiayaNonOperasionalLabel').text('Tambah Biaya Lain-lain');
+            $('#formBiayaNonOperasional')[0].reset();
+            $('#proposalId').val(proposalId);
+            $('#modalBiayaNonOperasional').modal('show');
+        }
+
+        // Fungsi untuk edit Biaya Lain-lain
+        function editBiayaNonOperasional(biayaId) {
+            {% if status_mahasiswa == 'selesai' %}
+            Swal.fire('Akses Dibatasi', 'Anda tidak dapat mengedit Biaya Lain-lain karena status akun Anda adalah "selesai".', 'warning');
+            return;
+            {% endif %}
+            
+            $.ajax({
+                url: `/mahasiswa/get_biaya_non_operasional/${biayaId}`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        const biaya_non_operasional = response.data;
+                        $('#editBiayaId').val(biaya_non_operasional.id);
+                        $('#editNamaBiaya').val(biaya_non_operasional.nama_biaya);
+                        
+                        // Format tanggal untuk input date (YYYY-MM-DD)
+                        if (biaya_non_operasional.tanggal_transaksi) {
+                            const tanggal = new Date(biaya_non_operasional.tanggal_transaksi);
+                            const formattedDate = tanggal.toISOString().split('T')[0];
+                            $('#editTanggalTransaksi').val(formattedDate);
+                        } else {
+                            $('#editTanggalTransaksi').val('');
+                        }
+                        
+                        // Pastikan quantity dan harga satuan sebagai integer
+                        $('#editQuantity').val(parseInt(biaya_non_operasional.quantity) || 1);
+                        $('#editHargaSatuan').val(parseInt(biaya_non_operasional.harga_satuan) || 0);
+                        
+                        // Update preview total setelah mengisi data
+                        setTimeout(() => {
+                            updateEditTotalPreview();
+                        }, 100);
+                        
+                        $('#modalEditBiayaNonOperasional').modal('show');
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Terjadi kesalahan saat mengambil data Biaya Lain-lain', 'error');
+                }
+            });
+        }
+
+        // Fungsi untuk hapus Biaya Lain-lain
+        function hapusBiayaNonOperasional(biayaId) {
+            {% if status_mahasiswa == 'selesai' %}
+            Swal.fire('Akses Dibatasi', 'Anda tidak dapat menghapus Biaya Lain-lain karena status akun Anda adalah "selesai".', 'warning');
+            return;
+            {% endif %}
+            
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: 'Apakah Anda yakin ingin menghapus Biaya Lain-lain ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/mahasiswa/delete_biaya_non_operasional',
+                        method: 'POST',
+                        data: {
+                            biaya_non_operasional_id: biayaId
+                        },
+                        
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Berhasil!', response.message, 'success');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1500);
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Terjadi kesalahan saat menghapus Biaya Lain-lain', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Event handler untuk form tambah Biaya Lain-lain
+        $('#formBiayaNonOperasional').on('submit', function(e) {
+            e.preventDefault();
+            
+            $.ajax({
+                url: '/mahasiswa/tambah_biaya_non_operasional',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('Berhasil!', response.message, 'success').then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Terjadi kesalahan saat menambah Biaya Lain-lain', 'error');
+                }
+            });
+        });
+
+        // Event handler untuk form edit Biaya Lain-lain
+        $('#formEditBiayaNonOperasional').on('submit', function(e) {
+            e.preventDefault();
+            
+            $.ajax({
+                url: '/mahasiswa/update_biaya_non_operasional',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('Berhasil!', response.message, 'success').then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Terjadi kesalahan saat mengupdate Biaya Lain-lain', 'error');
+                }
+            });
+        });
+
+        // Preview total pada form tambah Biaya Lain-lain
+        function updateTotalPreview() {
+            let qty = parseInt($('#quantity').val()) || 0;
+            let harga = parseInt($('#hargaSatuan').val()) || 0;
+            let total = qty * harga;
+            if (qty > 0 && harga > 0) {
+                $('#previewTotal').show();
+                $('#totalValue').text('Rp ' + total.toLocaleString('id-ID'));
+            } else {
+                $('#previewTotal').hide();
+            }
+        }
+        $('#quantity, #hargaSatuan').on('input', updateTotalPreview);
+
+        // Preview total pada form edit Biaya Lain-lain
+        function updateEditTotalPreview() {
+            let qty = parseInt($('#editQuantity').val()) || 0;
+            let harga = parseInt($('#editHargaSatuan').val()) || 0;
+            let total = qty * harga;
+            if (qty > 0 && harga > 0) {
+                $('#previewEditTotal').show();
+                $('#editTotalValue').text('Rp ' + total.toLocaleString('id-ID'));
+            } else {
+                $('#previewEditTotal').hide();
+            }
+        }
+        $('#editQuantity, #editHargaSatuan').on('input', updateEditTotalPreview);
+
+        // Tampilkan preview saat modal edit dibuka
+        $('#modalEditBiayaNonOperasional').on('shown.bs.modal', function () {
+            updateEditTotalPreview();
+        });
+
+        // Pastikan input quantity dan harga satuan hanya menerima bilangan bulat
+        $('#quantity, #editQuantity').on('input', function() {
+            let value = $(this).val();
+            // Hapus karakter non-digit kecuali tanda minus di awal
+            value = value.replace(/[^\d]/g, '');
+            // Pastikan tidak dimulai dengan 0 kecuali jika hanya 0
+            if (value.length > 1 && value.startsWith('0')) {
+                value = value.substring(1);
+            }
+            // Pastikan minimal 1
+            if (parseInt(value) < 1) {
+                value = '1';
+            }
+            $(this).val(value);
+        });
+
+        $('#hargaSatuan, #editHargaSatuan').on('input', function() {
+            let value = $(this).val();
+            // Hapus karakter non-digit
+            value = value.replace(/[^\d]/g, '');
+            // Pastikan tidak dimulai dengan 0 kecuali jika hanya 0
+            if (value.length > 1 && value.startsWith('0')) {
+                value = value.substring(1);
+            }
+            $(this).val(value);
+        });
+    </script>
+
+</body>
+
+</html>
+

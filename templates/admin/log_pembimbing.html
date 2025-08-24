@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Log Aktivitas - {{ pembimbing_info.nama }} - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <!-- DateRangePicker CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    
+    <style>
+        .info-card {
+            background: white;
+            border-radius: 12px;
+            color: #495057;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+        .info-card h4 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-weight: 600;
+            font-size: 1.3rem;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .info-item {
+            margin-bottom: 15px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .info-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #166534 0%, #15803d 100%);
+        }
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            border-color: #166534;
+        }
+        .info-item:last-child {
+            margin-bottom: 0;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.8rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+        .info-value {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #2c3e50;
+            line-height: 1.4;
+        }
+        .student-badge {
+            transition: all 0.3s ease;
+        }
+        .student-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(22, 101, 52, 0.4) !important;
+        }
+        .empty-state-icon {
+            opacity: 0.6;
+        }
+        
+        /* Clear Log Button Styling */
+        #clearLogBtn {
+            transition: all 0.3s ease;
+            border-width: 2px;
+        }
+        
+        #clearLogBtn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+            background-color: #dc2626;
+            color: white;
+        }
+        
+        #clearLogBtn:active {
+            transform: translateY(0);
+        }
+        .duration-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e9ecef;
+        }
+        .duration-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+        .duration-item {
+            text-align: center;
+            padding: 18px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #e9ecef;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+        }
+        .duration-item:hover {
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-color: #d0d7de;
+        }
+        .duration-number {
+            font-size: 1.6rem;
+            font-weight: 600;
+            color: #166534;
+            display: block;
+            line-height: 1.2;
+        }
+        .duration-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+            font-weight: 500;
+            margin-top: 3px;
+        }
+        .activity-card {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e9ecef;
+        }
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+            background: #f8f9fa;
+        }
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+        .activity-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .activity-tambah {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .activity-edit {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .activity-hapus {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .activity-login {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .activity-konfirmasi {
+            background: #f3e8ff;
+            color: #7c2d8c;
+        }
+        .activity-setuju {
+            background: #dcfce7;
+            color: #166534;
+        }
+        .activity-tolak {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .activity-revisi {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .activity-lihat {
+            background: #e0f2fe;
+            color: #0277bd;
+        }
+
+        @media (max-width: 768px) {
+            .duration-item {
+                margin-bottom: 10px;
+            }
+            .duration-number {
+                font-size: 1.5rem;
+            }
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+
+        /* DateRangePicker Custom Styling */
+        .daterangepicker {
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .daterangepicker .ranges li {
+            border-radius: 8px;
+            margin: 2px;
+        }
+
+        .daterangepicker .ranges li:hover {
+            background-color: #6f42c1;
+            color: white;
+        }
+
+        .daterangepicker .ranges li.active {
+            background-color: #6f42c1;
+            color: white;
+        }
+
+        .daterangepicker .drp-buttons {
+            border-top: 1px solid #e9ecef;
+            padding-top: 10px;
+        }
+
+        .daterangepicker .drp-selected {
+            display: none;
+        }
+
+        .daterangepicker .cancelBtn {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+
+        .daterangepicker .cancelBtn:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+        .daterangepicker .applyBtn {
+            background-color: #6f42c1;
+            border-color: #6f42c1;
+            color: white;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.875rem;
+        }
+
+        .daterangepicker .applyBtn:hover {
+            background-color: #5a2d8c;
+            border-color: #5a2d8c;
+        }
+
+        /* Date Range Input Styling */
+        .date-range-input {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            padding: 10px 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: #495057;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            min-width: 200px;
+        }
+
+        .date-range-input:hover {
+            border-color: #6f42c1;
+            box-shadow: 0 4px 15px rgba(111, 66, 193, 0.1);
+        }
+
+        .date-range-input:focus {
+            outline: none;
+            border-color: #6f42c1;
+            box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.1);
+        }
+
+        .date-range-input i {
+            color: #6f42c1;
+            font-size: 1rem;
+        }
+
+        .date-range-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .date-range-label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .date-range-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .date-range-input {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* SweetAlert2 Custom Styling */
+        .swal2-popup {
+            border-radius: 15px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .swal2-title {
+            color: #3b3f5c;
+            font-weight: 700;
+        }
+
+        .swal2-content {
+            color: #6c757d;
+        }
+
+        .swal2-confirm {
+            background: #435ebe !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-cancel {
+            background: #6c757d !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-success-circular-line-left,
+        .swal2-success-circular-line-right,
+        .swal2-success-fix {
+            background-color: transparent !important;
+        }
+
+        .swal2-icon.swal2-success {
+            border-color: #435ebe !important;
+        }
+
+        .swal2-icon.swal2-success [class^='swal2-success-line'] {
+            background-color: #435ebe !important;
+        }
+
+        .swal2-icon.swal2-success .swal2-success-ring {
+            border-color: #435ebe !important;
+        }
+
+        .swal2-icon.swal2-warning {
+            border-color: #ffc107 !important;
+        }
+
+        .swal2-icon.swal2-error {
+            border-color: #dc3545 !important;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-admin.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('admin.das_admin') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.das_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.admin_daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Mahasiswa</span>
+                            </a>
+                            <ul class="submenu">
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('admin.mahasiswa_belum_diverifikasi') }}">Belum Diverifikasi</a>
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('admin.mahasiswa_sudah_diverifikasi') }}">Sudah Diverifikasi</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi-bar-chart-line"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu">
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item active has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-clock-history"></i>
+                                <span>Log Aktivitas</span>
+                            </a>
+                            <ul class="submenu active">
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('admin.admin_daftar_log_mahasiswa') }}">Mahasiswa</a> 
+                                </li>
+                                <li class="submenu-item active">
+                                    <a href="{{ url_for('admin.admin_daftar_log_pembimbing') }}">Pembimbing</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.daftar_nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-award"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.pengajuan_proposal') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Pengajuan Proposal</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_kemajuan') }}" class='sidebar-link'>
+                                <i class="bi bi-graph-up"></i>
+                                <span>Laporan Kemajuan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_akhir') }}" class='sidebar-link'>
+                                <i class="bi bi-clipboard-data"></i>
+                                <span>Laporan Akhir</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Pembimbing</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.reviewer') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Reviewer</span>
+                            </a>
+                                </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.data_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Admin</span>
+                            </a>
+                        </li>
+                        
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.pengaturan') }}" class='sidebar-link'>
+                                <i class="bi bi-gear"></i>
+                                <span>Pengaturan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('index') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Detail Log Aktivitas Pembimbing</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Riwayat aktivitas dan statistik penggunaan sistem pembimbing.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('admin.das_admin') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url_for('admin.admin_daftar_log_pembimbing') }}">Log Aktivitas</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Detail Pembimbing</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Informasi Pembimbing -->
+                <div class="info-card" data-pembimbing-id="{{ pembimbing_info.id if pembimbing_info else '' }}">
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="me-3">
+                            <div class="avatar-circle" style="width: 60px; height: 60px; background: linear-gradient(135deg, #166534 0%, #15803d 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem; font-weight: 600;">
+                                {{ pembimbing_info.nama[0] if pembimbing_info and pembimbing_info.nama else 'P' }}
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="mb-1" style="color: #2c3e50; font-weight: 700;">{{ pembimbing_info.nama|e if pembimbing_info else 'Informasi Pembimbing' }}</h4>
+                            <p class="text-muted mb-0" style="font-size: 0.95rem;">
+                                <i class="bi bi-person-badge me-1"></i>{{ pembimbing_info.nip|e if pembimbing_info else 'NIP tidak tersedia' }}
+                            </p>
+                        </div>
+                        <div class="ms-auto">
+                            {% if pembimbing_info %}
+                                {% if pembimbing_info.status == 'aktif' %}
+                                <span class="badge bg-success rounded-pill px-3 py-2" style="font-size: 0.85rem;">
+                                    <i class="bi bi-check-circle me-1"></i>Aktif
+                                </span>
+                                {% elif pembimbing_info.status == 'nonaktif' %}
+                                <span class="badge bg-danger rounded-pill px-3 py-2" style="font-size: 0.85rem;">
+                                    <i class="bi bi-x-circle me-1"></i>Tidak Aktif
+                                </span>
+                                {% else %}
+                                <span class="badge bg-warning rounded-pill px-3 py-2" style="font-size: 0.85rem;">
+                                    <i class="bi bi-question-circle me-1"></i>{{ pembimbing_info.status.title() }}
+                                </span>
+                                {% endif %}
+                            {% else %}
+                            <span class="badge bg-secondary rounded-pill px-3 py-2" style="font-size: 0.85rem;">-</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="bi bi-mortarboard me-1"></i>Program Studi
+                                </div>
+                                <div class="info-value">{{ pembimbing_info.program_studi|e if pembimbing_info else '-' }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="bi bi-calendar-event me-1"></i>Tanggal Bergabung
+                                </div>
+                                <div class="info-value">{{ pembimbing_info.tanggal_dibuat.strftime('%d %B %Y') if pembimbing_info and pembimbing_info.tanggal_dibuat else '-' }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="bi bi-people me-1"></i>Kuota Maksimal
+                                </div>
+                                <div class="info-value">{{ pembimbing_info.kuota_mahasiswa if pembimbing_info else '-' }} mahasiswa</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="bi bi-person-check me-1"></i>Mahasiswa Aktif
+                                </div>
+                                <div class="info-value">{{ jumlah_mahasiswa_bimbing or 0 }} mahasiswa</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Bar Kuota -->
+                    <div class="row g-4 mt-2">
+                        <div class="col-12">
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="bi bi-graph-up me-1"></i>Progress Kuota Bimbingan
+                                </div>
+                                <div class="info-value">
+                                    {% if pembimbing_info %}
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <div>
+                                            <span class="fw-bold fs-5">{{ jumlah_mahasiswa_bimbing or 0 }} / {{ pembimbing_info.kuota_mahasiswa or 0 }}</span>
+                                            <span class="text-muted ms-2">Mahasiswa</span>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="fw-bold fs-5 text-primary">{{ "%.1f"|format(kuota_terpakai or 0) }}%</span>
+                                            <br>
+                                            <small class="text-muted">Kuota Terpakai</small>
+                                        </div>
+                                    </div>
+                                    <div class="progress mb-3" style="height: 12px; border-radius: 15px; background-color: #f8f9fa;">
+                                        {% set progress_class = 'bg-success' if (kuota_terpakai or 0) <= 70 else ('bg-warning' if (kuota_terpakai or 0) <= 90 else 'bg-danger') %}
+                                        <div class="progress-bar {{ progress_class }}" 
+                                             role="progressbar" 
+                                             style="width: {{ kuota_terpakai or 0 }}%; transition: width 0.8s ease; border-radius: 15px;"
+                                             aria-valuenow="{{ kuota_terpakai or 0 }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
+                                    </div>
+                                    {% if sisa_kuota is defined %}
+                                        <div class="d-flex align-items-center">
+                                            {% if sisa_kuota > 0 %}
+                                                <i class="bi bi-check-circle-fill text-success me-2" style="font-size: 1.1rem;"></i>
+                                                <span class="text-success fw-medium">Sisa kuota: {{ sisa_kuota }} mahasiswa</span>
+                                            {% elif sisa_kuota == 0 %}
+                                                <i class="bi bi-exclamation-triangle-fill text-warning me-2" style="font-size: 1.1rem;"></i>
+                                                <span class="text-warning fw-medium">Kuota penuh</span>
+                                            {% else %}
+                                                <i class="bi bi-x-circle-fill text-danger me-2" style="font-size: 1.1rem;"></i>
+                                                <span class="text-danger fw-medium">Melebihi kuota sebanyak {{ abs(sisa_kuota) }} mahasiswa</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                    {% else %}
+                                    <div class="text-center text-muted py-4">
+                                        <i class="bi bi-exclamation-circle" style="font-size: 2rem;"></i>
+                                        <p class="mt-2 mb-0">Data pembimbing tidak tersedia</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Daftar Mahasiswa Bimbingan -->
+                    <div class="row g-4 mt-2">
+                        <div class="col-12">
+                            <div class="info-item">
+                                <div class="info-label">
+                                    <i class="bi bi-people-fill me-1"></i>Mahasiswa yang Sedang Dibimbing
+                                    <span class="badge bg-primary rounded-pill ms-2">{{ jumlah_mahasiswa_bimbing or 0 }}</span>
+                                </div>
+                                <div class="info-value">
+                                    {% if nama_mahasiswa_bimbing %}
+                                    <div class="d-flex flex-wrap gap-3 mt-3">
+                                        {% for nama in nama_mahasiswa_bimbing.split(', ') %}
+                                        <div class="student-badge" style="background: linear-gradient(135deg, #166534 0%, #15803d 100%); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 500; box-shadow: 0 2px 8px rgba(22, 101, 52, 0.3);">
+                                            <i class="bi bi-person-circle me-2"></i>{{ nama }}
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% elif pembimbing_info %}
+                                    <div class="text-center py-5">
+                                        <div class="empty-state-icon mb-3">
+                                            <i class="bi bi-people" style="font-size: 3rem; color: #dee2e6;"></i>
+                                        </div>
+                                        <h6 class="text-muted mb-2">Belum Ada Mahasiswa</h6>
+                                        <p class="text-muted small mb-0">Pembimbing belum memiliki mahasiswa yang sedang dibimbing</p>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-center py-5">
+                                        <div class="empty-state-icon mb-3">
+                                            <i class="bi bi-exclamation-circle" style="font-size: 3rem; color: #dee2e6;"></i>
+                                        </div>
+                                        <h6 class="text-muted mb-2">Data Tidak Tersedia</h6>
+                                        <p class="text-muted small mb-0">Informasi mahasiswa bimbingan tidak dapat ditampilkan</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistik Durasi -->
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="duration-card">
+                            <div class="duration-title">
+                                Durasi Total Aktivitas
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-6 col-sm-3">
+                                    <div class="duration-item">
+                                        <span class="duration-number">{{ durasi_total.hari if durasi_total else 0 }}</span>
+                                        <span class="duration-label">Hari</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <div class="duration-item">
+                                        <span class="duration-number">{{ durasi_total.jam if durasi_total else 0 }}</span>
+                                        <span class="duration-label">Jam</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <div class="duration-item">
+                                        <span class="duration-number">{{ durasi_total.menit if durasi_total else 0 }}</span>
+                                        <span class="duration-label">Menit</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <div class="duration-item">
+                                        <span class="duration-number">{{ durasi_total.detik if durasi_total else 0 }}</span>
+                                        <span class="duration-label">Detik</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="duration-card">
+                            <div class="duration-title">
+                                Durasi Aktivitas Hari Ini
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-6 col-sm-3">
+                                    <div class="duration-item">
+                                        <span class="duration-number">0</span>
+                                        <span class="duration-label">Hari</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <div class="duration-item">
+                                        <span class="duration-number">{{ durasi_hari_ini.jam if durasi_hari_ini else 0 }}</span>
+                                        <span class="duration-label">Jam</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <div class="duration-item">
+                                        <span class="duration-number">{{ durasi_hari_ini.menit if durasi_hari_ini else 0 }}</span>
+                                        <span class="duration-label">Menit</span>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-sm-3">
+                                    <div class="duration-item">
+                                        <span class="duration-number">{{ durasi_hari_ini.detik if durasi_hari_ini else 0 }}</span>
+                                        <span class="duration-label">Detik</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabel Aktivitas Terbaru -->
+                <div class="activity-card">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 style="margin-bottom: 5px; color: #495057; font-weight: 700;">
+                                Aktivitas Terbaru
+                            </h4>
+                            <small class="text-muted">Riwayat aksi pembimbing dalam sistem</small>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-outline-danger btn-sm" id="clearLogBtn" title="Hapus semua riwayat aktivitas" style="border-radius: 8px; padding: 8px 12px;">
+                                <i class="bi bi-trash3 me-1"></i>Hapus Riwayat
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Date Range Filter -->
+                    <div class="date-range-container">
+                        <span class="date-range-label">Filter Periode:</span>
+                        <div class="date-range-input" id="dateRangeLog">
+                            <i class="bi bi-calendar3"></i>
+                            <span>30 Hari Terakhir</span>
+                        </div>
+                        <button class="btn btn-outline-secondary btn-sm" id="resetFilterLog" style="border-radius: 20px; padding: 6px 12px; font-size: 0.875rem;" title="Reset ke 30 hari terakhir">
+                            <i class="bi bi-arrow-clockwise"></i> Reset
+                        </button>
+                        <small class="text-muted ms-2" id="filterInfo" style="font-size: 0.8rem;">
+                            <i class="bi bi-info-circle me-1"></i>
+                            <span id="filterStatus">Menampilkan aktivitas 30 hari terakhir</span>
+                        </small>
+                    </div>
+                    
+                    {% if log_aktivitas %}
+                            <div class="table-responsive">
+                        <table class="table table-hover" id="logTable">
+                                    <thead>
+                                        <tr>
+                                    <th style="width: 8%;">No</th>
+                                    <th style="width: 20%;">Waktu</th>
+                                    <th style="width: 15%;">Jenis Aktivitas</th>
+                                    <th style="width: 25%;">Modul</th>
+                                    <th style="width: 32%;">Deskripsi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                {% for log in log_aktivitas %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>
+                                        <div class="fw-bold">{{ log.created_at.strftime('%d/%m/%Y') if log.created_at else '-' }}</div>
+                                        <small class="text-muted">{{ log.created_at.strftime('%H:%M:%S') if log.created_at else '-' }}</small>
+                                    </td>
+                                    <td>
+                                        {% if log.jenis_aktivitas == 'tambah' %}
+                                        <span class="activity-badge activity-tambah">Tambah</span>
+                                        {% elif log.jenis_aktivitas == 'edit' or log.jenis_aktivitas == 'update' %}
+                                        <span class="activity-badge activity-edit">Edit</span>
+                                        {% elif log.jenis_aktivitas == 'hapus' or log.jenis_aktivitas == 'delete' %}
+                                        <span class="activity-badge activity-hapus">Hapus</span>
+                                        {% elif log.jenis_aktivitas == 'login' %}
+                                        <span class="activity-badge activity-login">Login</span>
+                                        {% elif log.jenis_aktivitas == 'konfirmasi' %}
+                                        <span class="activity-badge activity-konfirmasi">Konfirmasi</span>
+                                        {% elif log.jenis_aktivitas == 'setuju' %}
+                                        <span class="activity-badge activity-setuju">Setuju</span>
+                                        {% elif log.jenis_aktivitas == 'tolak' %}
+                                        <span class="activity-badge activity-tolak">Tolak</span>
+                                        {% elif log.jenis_aktivitas == 'revisi' %}
+                                        <span class="activity-badge activity-revisi">Revisi</span>
+                                        {% elif log.jenis_aktivitas == 'lihat' or log.jenis_aktivitas == 'view' %}
+                                        <span class="activity-badge activity-lihat">Lihat</span>
+                                        {% else %}
+                                        <span class="activity-badge activity-edit">{{ log.jenis_aktivitas|title }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold">{{ log.modul|title if log.modul else 'Sistem' }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="text-muted">{{ log.deskripsi if log.deskripsi else 'Aktivitas ' + (log.jenis_aktivitas|title) + ' pada ' + (log.modul|title) }}</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                    {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-clock-history"></i>
+                        <h5>Belum Ada Aktivitas</h5>
+                        <p class="text-muted">Pembimbing belum memiliki riwayat aktivitas dalam sistem.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    
+    <!-- DataTables Scripts -->
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    
+    <!-- DateRangePicker JavaScript -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+    
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
+    <script>
+        // Global variables
+        let logTable;
+        let dateRangeFilter = null; // Initialize to null
+        
+        // DataTable untuk log aktivitas
+        $(document).ready(function() {
+            try {
+                // Check if table exists
+                if ($('#logTable').length === 0) {
+                    console.log('Table not found, skipping DataTable initialization');
+                    return;
+                }
+                
+                logTable = $('#logTable').DataTable({
+                    language: {
+                        "sProcessing": "Sedang memproses...",
+                        "sLengthMenu": "Tampilkan _MENU_ entri",
+                        "sZeroRecords": "Tidak ditemukan data aktivitas pada periode ini",
+                        "sInfo": "Menampilkan _START_ sampai _END_ dari _TOTAL_ aktivitas",
+                        "sInfoEmpty": "Menampilkan 0 sampai 0 dari 0 aktivitas",
+                        "sInfoFiltered": "(disaring dari _MAX_ aktivitas keseluruhan)",
+                        "sInfoPostFix": "",
+                        "sSearch": "Cari aktivitas:",
+                        "sUrl": "",
+                        "oPaginate": {
+                            "sFirst": "Pertama",
+                            "sPrevious": "Sebelumnya",
+                            "sNext": "Selanjutnya",
+                            "sLast": "Terakhir"
+                        }
+                    },
+                    responsive: true,
+                    pageLength: 15,
+                    lengthMenu: [[15, 25, 50, 100, -1], [15, 25, 50, 100, "Semua"]],
+                    order: [[1, "desc"]], // Sort by waktu descending
+                    columnDefs: [
+                        { orderable: false, targets: 0 } // Disable sorting on No column
+                    ],
+                    dom: '<"top"lf>rt<"bottom"ip>',
+                    drawCallback: function() {
+                        // Update counter setelah filter
+                        updateFilterCounter();
+                    }
+                });
+                
+                console.log('DataTable initialized successfully');
+                
+                // Verify table functionality
+                if (logTable && logTable.page) {
+                    console.log('DataTable is ready and functional');
+                } else {
+                    console.warn('DataTable initialized but page method not available');
+                }
+                
+                                // Initialize DateRangePicker dengan konfigurasi yang diperbaiki
+                 if (typeof moment !== 'undefined' && $('#dateRangeLog').length > 0) {
+                    $('#dateRangeLog').daterangepicker({
+                        opens: 'left',
+                        drops: 'down',
+                        autoUpdateInput: false,
+                        locale: {
+                            format: 'DD/MM/YYYY',
+                            separator: ' - ',
+                            applyLabel: 'Terapkan',
+                            cancelLabel: 'Batal',
+                            fromLabel: 'Dari',
+                            toLabel: 'Sampai',
+                            customRangeLabel: 'Rentang Kustom',
+                            daysOfWeek: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+                            monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+                            firstDay: 1
+                        },
+                        ranges: {
+                            'Hari Ini': [moment(), moment()],
+                            'Kemarin': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                            '7 Hari Terakhir': [moment().subtract(6, 'days'), moment()],
+                            '30 Hari Terakhir': [moment().subtract(29, 'days'), moment()],
+                            'Bulan Ini': [moment().startOf('month'), moment().endOf('month')],
+                            'Bulan Lalu': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                            '3 Bulan Terakhir': [moment().subtract(3, 'months').startOf('day'), moment()],
+                            'Tahun Ini': [moment().startOf('year'), moment().endOf('year')],
+                            'Semua Data': [moment('2020-01-01'), moment().add(1, 'year')]
+                        },
+                        startDate: moment().subtract(29, 'days'),
+                        endDate: moment(),
+                        maxDate: moment().add(1, 'days'), // Allow future dates for better UX
+                        minDate: moment('2020-01-01')
+                    });
+                    
+                                         // Apply event - when user selects a range
+                     $('#dateRangeLog').on('apply.daterangepicker', function(ev, picker) {
+                         try {
+                             let start = picker.startDate;
+                             let end = picker.endDate;
+                             let rangeText = start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY');
+                             let days = end.diff(start, 'days') + 1;
+                             
+                             // Update display text
+                             $(this).find('span').text(rangeText);
+                             
+                             // Update filter status
+                             $('#filterStatus').text(`Menampilkan aktivitas periode ${days} hari`);
+                             
+                             // Apply filter to table only if DataTable is available
+                             if (logTable && logTable.page) {
+                                 applyDateFilter(start, end);
+                             }
+                             
+                             // Show toast notification
+                             showFilterNotification(start, end);
+                         } catch (error) {
+                             console.error('Error in apply daterangepicker:', error);
+                         }
+                     });
+                     
+                     // Cancel event - when user cancels selection
+                     $('#dateRangeLog').on('cancel.daterangepicker', function(ev, picker) {
+                         try {
+                             // Reset to show all data
+                             $(this).find('span').text('Semua Data');
+                             $('#filterStatus').text('Menampilkan semua aktivitas');
+                             clearDateFilter();
+                             showFilterNotification(null, null, true);
+                         } catch (error) {
+                             console.error('Error in cancel daterangepicker:', error);
+                         }
+                     });
+                    
+                                         // Set default to show last 30 days - with delay to ensure DataTable is ready
+                     setTimeout(function() {
+                         let defaultStart = moment().subtract(29, 'days');
+                         let defaultEnd = moment();
+                         $('#dateRangeLog span').text(defaultStart.format('DD/MM/YYYY') + ' - ' + defaultEnd.format('DD/MM/YYYY'));
+                         
+                         // Only apply filter if DataTable is available
+                         if (logTable && logTable.page) {
+                             applyDateFilter(defaultStart, defaultEnd);
+                         }
+                     }, 500);
+                     
+                     console.log('DateRangePicker initialized successfully');
+                } else {
+                    console.log('Moment.js not available, DateRangePicker disabled');
+                }
+                
+                                 // Reset filter button - improved with error handling
+                 $('#resetFilterLog').on('click', function() {
+                     try {
+                         if (typeof moment !== 'undefined') {
+                             // Clear date range selection
+                             let dateRangePicker = $('#dateRangeLog').data('daterangepicker');
+                             if (dateRangePicker) {
+                                 dateRangePicker.setStartDate(moment().subtract(29, 'days'));
+                                 dateRangePicker.setEndDate(moment());
+                             }
+                             
+                             // Reset display text
+                             let defaultStart = moment().subtract(29, 'days');
+                             let defaultEnd = moment();
+                             $('#dateRangeLog span').text(defaultStart.format('DD/MM/YYYY') + ' - ' + defaultEnd.format('DD/MM/YYYY'));
+                             $('#filterStatus').text('Menampilkan aktivitas 30 hari terakhir');
+                             
+                             // Clear all filters
+                             clearDateFilter();
+                             
+                             // Reapply default filter only if DataTable is available
+                             setTimeout(function() {
+                                 if (logTable && logTable.page) {
+                                     applyDateFilter(defaultStart, defaultEnd);
+                                 }
+                             }, 100);
+                             
+                             // Show notification
+                             showFilterNotification(defaultStart, defaultEnd, false, true);
+                         }
+                     } catch (error) {
+                         console.error('Error in reset filter:', error);
+                     }
+                 });
+                
+                // Clear Log Button Event Handler
+                $('#clearLogBtn').on('click', function() {
+                    clearLogHistory();
+                });
+                
+            } catch (error) {
+                console.error('Error initializing DataTable:', error);
+                
+                // Add error message before table
+                if ($('#logTable').length > 0) {
+                    $('#logTable').before('<div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-2"></i>DataTable gagal dimuat. Menampilkan tabel sederhana.</div>');
+                }
+                
+                // Set logTable to null to prevent further errors
+                logTable = null;
+            }
+        });
+        
+                 // Improved filter function
+         function applyDateFilter(startDate, endDate) {
+             try {
+                 if (!logTable || !logTable.page) {
+                     console.log('DataTable not available for filtering');
+                     return;
+                 }
+                 
+                 // Remove existing filter if any
+                 clearDateFilter();
+                 
+                 // Create new filter function
+                 dateRangeFilter = function(settings, data, dataIndex) {
+                     try {
+                         if (settings.nTable.id !== 'logTable') return true;
+                         
+                         // Get date from column 1 (Waktu)
+                         let dateColumn = data[1];
+                         if (!dateColumn || dateColumn.trim() === '') return false;
+                         
+                         // Extract date using more robust regex
+                         let dateMatch = dateColumn.match(/(\d{2}\/\d{2}\/\d{4})/);
+                         if (!dateMatch || !dateMatch[1]) return false;
+                         
+                         // Parse the date
+                         let rowDate = moment(dateMatch[1], 'DD/MM/YYYY', true);
+                         if (!rowDate.isValid()) return false;
+                         
+                         // Check if date is within range (inclusive)
+                         return rowDate.isBetween(startDate, endDate, 'day', '[]');
+                     } catch (error) {
+                         console.error('Error in date filter:', error);
+                         return true; // Show row if error occurs
+                     }
+                 };
+                 
+                 // Add the filter
+                 $.fn.dataTable.ext.search.push(dateRangeFilter);
+                 
+                 // Redraw table
+                 logTable.draw();
+             } catch (error) {
+                 console.error('Error applying date filter:', error);
+             }
+         }
+         
+         // Clear date filter function
+         function clearDateFilter() {
+             try {
+                 if (dateRangeFilter) {
+                     // Remove the specific filter
+                     let index = $.fn.dataTable.ext.search.indexOf(dateRangeFilter);
+                     if (index > -1) {
+                         $.fn.dataTable.ext.search.splice(index, 1);
+                     }
+                     dateRangeFilter = null;
+                 }
+                 
+                 // Redraw table if available
+                 if (logTable && logTable.draw) {
+                     logTable.draw();
+                 }
+             } catch (error) {
+                 console.error('Error clearing date filter:', error);
+             }
+         }
+         
+         // Update filter counter
+         function updateFilterCounter() {
+             try {
+                 if (!logTable || !logTable.page) {
+                     console.log('DataTable not available for counter update');
+                     return;
+                 }
+                 
+                 setTimeout(function() {
+                     try {
+                         let pageInfo = logTable.page.info();
+                         let filteredCount = pageInfo.recordsDisplay;
+                         let totalCount = pageInfo.recordsTotal;
+                         
+                         // Update visual feedback
+                         let statusElement = $('#filterStatus');
+                         if (statusElement.length && filteredCount < totalCount) {
+                             let percentage = Math.round((filteredCount / totalCount) * 100);
+                             let currentText = statusElement.text();
+                             let newText = currentText.replace(/\(\d+\/\d+\)$/, '');
+                             statusElement.text(`${newText} (${filteredCount}/${totalCount})`);
+                             statusElement.removeClass('text-muted').addClass('text-info');
+                             console.log(`Menampilkan ${filteredCount} dari ${totalCount} aktivitas (${percentage}%)`);
+                         } else if (statusElement.length) {
+                             statusElement.removeClass('text-info').addClass('text-muted');
+                         }
+                     } catch (error) {
+                         console.error('Error in updateFilterCounter setTimeout:', error);
+                     }
+                 }, 100);
+             } catch (error) {
+                 console.error('Error in updateFilterCounter:', error);
+             }
+         }
+         
+         // Show filter notification with improved feedback
+         function showFilterNotification(start, end, cleared = false, reset = false) {
+             try {
+                 let message;
+                 let type = 'info';
+                 
+                 if (cleared) {
+                     message = '? Filter tanggal dibatalkan. Menampilkan semua data.';
+                     type = 'secondary';
+                 } else if (reset) {
+                     message = '?? Filter direset ke 30 hari terakhir.';
+                     type = 'primary';
+                 } else if (start && end) {
+                     let days = end.diff(start, 'days') + 1;
+                     let rangeText = start.format('DD MMM YYYY') + ' - ' + end.format('DD MMM YYYY');
+                     message = `?? Filter periode ${days} hari: ${rangeText}`;
+                     type = 'success';
+                 }
+                 
+                 if (message) {
+                     console.log(message);
+                     
+                     // Show temporary visual feedback
+                     let filterInfo = $('#filterInfo');
+                     if (filterInfo.length) {
+                         let originalClass = filterInfo.attr('class');
+                         
+                         filterInfo.removeClass('text-muted')
+                                  .addClass(`text-${type}`)
+                                  .find('#filterStatus')
+                                  .prepend('<i class="bi bi-check-circle me-1"></i>');
+                         
+                         // Reset after 3 seconds
+                         setTimeout(function() {
+                             if (filterInfo.length) {
+                                 filterInfo.attr('class', originalClass)
+                                          .find('#filterStatus i').remove();
+                             }
+                         }, 3000);
+                     }
+                 }
+             } catch (error) {
+                 console.error('Error in showFilterNotification:', error);
+             }
+         }
+         
+         // Clear Log History Function
+         function clearLogHistory() {
+             // SweetAlert konfirmasi dengan style yang konsisten
+             Swal.fire({
+                 title: 'Konfirmasi Hapus Riwayat',
+                 text: 'Apakah Anda yakin ingin menghapus semua riwayat aktivitas pembimbing ini? Tindakan ini tidak dapat dibatalkan.',
+                 icon: 'warning',
+                 showCancelButton: true,
+                 confirmButtonColor: '#dc3545',
+                 cancelButtonColor: '#6c757d',
+                 confirmButtonText: 'Ya, Hapus!',
+                 cancelButtonText: 'Batal',
+                 reverseButtons: true
+             }).then((result) => {
+                 if (result.isConfirmed) {
+                     // Show loading state
+                     const btn = $('#clearLogBtn');
+                     const originalText = btn.html();
+                     btn.prop('disabled', true).html('<i class="bi bi-hourglass-split me-1"></i>Menghapus...');
+                     
+                     // Get pembimbing ID from URL or data attribute
+                     const pembimbingId = new URLSearchParams(window.location.search).get('id') || 
+                                         $('[data-pembimbing-id]').data('pembimbing-id');
+                     
+                     if (!pembimbingId) {
+                         Swal.fire({
+                             icon: 'error',
+                             title: 'Error!',
+                             text: 'ID Pembimbing tidak ditemukan!',
+                             confirmButtonText: 'OK'
+                         });
+                         btn.prop('disabled', false).html(originalText);
+                         return;
+                     }
+                     
+                     // Show loading SweetAlert
+                     Swal.fire({
+                         title: 'Menghapus Riwayat...',
+                         text: 'Sedang menghapus log aktivitas dan session',
+                         allowOutsideClick: false,
+                         didOpen: () => {
+                             Swal.showLoading();
+                         }
+                     });
+                     
+                     // Send AJAX request to clear logs
+                     $.ajax({
+                         url: '/admin/clear_pembimbing_logs',
+                         method: 'POST',
+                         data: {
+                             pembimbing_id: pembimbingId
+                         },
+                         success: function(response) {
+                             if (response.success) {
+                                 // Show success message
+                                 Swal.fire({
+                                     icon: 'success',
+                                     title: 'Berhasil!',
+                                     text: response.message,
+                                     timer: 2000,
+                                     showConfirmButton: false
+                                 }).then(() => {
+                                     // Reload page to show empty state
+                                     location.reload();
+                                 });
+                             } else {
+                                 // Show error message
+                                 Swal.fire({
+                                     icon: 'error',
+                                     title: 'Gagal!',
+                                     text: response.message || 'Terjadi kesalahan saat menghapus riwayat',
+                                     confirmButtonText: 'OK'
+                                 });
+                             }
+                         },
+                         error: function(xhr, status, error) {
+                             console.error('Error clearing logs:', error);
+                             Swal.fire({
+                                 icon: 'error',
+                                 title: 'Error!',
+                                 text: 'Terjadi kesalahan saat menghapus riwayat aktivitas',
+                                 confirmButtonText: 'OK'
+                             });
+                         },
+                         complete: function() {
+                             // Reset button state
+                             btn.prop('disabled', false).html(originalText);
+                         }
+                     });
+                 }
+             });
+         }
+    </script>
+</body>
+
+</html>
+

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-logdaf.css') }}">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700&display=swap');
+
+        /* Base Styles */
+        body {
+            font-family: 'Baloo 2', Arial, sans-serif;
+            font-size: 1.1rem;
+            background: url('{{ url_for('static', filename='lodaf/bg.svg') }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Login Container */
+        .login-box {
+            padding: 50px;
+            margin: 0;
+            width: 100%;
+            height: 100vh;
+            border-radius: 0;
+        }
+
+        /* Logo Styles */
+        .logo {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .logo img {
+            max-height: 120px;
+            width: auto;
+        }
+
+        /* Header */
+        .header-title {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 8px;
+            font-size: 2.1rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #222;
+        }
+
+        .sub-header-title {
+            text-align: center;
+            margin-bottom: 28px;
+            font-size: 1.15rem;
+            color: #555;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+
+        /* Form Styles */
+        .login-form {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .login-form .form-control {
+            border-radius: 8px;
+            margin-bottom: 30px;
+            padding: 16px 18px;
+            font-size: 1.1rem;
+        }
+
+        .login-form .form-group {
+            position: relative;
+        }
+
+        .login-form .form-group .forgot-password {
+            position: absolute;
+            top: 6px;
+            right: 15px;
+        }
+
+        .login-form .btn {
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            padding: 16px 30px;
+            font-size: 1.15rem;
+        }
+
+        .login-form .btn.btn-primary {
+            background: #28a15a;
+            border-color: #28a15a;
+        }
+
+        .login-form .btn.btn-primary:hover, .login-form .btn.btn-primary:focus {
+            background: #21864a;
+            border-color: #21864a;
+        }
+
+        /* Password Toggle Button */
+        .input-group .btn-outline-secondary {
+            border-color: #ced4da;
+            color: #6c757d;
+        }
+
+        .input-group .btn-outline-secondary:hover {
+            background-color: #e9ecef;
+            border-color: #ced4da;
+            color: #495057;
+        }
+
+        .input-group .form-control {
+            border-right: 0;
+        }
+
+        .input-group .btn {
+            border-left: 0;
+        }
+
+        /* Carousel Styles */
+        .slider-feature-card {
+            background: #fff;
+            max-width: 280px;
+            margin: 0 auto;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 2px 25px -3px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+        }
+
+        .slider-feature-card img {
+            height: 80px;
+            margin: 30px 0;
+        }
+
+        .slider-feature-card h3,
+        .slider-feature-card p {
+            margin-bottom: 30px;
+        }
+
+        .slider-feature-card p {
+            font-size: 1.08rem;
+        }
+
+        .carousel-indicators {
+            bottom: -50px;
+        }
+
+        .carousel-indicators li {
+            cursor: pointer;
+        }
+
+        .carousel-inner {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        /* Responsive */
+        @media only screen and (max-width: 767px) {
+            .hide-on-mobile {
+                display: none;
+            }
+            .logo {
+                font-size: 28px;
+                margin-bottom: 10px;
+            }
+            .logo img {
+                max-height: 70px;
+            }
+            .login-box {
+                padding: 18px 4vw;
+                height: auto;
+            }
+            .login-form {
+                max-width: 100%;
+            }
+            .login-form .form-control {
+                font-size: 1.15rem;
+                padding: 14px 12px;
+            }
+            .login-form .btn {
+                font-size: 1.18rem;
+                padding: 14px 0;
+            }
+            .header-title {
+                font-size: 1.5rem;
+            }
+            .sub-header-title {
+                font-size: 1.05rem;
+                margin-bottom: 20px;
+            }
+        }
+        
+        @media only screen and (max-width: 576px) {
+            .login-box {
+                padding: 15px 3vw;
+            }
+            .logo img {
+                max-height: 60px;
+            }
+            .header-title {
+                font-size: 1.25rem;
+            }
+            .sub-header-title {
+                font-size: 0.95rem;
+                margin-bottom: 15px;
+            }
+            .login-form .form-control {
+                font-size: 1rem;
+                padding: 12px 10px;
+            }
+            .login-form .btn {
+                font-size: 1rem;
+                padding: 12px 0;
+            }
+        }
+        
+        @media only screen and (max-width: 480px) {
+            .login-box {
+                padding: 10px 2vw;
+            }
+            .logo img {
+                max-height: 50px;
+            }
+            .header-title {
+                font-size: 1.1rem;
+            }
+            .sub-header-title {
+                font-size: 0.85rem;
+                margin-bottom: 10px;
+            }
+            .login-form .form-control {
+                font-size: 0.9rem;
+                padding: 10px 8px;
+            }
+            .login-form .btn {
+                font-size: 0.9rem;
+                padding: 10px 0;
+            }
+        }
+        
+        /* Responsive SweetAlert */
+        .swal2-responsive {
+            font-size: 0.875rem !important;
+            padding: 1rem !important;
+        }
+        
+        .swal2-title-responsive {
+            font-size: 1.25rem !important;
+        }
+        
+        .swal2-content-responsive {
+            font-size: 0.875rem !important;
+        }
+        
+        @media only screen and (max-width: 576px) {
+            .swal2-responsive {
+                font-size: 0.8rem !important;
+                padding: 0.75rem !important;
+            }
+            
+            .swal2-title-responsive {
+                font-size: 1.1rem !important;
+            }
+            
+            .swal2-content-responsive {
+                font-size: 0.8rem !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-box">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="logo">
+                    <img src="{{ url_for('static', filename='lodaf/unjaya.png') }}" alt="Logo">
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Header dan Subheader -->
+            <div class="col-sm-6">
+                <h3 class="header-title">PORTAL ACHMAD YANI MUDAPRENEUR</h3>
+                <div class="sub-header-title">Universitas Jenderal Achmad Yani Yogyakarta</div>
+                <form class="login-form" id="loginForm">
+    
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="nim" id="nim" placeholder="NIM/Nama/NIP" required>
+                    </div>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Kata Sandi" required>
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                <i class="fas fa-eye" id="eyeIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Masuk Sekarang</button>
+                    </div>
+                    <div class="form-group">
+                        <div class="text-center">Belum punya akun? <a href="{{ url_for('daftar') }}">Daftar Dulu</a></div>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Carousel -->
+            <div class="col-sm-6 hide-on-mobile">
+                <div id="demo" class="carousel slide" data-ride="carousel">
+                    <!-- Indicators -->
+                    <ul class="carousel-indicators">
+                        <li data-target="#demo" data-slide-to="0" class="active"></li>
+                        <li data-target="#demo" data-slide-to="1"></li>
+                    </ul>
+                    
+                    <!-- Slideshow -->
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <div class="slider-feature-card">
+                                <i class="fas fa-wallet fa-3x" style="color:#28a15a; margin:30px 0;"></i>
+                                <h3 class="slider-title">Manajemen Keuangan Mudah</h3>
+                                <p class="slider-description">Kelola keuangan Anda secara efisien dan transparan.</p>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="slider-feature-card">
+                                <i class="fas fa-chart-line fa-3x" style="color:#28a15a; margin:30px 0;"></i>
+                                <h3 class="slider-title">Alat Bantu Andal</h3>
+                                <p class="slider-description">Solusi praktis untuk manajemen keuangan berbasis web.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Controls -->
+                    <a class="carousel-control-prev" href="#demo" data-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </a>
+                    <a class="carousel-control-next" href="#demo" data-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function(e) {
+            e.preventDefault();
+            const passwordField = document.getElementById('password');
+            const eyeIcon = document.getElementById('eyeIcon');
+            
+            // Toggle password visibility
+            const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordField.setAttribute('type', type);
+            
+            // Toggle icon
+            if (type === 'text') {
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        });
+
+        // Handle form submission dengan AJAX
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const loginBtn = document.getElementById('loginBtn');
+            const originalText = loginBtn.textContent;
+            
+            // Disable button dan ubah text
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Memproses...';
+            
+            const formData = new FormData(this);
+            
+            fetch('/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+    
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Login Berhasil!',
+                        text: data.message,
+                        timer: 1500,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'swal2-responsive',
+                            title: 'swal2-title-responsive',
+                            content: 'swal2-content-responsive'
+                        }
+                    }).then(() => {
+                        window.location.href = data.redirect;
+                    });
+                } else {
+                    // Tentukan icon dan warna berdasarkan jenis error
+                    let icon = 'error';
+                    let color = '#d33';
+                    
+                    if (data.message.includes('tidak ditemukan')) {
+                        icon = 'warning';
+                        color = '#f39c12';
+                    } else if (data.message.includes('Password yang Anda masukkan salah')) {
+                        icon = 'error';
+                        color = '#e74c3c';
+                    }
+                    
+                    Swal.fire({
+                        icon: icon,
+                        title: 'Login Gagal!',
+                        text: data.message,
+                        confirmButtonColor: color,
+                        confirmButtonText: 'Coba Lagi',
+                        customClass: {
+                            popup: 'swal2-responsive',
+                            title: 'swal2-title-responsive',
+                            content: 'swal2-content-responsive'
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan!',
+                    text: 'Koneksi bermasalah. Silakan refresh halaman.',
+                    confirmButtonColor: '#d33',
+                    customClass: {
+                        popup: 'swal2-responsive',
+                        title: 'swal2-title-responsive',
+                        content: 'swal2-content-responsive'
+                    }
+                });
+            })
+            .finally(() => {
+                // Re-enable button dan kembalikan text
+                loginBtn.disabled = false;
+                loginBtn.textContent = originalText;
+            });
+        });
+    </script>
+
+</body>
+
+</html>

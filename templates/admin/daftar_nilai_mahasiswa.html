@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Nilai Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            }
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-circle.btn-primary {
+            background: #435ebe;
+            color: white;
+        }
+        .btn-circle.btn-primary:hover {
+            background: #2c3e50;
+            color: white;
+        }
+        .btn-circle.btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-circle.btn-secondary:hover {
+            background: #495057;
+            color: white;
+        }
+        .btn-circle.btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-circle.btn-info:hover {
+            background: #138496;
+            color: white;
+        }
+        .btn-circle.btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-circle.btn-warning:hover {
+            background: #e0a800;
+            color: #212529;
+        }
+        .btn-circle.btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-circle.btn-success:hover {
+            background: #218838;
+            color: white;
+        }
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1.1rem;
+            line-height: 40px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+        .table th, .table td {
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        
+        /* Clean table styling untuk modal penilaian mahasiswa */
+        #admMhsTableSesi {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        #admMhsTableSesi thead th {
+            background-color: #f8f9fa;
+            border: none;
+            border-bottom: 1px solid #dee2e6;
+            color: #495057;
+            font-weight: 600;
+            padding: 12px 8px;
+        }
+        
+        #admMhsTableSesi tbody td {
+            border: none;
+            border-bottom: 1px solid #f1f3f4;
+            padding: 12px 8px;
+            vertical-align: middle;
+        }
+        
+        #admMhsTableSesi tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        #admMhsTableSesi tfoot th {
+            background-color: #f8f9fa;
+            border: none;
+            border-top: 2px solid #dee2e6;
+            color: #495057;
+            font-weight: 600;
+            padding: 12px 8px;
+        }
+        
+        /* Clean badge untuk status sesi */
+        .sesi-badge {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            min-width: 40px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .sesi-badge.locked {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border-color: #6c757d;
+        }
+        
+        .sesi-badge.unlocked {
+            background-color: #f8f9fa;
+            color: #ffc107;
+            border-color: #ffc107;
+        }
+        
+        .sesi-badge.empty {
+            background-color: #f8f9fa;
+            color: #adb5bd;
+            border-color: #dee2e6;
+        }
+        
+        /* Status text yang lebih subtle */
+        .status-text {
+            font-size: 0.75rem;
+            color: #6c757d;
+            margin-top: 4px;
+            display: block;
+        }
+        @media (max-width: 1200px) {
+            .table th, .table td {
+                font-size: 0.85rem;
+                padding: 7px 3px;
+            }
+        }
+        
+                @media (max-width: 768px) {
+            .table th, .table td {
+                font-size: 0.8rem;
+                padding: 5px 2px;
+            }
+            
+
+            
+
+        
+
+            
+            .page-title h3 {
+                font-size: 1.5rem;
+            }
+            
+            .page-title .text-subtitle {
+                font-size: 1rem !important;
+            }
+            
+            .card {
+                padding: 16px 12px 8px 12px !important;
+            }
+            
+            .table-responsive {
+                font-size: 0.75rem;
+            }
+            
+            .badge {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .table th, .table td {
+                font-size: 0.75rem;
+                padding: 4px 1px;
+            }
+            
+            .page-title h3 {
+                font-size: 1.3rem;
+            }
+            
+            .page-title .text-subtitle {
+                font-size: 0.9rem !important;
+            }
+            
+            .card {
+                padding: 12px 8px 6px 8px !important;
+            }
+            
+            .table-responsive {
+                font-size: 0.7rem;
+            }
+            
+            .badge {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.4rem;
+            }
+            
+            .table td small {
+                font-size: 0.7rem;
+            }
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+        .judul-usaha {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .judul-usaha:hover {
+            white-space: normal;
+            word-wrap: break-word;
+        }
+        
+        /* Styling untuk badge nilai - Clean design */
+        .badge {
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.4rem 0.7rem;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .badge.bg-success {
+            background-color: #f8f9fa !important;
+            color: #28a745 !important;
+            border-color: #28a745;
+        }
+        
+        .badge.bg-warning {
+            background-color: #f8f9fa !important;
+            color: #ffc107 !important;
+            border-color: #ffc107;
+        }
+        
+        .badge.bg-danger {
+            background-color: #f8f9fa !important;
+            color: #dc3545 !important;
+            border-color: #dc3545;
+        }
+        
+        .badge.bg-secondary {
+            background-color: #f8f9fa !important;
+            color: #6c757d !important;
+            border-color: #6c757d;
+        }
+        
+        /* Styling untuk tombol aksi btn-circle */
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-circle.btn-primary {
+            background: #435ebe;
+            color: white;
+        }
+        .btn-circle.btn-primary:hover {
+            background: #2c3e50;
+            color: white;
+        }
+        .btn-circle.btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        .btn-circle.btn-info:hover {
+            background: #138496;
+            color: white;
+        }
+        .btn-circle.btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        .btn-circle.btn-warning:hover {
+            background: #e0a800;
+            color: #212529;
+        }
+        .btn-circle.btn-success {
+            background: #28a745;
+            color: white;
+        }
+        .btn-circle.btn-success:hover {
+            background: #218838;
+            color: white;
+        }
+        
+        /* Modal styling untuk konsistensi - Clean design */
+        #modalAdmPenilaianMhs .modal-header,
+        #modalAdmPenilaianProposal .modal-header,
+        #modalAdmPenilaianKemajuan .modal-header,
+        #modalAdmPenilaianAkhir .modal-header {
+            border-bottom: 1px solid #e9ecef;
+            background-color: #f8f9fa;
+        }
+        #modalAdmPenilaianMhs .modal-title,
+        #modalAdmPenilaianProposal .modal-title,
+        #modalAdmPenilaianKemajuan .modal-title,
+        #modalAdmPenilaianAkhir .modal-title {
+            color: #495057;
+            font-weight: 600;
+        }
+        #modalAdmPenilaianMhs .modal-footer,
+        #modalAdmPenilaianProposal .modal-footer,
+        #modalAdmPenilaianKemajuan .modal-footer,
+        #modalAdmPenilaianAkhir .modal-footer {
+            border-top: 1px solid #e9ecef;
+            background-color: #f8f9fa;
+        }
+        #modalAdmPenilaianMhs .card.bg-light,
+        #modalAdmPenilaianProposal .card.bg-light,
+        #modalAdmPenilaianKemajuan .card.bg-light,
+        #modalAdmPenilaianAkhir .card.bg-light {
+            border: 1px solid #e9ecef;
+            background-color: #ffffff !important;
+        }
+        #modalAdmPenilaianMhs .comment-header,
+        #modalAdmPenilaianProposal .comment-header,
+        #modalAdmPenilaianKemajuan .comment-header,
+        #modalAdmPenilaianAkhir .comment-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            color: #495057;
+        }
+        #modalAdmPenilaianMhs .comment-card,
+        #modalAdmPenilaianProposal .comment-card,
+        #modalAdmPenilaianKemajuan .comment-card,
+        #modalAdmPenilaianAkhir .comment-card {
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            background-color: #ffffff;
+        }
+        
+        /* Styling untuk list group di modal */
+        .list-group-item {
+            border-left: none;
+            border-right: none;
+            border-radius: 0;
+        }
+        
+        .list-group-item:first-child {
+            border-top: none;
+        }
+        
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+        
+        .list-group-item strong {
+            color: #435ebe;
+            font-weight: 600;
+        }
+        
+        /* Styling untuk Quill content */
+        .quill-content {
+            font-family: 'Nunito', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .quill-content p {
+            margin-bottom: 0.75rem;
+        }
+        
+        .quill-content p:last-child {
+            margin-bottom: 0;
+        }
+        
+        .quill-content strong, .quill-content b {
+            font-weight: 600;
+            color: #435ebe;
+        }
+        
+        .quill-content em, .quill-content i {
+            font-style: italic;
+            color: #6c757d;
+        }
+        
+        .quill-content ul, .quill-content ol {
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+        }
+        
+        .quill-content li {
+            margin-bottom: 0.25rem;
+        }
+        
+        .quill-content blockquote {
+            border-left: 4px solid #435ebe;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            font-style: italic;
+            color: #6c757d;
+        }
+        
+        .quill-content h1, .quill-content h2, .quill-content h3, 
+        .quill-content h4, .quill-content h5, .quill-content h6 {
+            color: #435ebe;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+
+        
+        /* Styling untuk tombol aksi di mobile */
+        @media (max-width: 768px) {
+            .table td .d-flex.gap-2 {
+                gap: 0.25rem !important;
+            }
+            
+            .btn-circle {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .table td .d-flex.gap-2 {
+                gap: 0.125rem !important;
+            }
+            
+            .btn-circle {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+        }
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+        
+
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-pembimbing.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('admin.das_admin') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.das_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.admin_daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Mahasiswa</span>
+                            </a>
+                            <ul class="submenu">
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('admin.mahasiswa_belum_diverifikasi') }}">Belum Diverifikasi</a>
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('admin.mahasiswa_sudah_diverifikasi') }}">Sudah Diverifikasi</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi-bar-chart-line"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-clock-history"></i>
+                                <span>Log Aktivitas</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_mahasiswa') }}">Mahasiswa</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_pembimbing') }}">Pembimbing</a> 
+                                </li>
+                                
+                            </ul>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('admin.daftar_nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-award"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.pengajuan_proposal') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Pengajuan Proposal</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_kemajuan') }}" class='sidebar-link'>
+                                <i class="bi bi-graph-up"></i>
+                                <span>Laporan Kemajuan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_akhir') }}" class='sidebar-link'>
+                                <i class="bi bi-clipboard-data"></i>
+                                <span>Laporan Akhir</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Pembimbing</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.reviewer') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Reviewer</span>
+                            </a>
+                                </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.data_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Admin</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.pengaturan') }}" class='sidebar-link'>
+                                <i class="bi bi-gear"></i>
+                                <span>Pengaturan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Daftar Nilai Mahasiswa</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">
+                                Rekap nilai Mahasiswa, Proposal, Laporan Kemajuan, dan Laporan Akhir di AYMP UNJAYA.
+                            </p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('admin.das_admin') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Daftar Nilai Mahasiswa</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <div class="card" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h5 style="font-weight:700;font-size:1.25rem;color:#435ebe;">
+                                        <i class="bi bi-list-check me-2"></i>Daftar Nilai Mahasiswa
+                                    </h5>
+                                    <p class="text-muted mb-0">Rekap nilai Mahasiswa, Proposal, Laporan Kemajuan, dan Laporan Akhir</p>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="tableAdminNilai">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama</th>
+                                            <th>Judul Usaha</th>
+                                            <th>Nilai Mahasiswa</th>
+                                            <th>Nilai Proposal</th>
+                                            <th>Nilai Kemajuan</th>
+                                            <th>Nilai Akhir</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Modal: Detail Penilaian Mahasiswa -->
+                        <div class="modal fade" id="modalAdmPenilaianMhs" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"><i class="fas fa-user-graduate me-2"></i>Detail Penilaian Mahasiswa</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="card bg-light">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title text-primary"><i class="fas fa-id-card me-2"></i>Informasi Mahasiswa</h6>
+                                                        <p class="mb-1"><strong>Nama:</strong> <span id="admMhsNama">-</span></p>
+                                                        <p class="mb-1"><strong>NIM:</strong> <span id="admMhsNim">-</span></p>
+                                                        <p class="mb-1"><strong>Program Studi:</strong> <span id="admMhsProdi">-</span></p>
+                                                        <p class="mb-0"><strong>Judul Usaha:</strong> <span id="admMhsJudul">-</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card bg-light border-0">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title"><i class="fas fa-award me-2"></i>Hasil Penilaian</h6>
+                                                        <h3 class="mb-0 text-success" id="admMhsNilaiAkhir">0</h3>
+                                                        <small>Nilai Akhir (%)</small>
+                                                        <div class="mt-2">
+                                                            <small class="text-muted">
+                                                                <span id="admMhsTotalBobotDisplay">Total Bobot: 0</span> | 
+                                                                <span id="admMhsTotalNilaiDisplay">Total Nilai: 0</span>
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Tabel dengan kolom sesi -->
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered" id="admMhsTableSesi">
+                                                <thead class="table-light" id="admMhsTableHeader">
+                                                    <!-- Header akan diisi dinamis -->
+                                                </thead>
+                                                <tbody id="admMhsDetail"></tbody>
+                                                <tfoot id="admMhsTableFooter">
+                                                    <!-- Footer akan diisi dinamis -->
+                                                </tfoot>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal: Detail Penilaian Proposal -->
+                        <div class="modal fade" id="modalAdmPenilaianProposal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"><i class="fas fa-file-alt me-2"></i>Detail Penilaian Proposal</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="card bg-light">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title text-primary"><i class="fas fa-id-card me-2"></i>Informasi Mahasiswa</h6>
+                                                        <p class="mb-1"><strong>Nama:</strong> <span id="admPropNama">-</span></p>
+                                                        <p class="mb-1"><strong>NIM:</strong> <span id="admPropNim">-</span></p>
+                                                        <p class="mb-0"><strong>Judul Usaha:</strong> <span id="admPropJudul">-</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card bg-light border-0">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title"><i class="fas fa-award me-2"></i>Hasil Penilaian</h6>
+                                                        <h3 class="mb-0 text-success" id="admPropNilaiAkhir">0</h3>
+                                                        <small>Nilai Akhir</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th style="width:6%">No</th>
+                                                        <th>Pertanyaan</th>
+                                                        <th style="width:12%">Bobot</th>
+                                                        <th style="width:12%">Skor</th>
+                                                        <th style="width:12%">Nilai</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="admPropDetail"></tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th colspan="2" class="text-center">TOTAL</th>
+                                                        <th id="admPropTotalBobot">0</th>
+                                                        <th id="admPropTotalSkor">0</th>
+                                                        <th id="admPropTotalNilai">0</th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                        <div class="card comment-card mt-3">
+                                            <div class="card-header comment-header"><h6 class="mb-0"><i class="fas fa-comment-dots me-2"></i>Catatan Reviewer</h6></div>
+                                            <div class="card-body">
+                                                <div id="admPropCatatan" class="quill-content">-</div>
+                                            </div>
+                                        </div>
+                                        <div class="card comment-card mt-3">
+                                            <div class="card-header comment-header"><h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Rekomendasi Nilai Bantuan</h6></div>
+                                            <div class="card-body"><p id="admPropRekom" class="mb-0">-</p></div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal: Detail Penilaian Laporan Kemajuan -->
+                        <div class="modal fade" id="modalAdmPenilaianKemajuan" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"><i class="fas fa-chart-line me-2"></i>Detail Penilaian Laporan Kemajuan</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="card bg-light">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title text-primary"><i class="fas fa-id-card me-2"></i>Informasi Mahasiswa</h6>
+                                                        <p class="mb-1"><strong>Nama:</strong> <span id="admKemNama">-</span></p>
+                                                        <p class="mb-1"><strong>NIM:</strong> <span id="admKemNim">-</span></p>
+                                                        <p class="mb-0"><strong>Judul Usaha:</strong> <span id="admKemJudul">-</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card bg-light border-0">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title"><i class="fas fa-award me-2"></i>Hasil Penilaian</h6>
+                                                        <h3 class="mb-0 text-success" id="admKemNilaiAkhir">0</h3>
+                                                        <small>Nilai Akhir</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th style="width:6%">No</th>
+                                                        <th>Pertanyaan</th>
+                                                        <th style="width:12%">Bobot</th>
+                                                        <th style="width:12%">Skor</th>
+                                                        <th style="width:12%">Nilai</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="admKemDetail"></tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th colspan="2" class="text-center">TOTAL</th>
+                                                        <th id="admKemTotalBobot">0</th>
+                                                        <th id="admKemTotalSkor">0</th>
+                                                        <th id="admKemTotalNilai">0</th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                        <div class="card comment-card mt-3">
+                                            <div class="card-header comment-header"><h6 class="mb-0"><i class="fas fa-comment-dots me-2"></i>Catatan Reviewer</h6></div>
+                                            <div class="card-body">
+                                                <div id="admKemCatatan" class="quill-content">-</div>
+                                            </div>
+                                        </div>
+                                        <div class="card comment-card mt-3">
+                                            <div class="card-header comment-header"><h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Rekomendasi Pendanaan</h6></div>
+                                            <div class="card-body"><p id="admKemRekom" class="mb-0">-</p></div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal: Detail Penilaian Laporan Akhir -->
+                        <div class="modal fade" id="modalAdmPenilaianAkhir" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title"><i class="fas fa-flag-checkered me-2"></i>Detail Penilaian Laporan Akhir</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <div class="card bg-light">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title text-primary"><i class="fas fa-id-card me-2"></i>Informasi Mahasiswa</h6>
+                                                        <p class="mb-1"><strong>Nama:</strong> <span id="admAkhNama">-</span></p>
+                                                        <p class="mb-1"><strong>NIM:</strong> <span id="admAkhNim">-</span></p>
+                                                        <p class="mb-0"><strong>Judul Usaha:</strong> <span id="admAkhJudul">-</span></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card bg-light border-0">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title"><i class="fas fa-award me-2"></i>Hasil Penilaian</h6>
+                                                        <h3 class="mb-0 text-success" id="admAkhNilaiAkhir">0</h3>
+                                                        <small>Nilai Akhir</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th style="width:6%">No</th>
+                                                        <th>Pertanyaan</th>
+                                                        <th style="width:12%">Bobot</th>
+                                                        <th style="width:12%">Skor</th>
+                                                        <th style="width:12%">Nilai</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="admAkhDetail"></tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <th colspan="2" class="text-center">TOTAL</th>
+                                                        <th id="admAkhTotalBobot">0</th>
+                                                        <th id="admAkhTotalSkor">0</th>
+                                                        <th id="admAkhTotalNilai">0</th>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                        <div class="card comment-card mt-3">
+                                            <div class="card-header comment-header"><h6 class="mb-0"><i class="fas fa-comment-dots me-2"></i>Catatan Reviewer</h6></div>
+                                            <div class="card-body">
+                                                <div id="admAkhCatatan" class="quill-content">-</div>
+                                            </div>
+                                        </div>
+                                        <div class="card comment-card mt-3">
+                                            <div class="card-header comment-header"><h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Rekomendasi Kelulusan</h6></div>
+                                            <div class="card-body"><p id="admAkhRekom" class="mb-0">-</p></div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+
+    <script>
+        $(document).ready(function() {
+            const table = $("#tableAdminNilai").DataTable({
+                language: {
+                    "sProcessing":   "Sedang memproses...",
+                    "sLengthMenu":   "Tampilkan _MENU_ data",
+                    "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                    "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                    "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                    "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Cari:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "Pertama",
+                        "sPrevious": "Sebelumnya",
+                        "sNext":     "Selanjutnya",
+                        "sLast":     "Terakhir"
+                    },
+                    "oAria": {
+                        "sSortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                        "sSortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                    }
+                },
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
+                columnDefs: [
+                    { targets: [0, 7], orderable: false, searchable: false }
+                ],
+                order: [[1, 'asc']]
+            });
+
+            // Load data
+            loadAdminNilai();
+
+            function badgeByScore(x) {
+                if (x >= 75) return 'success';
+                if (x >= 60) return 'warning';
+                if (x > 0) return 'danger';
+                return 'secondary';
+            }
+
+            function loadAdminNilai() {
+                $.getJSON('{{ url_for("admin.admin_get_daftar_nilai_mahasiswa") }}', function(resp) {
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    console.error('AJAX Error:', textStatus, errorThrown);
+                    table.clear().draw();
+                    table.row.add([1, '<div class="text-center text-muted"><i class="bi bi-exclamation-triangle me-2"></i>Gagal memuat data</div>', '', '', '', '', '', '']).draw();
+                }).done(function(resp) {
+                    if (!resp.success) {
+                        console.error(resp.message);
+                        table.clear().draw();
+                        table.row.add([1, '<div class="text-center text-muted"><i class="bi bi-exclamation-triangle me-2"></i>Gagal memuat data</div>', '', '', '', '', '', '']).draw();
+                        return;
+                    }
+                    table.clear();
+                    resp.data.forEach((row, idx) => {
+                        const nama = `<div><strong>${row.nama_mahasiswa}</strong><br><small class="text-muted">NIM: ${row.nim}</small></div>`;
+                        const judul = `<div class="judul-usaha" title="${row.judul_usaha}">${row.judul_usaha}</div>`;
+                        const nMhs = `<span class="badge bg-${badgeByScore(row.nilai_mahasiswa)}">${Math.round(row.nilai_mahasiswa)}</span>`;
+                        const nProp = `<span class="badge bg-${badgeByScore(row.nilai_proposal)}">${Math.round(row.nilai_proposal)}</span><br><small class="text-muted">Bantuan: Rp ${(row.nilai_bantuan || 0).toLocaleString('id-ID')}</small>`;
+                        const nKem = `<span class="badge bg-${badgeByScore(row.nilai_kemajuan)}">${Math.round(row.nilai_kemajuan)}</span><br><small class="text-muted">${row.rekomendasi_pendanaan || '-'}</small>`;
+                        const nAkh = `<span class="badge bg-${badgeByScore(row.nilai_akhir)}">${Math.round(row.nilai_akhir)}</span><br><small class="text-muted">${row.rekomendasi_kelulusan || '-'}</small>`;
+                        const aksi = `
+                            <div class="d-flex gap-2">
+                                <button class="btn-circle btn-primary" title="Penilaian Mahasiswa" data-nim="${row.nim}" onclick="admShowMhs(this)"><i class="bi bi-person-check"></i></button>
+                                <button class="btn-circle btn-info" title="Penilaian Proposal" data-prop="${row.proposal_id}" onclick="admShowProp(this)"><i class="bi bi-file-earmark-text"></i></button>
+                                <button class="btn-circle btn-warning" title="Penilaian Kemajuan" data-prop="${row.proposal_id}" onclick="admShowKem(this)"><i class="bi bi-graph-up"></i></button>
+                                <button class="btn-circle btn-success" title="Penilaian Akhir" data-prop="${row.proposal_id}" onclick="admShowAkh(this)"><i class="bi bi-flag"></i></button>
+                            </div>`;
+                        table.row.add([idx+1, nama, judul, nMhs, nProp, nKem, nAkh, aksi]);
+                    });
+                    table.draw();
+                });
+            }
+
+            window.admShowMhs = function(btn) {
+                const nim = $(btn).data('nim');
+                $.getJSON('{{ url_for("admin.get_admin_detail_penilaian_mahasiswa") }}', { nim }, function(resp){
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    // Tampilkan modal dengan pesan error yang informatif
+                    $('#admMhsNama').text('Data tidak tersedia');
+                    $('#admMhsNim').text(nim);
+                    $('#admMhsProdi').text('Data tidak tersedia');
+                    $('#admMhsJudul').text('Data tidak tersedia');
+                    $('#admMhsNilaiAkhir').text('0');
+                    
+                    // Reset display
+                    $('#admMhsTotalBobotDisplay').text('Total Bobot: 0');
+                    $('#admMhsTotalNilaiDisplay').text('Total Nilai: 0');
+                    
+                    // Kosongkan tabel detail
+                    let tb = $('#admMhsDetail'); 
+                    tb.empty();
+                    tb.append(`<tr><td colspan="5" class="text-center text-danger">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Error:</strong> Gagal memuat data penilaian mahasiswa<br>
+                        <small>Detail: ${textStatus} - ${errorThrown}</small>
+                    </td></tr>`);
+                    
+                    $('#modalAdmPenilaianMhs').modal('show');
+                }).done(function(resp){
+                    if (!resp.success) {
+                        // Tampilkan modal dengan pesan error yang informatif
+                        $('#admMhsNama').text('Data tidak tersedia');
+                        $('#admMhsNim').text(nim);
+                        $('#admMhsProdi').text('Data tidak tersedia');
+                        $('#admMhsJudul').text('Data tidak tersedia');
+                        $('#admMhsNilaiAkhir').text('0');
+                        
+                        // Reset display
+                        $('#admMhsTotalBobotDisplay').text('Total Bobot: 0');
+                        $('#admMhsTotalNilaiDisplay').text('Total Nilai: 0');
+                        
+                        // Kosongkan tabel detail
+                        let tb = $('#admMhsDetail'); 
+                        tb.empty();
+                        tb.append(`<tr><td colspan="5" class="text-center text-muted">
+                            <i class="bi bi-info-circle me-2"></i>
+                            ${resp.message}
+                        </td></tr>`);
+                        
+                        $('#modalAdmPenilaianMhs').modal('show');
+                        return;
+                    }
+                    
+                    const d = resp.data;
+                    
+                    // Update info mahasiswa
+                    $('#admMhsNama').text(d.mahasiswa.nama_mahasiswa);
+                    $('#admMhsNim').text(d.mahasiswa.nim_mahasiswa);
+                    $('#admMhsProdi').text(d.mahasiswa.program_studi || '-');
+                    $('#admMhsJudul').text(d.mahasiswa.judul_usaha);
+                    $('#admMhsNilaiAkhir').text(Math.round(parseFloat(d.penilaian.nilai_akhir)));
+                    
+                    // Update display total
+                    $('#admMhsTotalBobotDisplay').text(`Total Bobot: ${d.penilaian.total_bobot.toFixed(1)}`);
+                    $('#admMhsTotalNilaiDisplay').text(`Total Nilai: ${d.penilaian.total_nilai.toFixed(2)}`);
+                    
+                    // Debug: Log data jadwal untuk memastikan data diterima
+                    console.log('Jadwal info received:', d.jadwal_info);
+                    console.log('Detail penilaian:', d.detail_penilaian);
+                    
+                    // Render tabel dengan sesi
+                    renderMhsTableWithSesi(d);
+                    
+                    $('#modalAdmPenilaianMhs').modal('show');
+                });
+            }
+            
+            // Fungsi untuk render tabel dengan kolom sesi dan kategori
+            function renderMhsTableWithSesi(data) {
+                const kategoriList = data.detail_penilaian || [];
+                const jadwalInfo = data.jadwal_info || {};
+                
+                // Debug: Log data yang akan di-render
+                console.log('Rendering table with data:', { kategoriList, jadwalInfo });
+                
+                // Validasi data jadwal
+                if (!jadwalInfo || !jadwalInfo.interval_tipe || !jadwalInfo.jam_mulai || !jadwalInfo.jam_selesai) {
+                    console.error('Data jadwal tidak lengkap:', jadwalInfo);
+                    $('#admMhsDetail').html(`
+                        <tr><td colspan="5" class="text-center text-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Error:</strong> Data jadwal tidak lengkap dari database!<br>
+                            <small>Silakan hubungi admin untuk mengatur jadwal dengan benar.</small>
+                        </td></tr>
+                    `);
+                    return;
+                }
+                
+                if (kategoriList.length === 0) {
+                    $('#admMhsDetail').html(`
+                        <tr><td colspan="5" class="text-center text-muted">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Tidak ada data penilaian
+                        </td></tr>
+                    `);
+                    return;
+                }
+                
+                // Hitung max sesi dari semua pertanyaan di semua kategori
+                let maxSesi = 1;
+                kategoriList.forEach(kategori => {
+                    kategori.pertanyaan_list.forEach(pertanyaan => {
+                        const sesiKeys = Object.keys(pertanyaan.sesi_data || {});
+                        if (sesiKeys.length > 0) {
+                            maxSesi = Math.max(maxSesi, Math.max(...sesiKeys.map(Number)));
+                        }
+                    });
+                });
+                
+                console.log('Max sesi calculated:', maxSesi);
+                
+                // Render header dengan kolom sesi
+                renderMhsTableHeader(maxSesi, jadwalInfo);
+                
+                // Render body dengan kategori
+                renderMhsTableBodyWithKategori(kategoriList, maxSesi);
+                
+                // Render footer
+                renderMhsTableFooterWithKategori(kategoriList, maxSesi);
+            }
+            
+            // Render header tabel dengan kolom sesi
+            function renderMhsTableHeader(maxSesi, jadwalInfo) {
+                console.log('Rendering header with maxSesi:', maxSesi, 'jadwalInfo:', jadwalInfo);
+                
+                let headerHtml = `
+                    <tr>
+                        <th style="width:6%">No</th>
+                        <th>Pertanyaan</th>
+                        <th style="width:8%">Bobot</th>
+                        <th style="width:8%">Skor Max</th>
+                        <th colspan="${maxSesi}" class="text-center">Skor Per </th>
+                        <th style="width:8%">Rata-rata</th>
+                        <th style="width:8%">Nilai</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                `;
+                
+                // Sub-header untuk setiap sesi
+                for (let i = 1; i <= maxSesi; i++) {
+                    let sesiLabel = getMhsSesiLabel(i, jadwalInfo);
+                    console.log(`Sesi ${i} label:`, sesiLabel);
+                    headerHtml += `<th class="text-center" style="width:8%">
+                        <div class="fw-semibold">${sesiLabel}</div>
+                        <small class="text-muted">Sesi ${i}</small>
+                    </th>`;
+                }
+                
+                headerHtml += `
+                        <th></th>
+                        <th></th>
+                    </tr>
+                `;
+                
+                $('#admMhsTableHeader').html(headerHtml);
+            }
+            
+            // Render body tabel dengan kategori
+            function renderMhsTableBodyWithKategori(kategoriList, maxSesi) {
+                let tbodyHtml = '';
+                
+                kategoriList.forEach((kategori, kategoriIndex) => {
+                    // Header kategori
+                    tbodyHtml += `
+                        <tr class="table-primary">
+                            <td colspan="${maxSesi + 7}" class="fw-bold">
+                                <i class="bi bi-folder-fill me-2"></i>${kategori.nama_kategori}
+                                <span class="float-end">
+                                    <small class="text-muted">
+                                        Total Bobot: ${kategori.total_bobot_kategori.toFixed(1)} | 
+                                        Total Nilai: ${kategori.total_nilai_kategori.toFixed(2)}
+                                    </small>
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                    
+                    // Pertanyaan dalam kategori (nomor di-reset untuk setiap kategori)
+                    kategori.pertanyaan_list.forEach((pertanyaan, pertanyaanIndex) => {
+                        const bobot = parseFloat(pertanyaan.bobot) || 0;
+                        const skorMax = parseInt(pertanyaan.skor_maksimal) || 4;
+                        const sesiData = pertanyaan.sesi_data || {};
+                        
+                        // ✅ PERBAIKAN: Hitung rata-rata skor dari semua sesi yang ada
+                        let totalSkorPertanyaan = 0;
+                        let jumlahSesi = 0;
+                        
+                        // Hitung dari semua sesi yang ada (termasuk skor 0)
+                        for (let sesi = 1; sesi <= maxSesi; sesi++) {
+                            if (sesiData[sesi]) {
+                                const skor = parseFloat(sesiData[sesi].skor) || 0;
+                                totalSkorPertanyaan += skor;  // ✅ PERBAIKAN: Hitung semua sesi (termasuk skor 0)
+                                jumlahSesi++;
+                            }
+                        }
+                        
+                        // ✅ PERBAIKAN: Rata-rata = total skor / jumlah sesi (semua sesi)
+                        const rataRataSkor = jumlahSesi > 0 ? (totalSkorPertanyaan / jumlahSesi) : 0;
+                        const nilaiAkhir = (rataRataSkor / skorMax) * bobot;
+                        
+                        // Nomor pertanyaan di-reset untuk setiap kategori (1, 2, 3...)
+                        const nomorPertanyaan = pertanyaanIndex + 1;
+                        
+                        let rowHtml = `
+                            <tr>
+                                <td class="text-center">${nomorPertanyaan}</td>
+                                <td>${pertanyaan.pertanyaan}</td>
+                                <td class="text-center">${bobot.toFixed(1)}</td>
+                                <td class="text-center">${skorMax}</td>
+                        `;
+                        
+                        // Kolom skor per sesi dengan styling clean
+                        for (let sesi = 1; sesi <= maxSesi; sesi++) {
+                            if (sesiData[sesi]) {
+                                const skor = sesiData[sesi].skor;
+                                const isLocked = sesiData[sesi].is_locked;
+                                const badgeClass = isLocked ? 'locked' : 'unlocked';
+                                const lockText = isLocked ? 'Terkunci' : 'Belum Kunci';
+                                
+                                rowHtml += `
+                                    <td class="text-center">
+                                        <div class="sesi-badge ${badgeClass}">${skor}</div>
+                                        <span class="status-text">${lockText}</span>
+                                    </td>
+                                `;
+                            } else {
+                                rowHtml += `
+                                    <td class="text-center">
+                                        <div class="sesi-badge empty">-</div>
+                                        <span class="status-text">Belum ada</span>
+                                    </td>
+                                `;
+                            }
+                        }
+                        
+                        // Kolom rata-rata dan nilai
+                        rowHtml += `
+                            <td class="text-center fw-semibold">${rataRataSkor.toFixed(1)}</td>
+                            <td class="text-center fw-semibold">${nilaiAkhir.toFixed(2)}</td>
+                        </tr>`;
+                        
+                        tbodyHtml += rowHtml;
+                    });
+                    
+                    // Separator antar kategori (kecuali kategori terakhir)
+                    if (kategoriIndex < kategoriList.length - 1) {
+                        tbodyHtml += `
+                            <tr class="table-light">
+                                <td colspan="${maxSesi + 7}" style="height: 8px; background-color: #f8f9fa;"></td>
+                            </tr>
+                        `;
+                    }
+                });
+                
+                $('#admMhsDetail').html(tbodyHtml);
+            }
+            
+            // Render footer tabel dengan kategori
+            function renderMhsTableFooterWithKategori(kategoriList, maxSesi) {
+                let footerHtml = `
+                    <tr class="table-dark">
+                        <th colspan="3" class="fw-bold text-white">Total Keseluruhan</th>
+                        <th></th>
+                `;
+                
+                // Total per sesi
+                for (let sesi = 1; sesi <= maxSesi; sesi++) {
+                    let totalSesi = 0;
+                    kategoriList.forEach(kategori => {
+                        kategori.pertanyaan_list.forEach(pertanyaan => {
+                            const sesiData = pertanyaan.sesi_data || {};
+                            if (sesiData[sesi]) {
+                                totalSesi += parseInt(sesiData[sesi].skor) || 0;
+                            }
+                        });
+                    });
+                    footerHtml += `<th class="text-center fw-bold text-white">${totalSesi}</th>`;
+                }
+                
+                // Total rata-rata dan nilai akhir
+                let totalRataRata = 0;
+                let totalNilaiAkhir = 0;
+                let totalBobot = 0;
+                
+                kategoriList.forEach(kategori => {
+                    kategori.pertanyaan_list.forEach(pertanyaan => {
+                        const sesiData = pertanyaan.sesi_data || {};
+                        const bobot = parseFloat(pertanyaan.bobot) || 0;
+                        const skorMax = parseInt(pertanyaan.skor_maksimal) || 4;
+                        
+                        // ✅ PERBAIKAN: Hitung rata-rata skor dari semua sesi yang ada
+                        let totalSkorPertanyaan = 0;
+                        let jumlahSesi = 0;
+                        
+                        // Hitung dari semua sesi yang ada (termasuk skor 0)
+                        for (let sesi = 1; sesi <= maxSesi; sesi++) {
+                            if (sesiData[sesi]) {
+                                const skor = parseFloat(sesiData[sesi].skor) || 0;
+                                totalSkorPertanyaan += skor;  // ✅ PERBAIKAN: Hitung semua sesi (termasuk skor 0)
+                                jumlahSesi++;
+                            }
+                        }
+                        
+                        // ✅ PERBAIKAN: Rata-rata = total skor / jumlah sesi (semua sesi)
+                        const rataRataSkor = jumlahSesi > 0 ? (totalSkorPertanyaan / jumlahSesi) : 0;
+                        const nilaiAkhir = (rataRataSkor / skorMax) * bobot;
+                        
+                        totalRataRata += rataRataSkor;
+                        totalNilaiAkhir += nilaiAkhir;
+                        totalBobot += bobot;
+                    });
+                });
+                
+                footerHtml += `
+                    <th class="text-center fw-bold text-white">${totalRataRata.toFixed(1)}</th>
+                    <th class="text-center fw-bold text-white">${totalNilaiAkhir.toFixed(2)}</th>
+                </tr>
+                <tr class="table-info">
+                    <td colspan="${maxSesi + 7}" class="text-center fw-bold">
+                        <i class="bi bi-calculator me-2"></i>
+                        Total Bobot: ${totalBobot.toFixed(1)} | 
+                        Total Nilai: ${totalNilaiAkhir.toFixed(2)} | 
+                        Nilai Akhir: ${((totalNilaiAkhir / totalBobot) * 100).toFixed(1)}%
+                    </td>
+                </tr>`;
+                
+                $('#admMhsTableFooter').html(footerHtml);
+            }
+            
+            // Helper function untuk label interval
+            function getMhsIntervalLabel(jadwalInfo) {
+                if (!jadwalInfo) return 'Sesi';
+                
+                if (jadwalInfo.interval_tipe === 'setiap_jam') return 'Jam';
+                if (jadwalInfo.interval_tipe === 'harian') return 'Hari';
+                if (jadwalInfo.interval_tipe === 'mingguan') return 'Minggu';
+                if (jadwalInfo.interval_tipe === 'bulanan') return 'Bulan';
+                
+                return 'Sesi';
+            }
+            
+            // Helper function untuk label sesi
+            function getMhsSesiLabel(sesi, jadwalInfo) {
+                if (!jadwalInfo) {
+                    console.error('Jadwal info tidak tersedia');
+                    return `Sesi ${sesi}`;
+                }
+                
+                // Prioritas 1: Gunakan metadata_kolom dari database jika tersedia
+                if (jadwalInfo.metadata_kolom && jadwalInfo.metadata_kolom.length > 0) {
+                    const metadata = jadwalInfo.metadata_kolom.find(m => m.urutan_kolom === sesi);
+                    if (metadata) {
+                        console.log(`Sesi ${sesi} from metadata:`, metadata.nama_kolom);
+                        return metadata.nama_kolom;
+                    }
+                }
+                
+                // Prioritas 2: Gunakan jam_list dari pengaturan jadwal untuk interval setiap_jam
+                if (jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_list && jadwalInfo.jam_list[sesi - 1]) {
+                    return jadwalInfo.jam_list[sesi - 1];
+                }
+                
+                // Prioritas 3: Untuk interval setiap_jam tanpa jam_list, generate berdasarkan jam_mulai dan jam_selesai
+                if (jadwalInfo.interval_tipe === 'setiap_jam' && jadwalInfo.jam_mulai && jadwalInfo.jam_selesai) {
+                    try {
+                        const jamMulai = jadwalInfo.jam_mulai;
+                        const jamSelesai = jadwalInfo.jam_selesai;
+                        const interval = parseInt(jadwalInfo.interval_nilai) || 1;
+                        
+                        console.log('Calculating session time with:', { jamMulai, jamSelesai, interval, sesi });
+                        
+                        // Parse jam mulai dan selesai
+                        let currentHour, currentMinute, endHour, endMinute, startHour;
+                        
+                        // Handle format datetime lengkap (YYYY-MM-DD HH:mm:ss) atau format jam saja (HH:mm)
+                        if (jamMulai.includes(' ')) {
+                            // Format datetime lengkap: '2025-08-19 21:20:00'
+                            const jamMulaiParts = jamMulai.split(' ')[1].split(':');
+                            const jamSelesaiParts = jamSelesai.split(' ')[1].split(':');
+                            
+                            currentHour = parseInt(jamMulaiParts[0]);
+                            currentMinute = parseInt(jamMulaiParts[1]);
+                            endHour = parseInt(jamSelesaiParts[0]);
+                            endMinute = parseInt(jamSelesaiParts[1]);
+                            startHour = parseInt(jamMulaiParts[0]);
+                        } else {
+                            // Format jam saja: '21:20'
+                            currentHour = parseInt(jamMulai.split(':')[0]);
+                            currentMinute = parseInt(jamMulai.split(':')[1]);
+                            endHour = parseInt(jamSelesai.split(':')[0]);
+                            endMinute = parseInt(jamSelesai.split(':')[1]);
+                            startHour = parseInt(jamMulai.split(':')[0]);
+                        }
+                        
+                        console.log('Parsed values:', { currentHour, currentMinute, endHour, endMinute, startHour });
+                        
+                        // PERBAIKAN: Hitung jam untuk sesi tertentu dengan validasi batas
+                        for (let i = 1; i < sesi; i++) {
+                            currentHour += interval;
+                            console.log(`After adding interval ${interval}: currentHour = ${currentHour}`);
+                            
+                            // PERBAIKAN: Validasi batas jam 0-23 (cross-midnight)
+                            if (currentHour >= 24) {
+                                currentHour = currentHour % 24; // Reset ke 0-23
+                                console.log(`After modulo 24: currentHour = ${currentHour}`);
+                            }
+                            
+                            // PERBAIKAN: Cek apakah sudah melewati batas waktu (perbaikan untuk cross-midnight)
+                            let isOverLimit = false;
+                            
+                            // Jika jam selesai lebih kecil dari jam mulai, berarti cross-midnight
+                            if (endHour < startHour) {
+                                console.log('Cross-midnight detected:', { endHour, startHour });
+                                // Cross-midnight case: jam selesai < jam mulai
+                                // Contoh: jam mulai 21:20, jam selesai 00:25
+                                // Valid range: 21:20 - 23:59, 00:00 - 00:25
+                                // PERBAIKAN: Hanya batasi jika melewati jam selesai (termasuk menit)
+                                if (currentHour > endHour || (currentHour === endHour && currentMinute > endMinute)) {
+                                    isOverLimit = true;
+                                    console.log(`Over limit detected: currentHour ${currentHour}:${currentMinute} > endHour ${endHour}:${endMinute}`);
+                                }
+                            } else {
+                                console.log('Normal case detected:', { endHour, startHour });
+                                // Normal case: jam selesai > jam mulai
+                                // Contoh: jam mulai 08:00, jam selesai 17:00
+                                if (currentHour > endHour || (currentHour === endHour && currentMinute > endMinute)) {
+                                    isOverLimit = true;
+                                    console.log(`Over limit detected: currentHour ${currentHour} > endHour ${endHour}`);
+                                }
+                            }
+                            
+                            if (isOverLimit) {
+                                // Jika melewati batas, gunakan jam terakhir yang valid
+                                currentHour = endHour;
+                                currentMinute = endMinute;
+                                console.log(`Using end time: ${currentHour}:${currentMinute}`);
+                                break;
+                            }
+                        }
+                        
+                        // PERBAIKAN: Pastikan jam dalam range 0-23
+                        if (currentHour < 0) currentHour = 0;
+                        if (currentHour > 23) currentHour = 23;
+                        
+                        // Format jam dengan leading zero
+                        const formattedHour = currentHour.toString().padStart(2, '0');
+                        const formattedMinute = currentMinute.toString().padStart(2, '0');
+                        
+                        const result = `Jam ${formattedHour}:${formattedMinute}`;
+                        console.log(`Sesi ${sesi} calculated as: ${result}`);
+                        return result;
+                    } catch (e) {
+                        console.error('Error calculating session time:', e);
+                        return `Sesi ${sesi}`;
+                    }
+                }
+                
+                // Prioritas 4: Fallback ke label generik berdasarkan interval
+                if (jadwalInfo.interval_tipe) {
+                    return `${getMhsIntervalLabel(jadwalInfo)} ${sesi}`;
+                }
+                
+                // Jika semua gagal, return default
+                console.warn('Tidak bisa generate label sesi, menggunakan default:', jadwalInfo);
+                return `Sesi ${sesi}`;
+            }
+
+
+
+            window.admShowProp = function(btn){
+                const proposal_id = $(btn).data('prop');
+                $.getJSON('{{ url_for("admin.get_admin_detail_penilaian_proposal") }}',{proposal_id}, function(resp){
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    // Tampilkan modal dengan pesan error yang informatif
+                    $('#admPropNama').text('Data tidak tersedia');
+                    $('#admPropNim').text('Data tidak tersedia');
+                    $('#admPropJudul').text('Data tidak tersedia');
+                    $('#admPropNilaiAkhir').text('0');
+                    
+                    // Kosongkan tabel detail
+                    let tb = $('#admPropDetail'); 
+                    tb.empty();
+                    tb.append(`<tr><td colspan="5" class="text-center text-muted">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Gagal memuat data penilaian proposal
+                    </td></tr>`);
+                    
+                    // Reset total
+                    $('#admPropTotalBobot').text('0');
+                    $('#admPropTotalSkor').text('0');
+                    $('#admPropTotalNilai').text('0');
+                    
+                    // Reset catatan dan rekomendasi
+                    $('#admPropCatatan').html('<em class="text-muted">Data tidak tersedia</em>');
+                    $('#admPropRekom').text('Data tidak tersedia');
+                    
+                    $('#modalAdmPenilaianProposal').modal('show');
+                }).done(function(resp){
+                    if(!resp.success) {
+                        // Tampilkan modal dengan pesan error yang informatif
+                        $('#admPropNama').text('Data tidak tersedia');
+                        $('#admPropNim').text('Data tidak tersedia');
+                        $('#admPropJudul').text('Data tidak tersedia');
+                        $('#admPropNilaiAkhir').text('0');
+                        
+                        // Kosongkan tabel detail
+                        let tb = $('#admPropDetail'); 
+                        tb.empty();
+                        tb.append(`<tr><td colspan="5" class="text-center text-muted">
+                            <i class="bi bi-info-circle me-2"></i>
+                            ${resp.message}
+                        </td></tr>`);
+                        
+                        // Reset total
+                        $('#admPropTotalBobot').text('0');
+                        $('#admPropTotalSkor').text('0');
+                        $('#admPropTotalNilai').text('0');
+                        
+                        // Reset catatan dan rekomendasi
+                        $('#admPropCatatan').html('<em class="text-muted">Data tidak tersedia</em>');
+                        $('#admPropRekom').text('Data tidak tersedia');
+                        
+                        $('#modalAdmPenilaianProposal').modal('show');
+                        return;
+                    }
+                    const data = resp.data;
+                    
+                    // Debug: Log response data
+                    console.log('Response data:', data);
+                    console.log('Catatan data:', data.catatan);
+                    
+                    // Fill informasi mahasiswa
+                    $('#admPropNama').text(data.mahasiswa.nama_mahasiswa || '-');
+                    $('#admPropNim').text(data.mahasiswa.nim || '-');
+                    $('#admPropJudul').text(data.mahasiswa.judul_usaha || '-');
+                    
+                    // Fill nilai akhir
+                    $('#admPropNilaiAkhir').text(Math.round(parseFloat(data.penilaian.nilai_akhir || 0)));
+                    
+                    // Fill tabel detail
+                    let tb = $('#admPropDetail'); tb.empty();
+                    let tB = 0, tS = 0, tN = 0;
+                    (data.detail_penilaian || []).forEach((it, i) => {
+                        tB += parseFloat(it.bobot || 0);
+                        tS += parseFloat(it.skor || 0);
+                        tN += parseFloat(it.nilai || 0);
+                        tb.append(`<tr>
+                            <td class="text-center">${i+1}</td>
+                            <td>${it.pertanyaan || '-'}</td>
+                            <td class="text-center">${parseFloat(it.bobot || 0).toFixed(1)}</td>
+                            <td class="text-center">${it.skor || 0}${it.skor_maksimal ? ('/' + it.skor_maksimal) : ''}</td>
+                            <td class="text-center">${Math.round(parseFloat(it.nilai || 0))}</td>
+                        </tr>`);
+                    });
+                    
+                    // Fill total
+                    $('#admPropTotalBobot').text(tB.toFixed(1));
+                    $('#admPropTotalSkor').text(tS.toFixed(0));
+                    $('#admPropTotalNilai').text(Math.round(tN));
+                    
+                    // Fill catatan (HTML dari Quill editor)
+                    console.log('Processing catatan:', data.catatan);
+                    console.log('Catatan length:', data.catatan ? data.catatan.length : 'undefined');
+                    console.log('Catatan type:', typeof data.catatan);
+                    console.log('Catatan is array:', Array.isArray(data.catatan));
+                    
+                    if (data.catatan && data.catatan.length > 0) {
+                        // Data catatan langsung berupa string HTML, bukan object
+                        const catatanHTML = data.catatan[0];
+                        console.log('First catatan item:', catatanHTML);
+                        console.log('First catatan type:', typeof catatanHTML);
+                        console.log('First catatan length:', catatanHTML ? catatanHTML.length : 'undefined');
+                        
+                        if (catatanHTML) {
+                            console.log('Setting catatan HTML:', catatanHTML);
+                            
+                            // Test dengan HTML sederhana dulu
+                            $('#admPropCatatan').html(catatanHTML);
+                            
+                            // Debug: Verifikasi HTML sudah di-set
+                            setTimeout(() => {
+                                const currentHTML = $('#admPropCatatan').html();
+                                console.log('Current HTML after setting:', currentHTML);
+                                console.log('Element exists:', $('#admPropCatatan').length);
+                                console.log('Element visible:', $('#admPropCatatan').is(':visible'));
+                            }, 100);
+                        } else {
+                            console.log('Catatan HTML is empty/null');
+                            $('#admPropCatatan').html('<em class="text-muted">Tidak ada catatan</em>');
+                        }
+                    } else {
+                        console.log('No catatan data found');
+                        $('#admPropCatatan').html('<em class="text-muted">Tidak ada catatan</em>');
+                    }
+                    
+                    // Fill rekomendasi
+                    if (data.rekomendasi && data.rekomendasi.length > 0) {
+                        const rekom = data.rekomendasi[0];
+                        let rekomText = rekom.rekomendasi || '-';
+                        // Hapus pattern persen seperti (0.0%) atau (0%)
+                        rekomText = rekomText.replace(/\s*\(\d+(?:\.\d+)?%\)\s*/g, '');
+                        $('#admPropRekom').text(rekomText);
+                    } else {
+                        $('#admPropRekom').text('-');
+                    }
+                    
+                    $('#modalAdmPenilaianProposal').modal('show');
+                    
+                    // Debug: Verifikasi modal dan element
+                    setTimeout(() => {
+                        console.log('Modal shown, checking elements...');
+                        console.log('Modal visible:', $('#modalAdmPenilaianProposal').is(':visible'));
+                        console.log('Catatan element exists:', $('#admPropCatatan').length);
+                        console.log('Catatan element HTML:', $('#admPropCatatan').html());
+                        console.log('Catatan element visible:', $('#admPropCatatan').is(':visible'));
+                    }, 500);
+                });
+            }
+
+            window.admShowKem = function(btn){
+                const proposal_id = $(btn).data('prop');
+                $.getJSON('{{ url_for("admin.get_admin_detail_penilaian_kemajuan") }}',{proposal_id}, function(resp){
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    // Tampilkan modal dengan pesan error yang informatif
+                    $('#admKemNama').text('Data tidak tersedia');
+                    $('#admKemNim').text('Data tidak tersedia');
+                    $('#admKemJudul').text('Data tidak tersedia');
+                    $('#admKemNilaiAkhir').text('0');
+                    
+                    // Kosongkan tabel detail
+                    let tb = $('#admKemDetail'); 
+                    tb.empty();
+                    tb.append(`<tr><td colspan="5" class="text-center text-muted">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Gagal memuat data penilaian laporan kemajuan
+                    </td></tr>`);
+                    
+                    // Reset total
+                    $('#admKemTotalBobot').text('0');
+                    $('#admKemTotalSkor').text('0');
+                    $('#admKemTotalNilai').text('0');
+                    
+                    // Reset catatan dan rekomendasi
+                    $('#admKemCatatan').html('<em class="text-muted">Data tidak tersedia</em>');
+                    $('#admKemRekom').text('Data tidak tersedia');
+                    
+                    $('#modalAdmPenilaianKemajuan').modal('show');
+                }).done(function(resp){
+                    if(!resp.success) {
+                        // Tampilkan modal dengan pesan error yang informatif
+                        $('#admKemNama').text('Data tidak tersedia');
+                        $('#admKemNim').text('Data tidak tersedia');
+                        $('#admKemJudul').text('Data tidak tersedia');
+                        $('#admKemNilaiAkhir').text('0');
+                        
+                        // Kosongkan tabel detail
+                        let tb = $('#admKemDetail'); 
+                        tb.empty();
+                        tb.append(`<tr><td colspan="5" class="text-center text-muted">
+                            <i class="bi bi-info-circle me-2"></i>
+                            ${resp.message}
+                        </td></tr>`);
+                        
+                        // Reset total
+                        $('#admKemTotalBobot').text('0');
+                        $('#admKemTotalSkor').text('0');
+                        $('#admKemTotalNilai').text('0');
+                        
+                        // Reset catatan dan rekomendasi
+                        $('#admKemCatatan').html('<em class="text-muted">Data tidak tersedia</em>');
+                        $('#admKemRekom').text('Data tidak tersedia');
+                        
+                        $('#modalAdmPenilaianKemajuan').modal('show');
+                        return;
+                    }
+                    const data = resp.data;
+                    
+                    // Debug: Log response data
+                    console.log('Response data kemajuan:', data);
+                    console.log('Catatan data kemajuan:', data.catatan);
+                    
+                    // Fill informasi mahasiswa
+                    $('#admKemNama').text(data.mahasiswa.nama_mahasiswa || '-');
+                    $('#admKemNim').text(data.mahasiswa.nim || '-');
+                    $('#admKemJudul').text(data.mahasiswa.judul_usaha || '-');
+                    
+                    // Fill nilai akhir
+                    $('#admKemNilaiAkhir').text(Math.round(parseFloat(data.penilaian.nilai_akhir || 0)));
+                    
+                    // Fill tabel detail
+                    let tb = $('#admKemDetail'); tb.empty();
+                    let tB = 0, tS = 0, tN = 0;
+                    (data.detail_penilaian || []).forEach((it, i) => {
+                        tB += parseFloat(it.bobot || 0);
+                        tS += parseFloat(it.skor || 0);
+                        tN += parseFloat(it.nilai || 0);
+                        tb.append(`<tr>
+                            <td class="text-center">${i+1}</td>
+                            <td>${it.pertanyaan || '-'}</td>
+                            <td class="text-center">${parseFloat(it.bobot || 0).toFixed(1)}</td>
+                            <td class="text-center">${it.skor || 0}${it.skor_maksimal ? ('/' + it.skor_maksimal) : ''}</td>
+                            <td class="text-center">${Math.round(parseFloat(it.nilai || 0))}</td>
+                        </tr>`);
+                    });
+                    
+                    // Fill total
+                    $('#admKemTotalBobot').text(tB.toFixed(1));
+                    $('#admKemTotalSkor').text(tS.toFixed(0));
+                    $('#admKemTotalNilai').text(Math.round(tN));
+                    
+                    // Fill catatan (HTML dari Quill editor)
+                    console.log('Processing catatan kemajuan:', data.catatan);
+                    if (data.catatan && data.catatan.length > 0) {
+                        // Data catatan langsung berupa string HTML, bukan object
+                        const catatanHTML = data.catatan[0];
+                        if (catatanHTML) {
+                            console.log('Setting catatan kemajuan HTML:', catatanHTML);
+                            $('#admKemCatatan').html(catatanHTML);
+                        } else {
+                            $('#admKemCatatan').html('<em class="text-muted">Tidak ada catatan</em>');
+                        }
+                    } else {
+                        $('#admKemCatatan').html('<em class="text-muted">Tidak ada catatan</em>');
+                    }
+                    
+                    // Fill rekomendasi
+                    if (data.rekomendasi && data.rekomendasi.length > 0) {
+                        const rekom = data.rekomendasi[0];
+                        const rekomText = `Rekomendasi Pendanaan: ${rekom.rekomendasi_pendanaan || '-'}\nAlasan Rekomendasi: ${rekom.alasan_rekomendasi || '-'}`;
+                        $('#admKemRekom').text(rekomText);
+                    } else {
+                        $('#admKemRekom').text('-');
+                    }
+                    
+                    $('#modalAdmPenilaianKemajuan').modal('show');
+                });
+            }
+
+            window.admShowAkh = function(btn){
+                const proposal_id = $(btn).data('prop');
+                $.getJSON('{{ url_for("admin.get_admin_detail_penilaian_akhir") }}',{proposal_id}, function(resp){
+                }).fail(function(jqXHR, textStatus, errorThrown) {
+                    // Tampilkan modal dengan pesan error yang informatif
+                    $('#admAkhNama').text('Data tidak tersedia');
+                    $('#admAkhNim').text('Data tidak tersedia');
+                    $('#admAkhJudul').text('Data tidak tersedia');
+                    $('#admAkhNilaiAkhir').text('0');
+                    
+                    // Kosongkan tabel detail
+                    let tb = $('#admAkhDetail'); 
+                    tb.empty();
+                    tb.append(`<tr><td colspan="5" class="text-center text-muted">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Gagal memuat data penilaian laporan akhir
+                    </td></tr>`);
+                    
+                    // Reset total
+                    $('#admAkhTotalBobot').text('0');
+                    $('#admAkhTotalSkor').text('0');
+                    $('#admAkhTotalNilai').text('0');
+                    
+                    // Reset catatan dan rekomendasi
+                    $('#admAkhCatatan').html('<em class="text-muted">Data tidak tersedia</em>');
+                    $('#admAkhRekom').text('Data tidak tersedia');
+                    
+                    $('#modalAdmPenilaianAkhir').modal('show');
+                }).done(function(resp){
+                    if(!resp.success) {
+                        // Tampilkan modal dengan pesan error yang informatif
+                        $('#admAkhNama').text('Data tidak tersedia');
+                        $('#admAkhNim').text('Data tidak tersedia');
+                        $('#admAkhJudul').text('Data tidak tersedia');
+                        $('#admAkhNilaiAkhir').text('0');
+                        
+                        // Kosongkan tabel detail
+                        let tb = $('#admAkhDetail'); 
+                        tb.empty();
+                        tb.append(`<tr><td colspan="5" class="text-center text-muted">
+                            <i class="bi bi-info-circle me-2"></i>
+                            ${resp.message}
+                        </td></tr>`);
+                        
+                        // Reset total
+                        $('#admAkhTotalBobot').text('0');
+                        $('#admAkhTotalSkor').text('0');
+                        $('#admAkhTotalNilai').text('0');
+                        
+                        // Reset catatan dan rekomendasi
+                        $('#admAkhCatatan').html('<em class="text-muted">Data tidak tersedia</em>');
+                        $('#admAkhRekom').text('Data tidak tersedia');
+                        
+                        $('#modalAdmPenilaianAkhir').modal('show');
+                        return;
+                    }
+                    const data = resp.data;
+                    
+                    // Debug: Log response data
+                    console.log('Response data akhir:', data);
+                    console.log('Catatan data akhir:', data.catatan);
+                    
+                    // Fill informasi mahasiswa
+                    $('#admAkhNama').text(data.mahasiswa.nama_mahasiswa || '-');
+                    $('#admAkhNim').text(data.mahasiswa.nim || '-');
+                    $('#admAkhJudul').text(data.mahasiswa.judul_usaha || '-');
+                    
+                    // Fill nilai akhir
+                    $('#admAkhNilaiAkhir').text(Math.round(parseFloat(data.penilaian.nilai_akhir || 0)));
+                    
+                    // Fill tabel detail
+                    let tb = $('#admAkhDetail'); tb.empty();
+                    let tB = 0, tS = 0, tN = 0;
+                    (data.detail_penilaian || []).forEach((it, i) => {
+                        tB += parseFloat(it.bobot || 0);
+                        tS += parseFloat(it.skor || 0);
+                        tN += parseFloat(it.nilai || 0);
+                        tb.append(`<tr>
+                            <td class="text-center">${i+1}</td>
+                            <td>${it.pertanyaan || '-'}</td>
+                            <td class="text-center">${parseFloat(it.bobot || 0).toFixed(1)}</td>
+                            <td class="text-center">${it.skor || 0}${it.skor_maksimal ? ('/' + it.skor_maksimal) : ''}</td>
+                            <td class="text-center">${Math.round(parseFloat(it.nilai || 0))}</td>
+                        </tr>`);
+                    });
+                    
+                    // Fill total
+                    $('#admAkhTotalBobot').text(tB.toFixed(1));
+                    $('#admAkhTotalSkor').text(tS.toFixed(0));
+                    $('#admAkhTotalNilai').text(Math.round(tN));
+                    
+                    // Fill catatan (HTML dari Quill editor)
+                    console.log('Processing catatan akhir:', data.catatan);
+                    if (data.catatan && data.catatan.length > 0) {
+                        // Data catatan langsung berupa string HTML, bukan object
+                        const catatanHTML = data.catatan[0];
+                        if (catatanHTML) {
+                            console.log('Setting catatan akhir HTML:', catatanHTML);
+                            $('#admAkhCatatan').html(catatanHTML);
+                        } else {
+                            $('#admAkhCatatan').html('<em class="text-muted">Tidak ada catatan</em>');
+                        }
+                    } else {
+                        $('#admAkhCatatan').html('<em class="text-muted">Tidak ada catatan</em>');
+                    }
+                    
+                    // Fill rekomendasi
+                    if (data.rekomendasi && data.rekomendasi.length > 0) {
+                        const rekom = data.rekomendasi[0];
+                        const rekomText = `Rekomendasi Kelulusan: ${rekom.rekomendasi_kelulusan || '-'}\nAlasan Rekomendasi: ${rekom.alasan_rekomendasi || '-'}`;
+                        $('#admAkhRekom').text(rekomText);
+                    } else {
+                        $('#admAkhRekom').text('-');
+                    }
+                    
+                    $('#modalAdmPenilaianAkhir').modal('show');
+                });
+            }
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+</body>
+
+</html>

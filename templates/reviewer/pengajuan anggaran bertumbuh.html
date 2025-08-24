@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Anggaran Bertumbuh - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .table td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+
+
+        /* Modal Styles */
+        .modal-xl {
+            max-width: 1200px;
+        }
+
+        .modal-header {
+            background: #435ebe;
+            color: white;
+            border-bottom: none;
+        }
+
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+
+        /* Action Buttons with Circle Background */
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .action-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(67, 94, 190, 0.25);
+        }
+
+        .btn-edit {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563EB;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #EF4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #DC2626;
+            color: white;
+        }
+
+        .btn-success {
+            background: #22c55e;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+            color: white;
+        }
+
+        /* Status Badge - Compact Layout */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            text-align: center;
+            min-width: 90px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .status-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .status-belum {
+            background-color: #fef3c7;
+            color: #92400e;
+            border-color: #f59e0b;
+        }
+
+        .status-sudah {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-color: #10b981;
+        }
+
+        .status-tolak {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border-color: #ef4444;
+        }
+
+        .status-revisi {
+            background-color: #fef3c7;
+            color: #92400e;
+            border-color: #f59e0b;
+        }
+
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: none;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-circle.btn-success {
+            background: #22c55e !important;
+            color: #fff !important;
+        }
+
+        .btn-circle.btn-warning {
+            background: #f59e0b !important;
+            color: #fff !important;
+        }
+
+        .btn-circle.btn-danger {
+            background: #ef4444 !important;
+            color: #fff !important;
+        }
+
+        .btn-circle i {
+            color: #fff !important;
+            font-size: 1.2em;
+        }
+
+        .nilai-bantuan {
+            font-weight: 600;
+            color: #059669;
+        }
+
+        /* Enhanced Table Responsiveness */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .table {
+            margin-bottom: 0;
+            min-width: 1200px; /* Ensure minimum width for readability */
+        }
+
+        .table th, .table td {
+            padding: 12px 8px;
+            vertical-align: middle;
+            word-wrap: break-word;
+            white-space: normal;
+            border: 1px solid #dee2e6;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            color: #495057;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table td {
+            font-size: 0.85rem;
+            line-height: 1.3;
+            color: #212529;
+        }
+
+        /* Status column styling */
+        .table th:last-child,
+        .table td:last-child {
+            width: 8%;
+        }
+
+        /* Enhanced Responsive Breakpoints */
+        @media (max-width: 1600px) {
+            .table th, .table td {
+                font-size: 0.8rem;
+                padding: 10px 6px;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .table th, .table td {
+                font-size: 0.75rem;
+                padding: 8px 5px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .table th, .table td {
+                font-size: 0.7rem;
+                padding: 6px 4px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .table th, .table td {
+                font-size: 0.65rem;
+                padding: 5px 3px;
+            }
+            
+            .table {
+                min-width: 1000px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .table th, .table td {
+                font-size: 0.6rem;
+                padding: 4px 2px;
+            }
+            
+            .table {
+                min-width: 900px;
+            }
+            
+            /* Optimize button sizes for mobile */
+            .btn-lihat-link {
+                font-size: 0.7rem !important;
+                padding: 0.2rem 0.6rem !important;
+            }
+            
+            .badge {
+                font-size: 0.6rem;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .table th, .table td {
+                font-size: 0.55rem;
+                padding: 3px 1px;
+            }
+            
+            .table {
+                min-width: 800px;
+            }
+            
+            /* Stack info in mobile */
+            .card-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .page-heading .row {
+                flex-direction: column;
+            }
+            
+            .page-heading .col-12 {
+                order: 1;
+                margin-bottom: 15px;
+            }
+        }
+
+        /* Mobile-first table improvements */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Ensure table fits without horizontal scroll on larger screens */
+        @media (min-width: 1600px) {
+            .card-body .table-responsive {
+                overflow-x: visible;
+            }
+            
+            .table {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+
+        /* Action buttons container for vertical layout */
+        .action-btn-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-height: 40px;
+            justify-content: center;
+        }
+
+        /* Action column styling */
+        .table td:last-child {
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        /* Status column styling */
+        .table td:nth-last-child(3) {
+            text-align: center;
+            vertical-align: middle;
+            padding: 6px 4px;
+        }
+
+        /* Status badge container */
+        .status-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 32px;
+        }
+
+        /* Enhanced button styling */
+        .action-btn i {
+            transition: transform 0.2s ease;
+        }
+
+        .action-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Animation for status changes - Improved */
+        .status-badge {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .status-badge.fade-out {
+            opacity: 0;
+            transform: scale(0.9) translateY(-5px);
+            filter: blur(1px);
+        }
+
+        .status-badge.fade-in {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            filter: blur(0);
+        }
+
+        /* Row update animation */
+        .table tbody tr {
+            transition: background-color 0.3s ease;
+        }
+
+        .table tbody tr.updated {
+            background-color: rgba(34, 197, 94, 0.1);
+            animation: highlightRow 1s ease-out;
+        }
+
+        @keyframes highlightRow {
+            0% { background-color: rgba(34, 197, 94, 0.3); }
+            100% { background-color: transparent; }
+        }
+
+        /* Total Row Styling */
+        .total-row {
+            background: #f8f9fa;
+            font-weight: 700;
+        }
+
+        .total-row td {
+            border-top: 2px solid #dee2e6;
+        }
+
+        #totalJumlah {
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .btn-lihat-link {
+            background: #435ebe !important;
+            color: #fff !important;
+            border-radius: 1.5rem !important;
+            font-size: 0.8rem !important;
+            padding: 0.25rem 0.9rem !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .btn-lihat-link:hover {
+            background: #25396f !important;
+            color: #fff !important;
+        }
+
+        @media (max-width: 768px) {
+            .action-btn {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 10px !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .action-btn {
+                width: 24px !important;
+                height: 24px !important;
+                font-size: 9px !important;
+            }
+        }
+
+        /* SweetAlert2 Custom Styling - Improved */
+        .swal2-popup {
+            border-radius: 20px !important;
+            font-family: 'Nunito', sans-serif !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15) !important;
+            border: none !important;
+            overflow: hidden !important;
+        }
+
+        .swal2-title {
+            color: #3b3f5c !important;
+            font-weight: 700 !important;
+            font-size: 1.5rem !important;
+            margin-bottom: 1rem !important;
+        }
+
+        .swal2-html-container {
+            color: #6c757d !important;
+            font-size: 1rem !important;
+            line-height: 1.6 !important;
+            margin: 1rem 0 !important;
+        }
+
+        .swal2-confirm {
+            background-color: #435ebe !important;
+            border-radius: 12px !important;
+            font-weight: 600 !important;
+            padding: 12px 30px !important;
+            font-size: 0.95rem !important;
+            border: none !important;
+            box-shadow: 0 4px 12px rgba(67, 94, 190, 0.3) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .swal2-confirm:hover {
+            background-color: #25396f !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(67, 94, 190, 0.4) !important;
+        }
+
+        .swal2-cancel {
+            background-color: #6c757d !important;
+            border-radius: 12px !important;
+            font-weight: 600 !important;
+            padding: 12px 30px !important;
+            font-size: 0.95rem !important;
+            border: none !important;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3) !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .swal2-cancel:hover {
+            background-color: #495057 !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4) !important;
+        }
+
+        /* Success Icon Styling */
+        .swal2-success-circular-line-left,
+        .swal2-success-circular-line-right,
+        .swal2-success-fix {
+            background-color: transparent !important;
+        }
+
+        .swal2-icon.swal2-success {
+            border-color: #435ebe !important;
+            background-color: #435ebe !important;
+        }
+
+        .swal2-icon.swal2-success [class^='swal2-success-line'] {
+            background-color: #ffffff !important;
+        }
+
+        .swal2-icon.swal2-success .swal2-success-ring {
+            border-color: #435ebe !important;
+        }
+
+        /* Error Icon Styling */
+        .swal2-icon.swal2-error {
+            border-color: #ef4444 !important;
+            background-color: #ef4444 !important;
+        }
+
+        .swal2-icon.swal2-error [class^='swal2-x-mark-line'] {
+            background-color: #ffffff !important;
+        }
+
+        /* Warning Icon Styling */
+        .swal2-icon.swal2-warning {
+            border-color: #f59e0b !important;
+            background-color: #f59e0b !important;
+        }
+
+        .swal2-icon.swal2-warning [class^='swal2-warning-line'] {
+            background-color: #ffffff !important;
+        }
+
+        /* Question Icon Styling */
+        .swal2-icon.swal2-question {
+            border-color: #435ebe !important;
+            background-color: #435ebe !important;
+        }
+
+        .swal2-icon.swal2-question [class^='swal2-question-line'] {
+            background-color: #ffffff !important;
+        }
+
+        /* Loading Animation */
+        .swal2-loading {
+            border-color: #435ebe !important;
+        }
+
+        /* Custom Animation */
+        .swal2-show {
+            animation: swal2-show 0.3s ease-out !important;
+        }
+
+        @keyframes swal2-show {
+            0% {
+                transform: scale(0.7);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('reviewer.dashboard') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('reviewer.dashboard') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('reviewer.proposal') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Proposal untuk Review</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('reviewer.daftar_mahasiswa_laporan_kemajuan') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Laporan Kemajuan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('reviewer.daftar_mahasiswa_laporan_akhir') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Laporan Akhir</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('index') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Review Anggaran Bertumbuh</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Review dan konfirmasi anggaran bertumbuh mahasiswa.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('reviewer.dashboard') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url_for('reviewer.proposal') }}">Proposal</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Anggaran Bertumbuh</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <div class="card" style="padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+                                <div>
+                                    <div style="font-weight:700;font-size:1.25rem;">Anggaran Bertumbuh - {{ proposal_info.judul_usaha }}</div>
+                                    <small class="text-muted">Tahapan: {{ proposal_info.tahapan_usaha }}</small>
+
+                                </div>
+                            </div>
+                            {% if anggaran_data_flat %}
+                                <div class="table-responsive">
+                                    <table class="table table-bordered align-middle text-center" style="width: 100%; font-size: 0.85rem;" id="anggaranTable">
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2" style="vertical-align:middle; width: 15%;">Kegiatan Utama</th>
+                                                <th colspan="6" style="width: 55%;">Rencana</th>
+                                                <th rowspan="2" style="vertical-align:middle; width: 10%;">Keterangan/<br>Ref. Harga</th>
+                                                <th rowspan="2" style="vertical-align:middle; width: 10%;">Target Capaian<br>H = Output A</th>
+                                                <th rowspan="2" style="vertical-align:middle; width: 10%;">Penanggung Jawab</th>
+                                                <th rowspan="2" style="vertical-align:middle; width: 5%;">Status</th>
+                                                <th rowspan="2" style="vertical-align:middle; width: 12%;">Nilai Bantuan</th>
+                                                <th rowspan="2" style="vertical-align:middle; width: 5%;">Aksi</th>
+                                            </tr>
+                                            <tr>
+                                                <th style="width: 10%;">Kegiatan<br>A</th>
+                                                <th style="width: 12%;">Nama Barang<br>B</th>
+                                                <th style="width: 8%;">Kuantitas<br>C</th>
+                                                <th style="width: 8%;">Satuan<br>D</th>
+                                                <th style="width: 12%;">Harga Satuan<br>E</th>
+                                                <th style="width: 10%;">Jumlah (Rp)<br>F=C×E</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for row in anggaran_data_flat %}
+                                                <tr data-anggaran-id="{{ row.id }}">
+                                                    {% if row.show_kegiatan_utama %}
+                                                        <td rowspan="{{ row.kegiatan_utama_rowspan }}">{{ row.kegiatan_utama|e if row.kegiatan_utama else '-' }}</td>
+                                                    {% endif %}
+                                                    {% if row.show_kegiatan %}
+                                                        <td rowspan="{{ row.kegiatan_rowspan }}">{{ row.kegiatan|e if row.kegiatan else '-' }}</td>
+                                                    {% endif %}
+                                                    <td>{{ row.nama_barang|e if row.nama_barang else '-' }}</td>
+                                                    <td>{{ row.kuantitas if row.kuantitas else '0' }}</td>
+                                                    <td>{{ row.satuan|e if row.satuan else '-' }}</td>
+                                                    <td>Rp {{ "{:,}".format(row.harga_satuan|int) if row.harga_satuan else '0' }}</td>
+                                                    <td class="cell-jumlah">Rp {{ "{:,}".format(row.jumlah|int) if row.jumlah else '0' }}</td>
+                                                    <td>
+                                                        {% if row.keterangan %}
+                                                            {% set keterangan_lower = row.keterangan|lower %}
+                                                            {% if 'http' in keterangan_lower or 'www' in keterangan_lower or '.com' in keterangan_lower or '.id' in keterangan_lower or '.org' in keterangan_lower or '.net' in keterangan_lower or '.co' in keterangan_lower or '.ac' in keterangan_lower or '.go' in keterangan_lower %}
+                                                                <button class="btn btn-primary btn-sm btn-lihat-link lihat-keterangan-btn" data-keterangan="{{ row.keterangan|e }}" data-link="{{ row.keterangan|e }}" style="border-radius: 1.5rem; padding: 0.25rem 0.9rem; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                                                    <i class="fa fa-external-link-alt me-1"></i>Lihat
+                                                                </button>
+                                                            {% else %}
+                                                                <span class="text-muted">{{ row.keterangan|e }}</span>
+                                                            {% endif %}
+                                                        {% else %}
+                                                            <span class="text-muted">-</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    {% if row.show_target_capaian %}
+                                                        <td rowspan="{{ row.target_capaian_rowspan }}">{{ row.target_capaian|e if row.target_capaian else '-' }}</td>
+                                                    {% endif %}
+                                                    {% if row.show_penanggung_jawab %}
+                                                        <td rowspan="{{ row.penanggung_jawab_rowspan }}">{{ row.penanggung_jawab if row.penanggung_jawab else '-' }}</td>
+                                                    {% endif %}
+                                                    <td>
+                                                        <div class="status-container">
+                                                            {% if row.status_reviewer == 'belum_direview' %}
+                                                                <span class="status-badge status-belum" title="Belum direview oleh reviewer">Belum Direview</span>
+                                                            {% elif row.status_reviewer == 'sudah_direview' %}
+                                                                {% if row.status == 'revisi' %}
+                                                                    <span class="status-badge status-revisi" title="Sudah direview tapi perlu revisi">Perlu Revisi</span>
+                                                                {% else %}
+                                                                    <span class="status-badge status-sudah" title="Sudah direview dan disetujui dengan nilai bantuan">Sudah Direview</span>
+                                                                {% endif %}
+                                                            {% elif row.status_reviewer == 'tolak_bantuan' %}
+                                                                <span class="status-badge status-tolak" title="Bantuan ditolak oleh reviewer">Tolak Bantuan</span>
+                                                            {% else %}
+                                                                <span class="status-badge status-belum" title="Belum direview oleh reviewer">Belum Direview</span>
+                                                            {% endif %}
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell-nilai-bantuan">
+                                                        {% if row.nilai_bantuan and row.nilai_bantuan > 0 %}
+                                                            <span class="nilai-bantuan">Rp {{ "{:,.0f}".format(row.nilai_bantuan) }}</span>
+                                                        {% elif row.nilai_bantuan == 0 %}
+                                                            <span class="text-danger">Rp 0</span>
+                                                        {% else %}
+                                                            <span class="text-muted">-</span>
+                                                        {% endif %}
+                                                    </td>
+                                                                                                    <td>
+                                                    {% if row.status_reviewer == 'belum_direview' %}
+                                                        <div class="action-btn-group">
+                                                            <button class="action-btn btn-success" 
+                                                                    onclick="konfirmasiBantuan({{ row.id }}, 'sudah_direview')" 
+                                                                    title="Sudah Direview">
+                                                                <i class="bi bi-check-circle-fill"></i>
+                                                            </button>
+                                                            <button class="action-btn btn-danger" 
+                                                                    onclick="konfirmasiBantuan({{ row.id }}, 'tolak_bantuan')" 
+                                                                    title="Tolak Bantuan">
+                                                                <i class="bi bi-x-circle-fill"></i>
+                                                            </button>
+                                                        </div>
+                                                    {% else %}
+                                                        <div class="action-btn-group">
+                                                            <button class="action-btn btn-warning" 
+                                                                    onclick="editNilaiBantuan({{ row.id }}, {{ row.nilai_bantuan or 0 }})" 
+                                                                    title="Edit Nilai Bantuan">
+                                                                <i class="bi bi-pencil-fill"></i>
+                                                            </button>
+                                                        </div>
+                                                    {% endif %}
+                                                </td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                        <tr class="total-row">
+                                            <td colspan="6" class="text-end fw-bold">TOTAL ANGGARAN:
+                                                <span id="badgeTotalStatus" class="badge ms-2" style="display:none"></span>
+                                            </td>
+                                            <td id="totalJumlah" class="fw-bold">Rp 0</td>
+                                            <td colspan="6"></td>
+                                        </tr>
+                                            <tr class="total-row" style="background:#e8f5e8;">
+                                                <td colspan="6" class="text-end fw-bold text-success"><i class="fa-solid fa-money-bill-wave me-1"></i>TOTAL NILAI BANTUAN:</td>
+                                                <td id="totalNilaiBantuan" class="fw-bold text-success">Rp {{ "{:,}".format(total_nilai_bantuan|int) if total_nilai_bantuan else 0 }}</td>
+                                                <td colspan="6"></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            {% else %}
+                                <div class="alert alert-info text-center" style="margin: 20px 0;">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Informasi:</strong> Belum ada data anggaran bertumbuh yang disetujui untuk proposal ini.
+                                    <br>
+                                    <small class="text-muted">Hanya anggaran dengan status "Disetujui" yang dapat direview oleh reviewer.</small>
+                                    <br>
+                                    <small class="text-warning"><i class="bi bi-exclamation-triangle"></i> Pastikan proposal ini adalah "Usaha Bertumbuh" dan anggaran sudah disetujui oleh admin.</small>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Keterangan/Ref. Harga -->
+    <div class="modal fade" id="modalKeterangan" tabindex="-1" aria-labelledby="modalKeteranganLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalKeteranganLabel">Keterangan / Ref. Harga</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+          </div>
+          <div class="modal-body">
+            <p id="isiKeterangan"></p>
+            <div id="linkContainer" style="display:none;">
+                <hr>
+                <div class="input-group">
+                    <input type="text" id="linkKeterangan" class="form-control" readonly>
+                    <button class="btn btn-outline-primary" type="button" onclick="copyLink()">
+                        <i class="fa fa-copy me-1"></i>Copy
+                    </button>
+                    <a id="linkKeteranganBtn" href="#" target="_blank" class="btn btn-primary">
+                        <i class="fa fa-external-link-alt me-1"></i>Buka
+                    </a>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Input Nilai Bantuan -->
+    <div class="modal fade" id="modalNilaiBantuan" tabindex="-1" aria-labelledby="modalNilaiBantuanLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalNilaiBantuanLabel">Input Nilai Bantuan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formNilaiBantuan" onsubmit="return false;">
+                        <input type="hidden" id="anggaranId">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Informasi:</strong> Masukkan nilai bantuan yang akan diberikan untuk item ini.
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label fw-bold">Nilai Bantuan (Rp)</label>
+                                <input type="text" class="form-control" id="nilaiBantuan" name="nilai_bantuan" 
+                                       placeholder="Contoh: Rp 1.000.000 atau 1000000" required>
+                                <small class="text-muted">Masukkan nilai dalam format Rupiah (Rp 1.000.000) atau angka biasa (1000000)</small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="btnSimpanNilaiBantuan">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+
+            // Modal keterangan functionality
+            $(document).on('click', '.lihat-keterangan-btn', function() {
+                var keterangan = $(this).data('keterangan');
+                var link = $(this).data('link');
+                var isLink = false;
+                var linkLower = link ? link.toLowerCase() : '';
+                if (linkLower.includes('http') || linkLower.includes('www') || linkLower.includes('.com') || linkLower.includes('.id') || linkLower.includes('.org') || linkLower.includes('.net') || linkLower.includes('.co') || linkLower.includes('.ac') || linkLower.includes('.go')) {
+                    isLink = true;
+                }
+                if (isLink) {
+                    $('#isiKeterangan').text(''); // Jangan tampilkan teks link
+                    $('#linkKeterangan').val(linkLower); // Selalu tampilkan lowercase
+                    $('#linkKeteranganBtn').attr('href', link);
+                    $('#linkContainer').show();
+                } else {
+                    $('#isiKeterangan').text(keterangan); // Tampilkan keterangan biasa
+                    $('#linkContainer').hide();
+                }
+                $('#modalKeterangan').modal('show');
+            });
+
+            // Function to copy link
+            window.copyLink = function() {
+                var linkInput = document.getElementById('linkKeterangan');
+                linkInput.select();
+                linkInput.setSelectionRange(0, 99999); // For mobile devices
+                
+                try {
+                    navigator.clipboard.writeText(linkInput.value);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Link berhasil disalin ke clipboard',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'animated fadeInDown'
+                        },
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp'
+                        }
+                    });
+                } catch (err) {
+                    // Fallback for older browsers
+                    document.execCommand('copy');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Link berhasil disalin ke clipboard',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'animated fadeInDown'
+                        },
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp'
+                        }
+                    });
+                }
+            };
+
+                    // Calculate total - local function
+        function updateTotalJumlah() {
+            let total = 0;
+            const cells = document.querySelectorAll('td.cell-jumlah');
+            if (cells.length > 0) {
+                cells.forEach(function(cell) {
+                    if (cell && cell.textContent) {
+                        let text = cell.textContent.trim();
+                        if (/^Rp\s*[\d,.]+$/.test(text)) {
+                            let val = text.replace(/[^\d]/g, '');
+                            if (val) total += parseInt(val);
+                        }
+                    }
+                });
+            }
+            
+            // Check if element exists before setting textContent
+            const totalElement = document.getElementById('totalJumlah');
+            if (totalElement) {
+                totalElement.textContent = 'Rp ' + total.toLocaleString('id-ID');
+            }
+
+            // Badge & tooltip seperti mahasiswa
+            const minBatas = {{ (batas_min_bertumbuh or 0)|int }};
+            const maxBatas = {{ (batas_max_bertumbuh or 0)|int }};
+            const badge = document.getElementById('badgeTotalStatus');
+            if (badge) {
+                badge.style.display = 'inline-block';
+                badge.className = 'badge ms-2';
+                if (minBatas && total < minBatas) {
+                    badge.classList.add('bg-warning', 'text-dark');
+                    badge.textContent = 'Kurang dari minimal';
+                } else if (maxBatas && total > maxBatas) {
+                    badge.classList.add('bg-danger');
+                    badge.textContent = 'Melebihi maksimal';
+                } else {
+                    badge.classList.add('bg-success');
+                    badge.textContent = 'Dalam batas';
+                }
+                let info = [];
+                if (minBatas) info.push('Minimal: Rp ' + minBatas.toLocaleString('id-ID'));
+                if (maxBatas) info.push('Maksimal: Rp ' + maxBatas.toLocaleString('id-ID'));
+                badge.setAttribute('title', info.length ? info.join(' | ') : 'Tidak dibatasi');
+                try { var tt = bootstrap.Tooltip.getInstance(badge); if (tt) tt.dispose(); new bootstrap.Tooltip(badge); } catch(e) {}
+            }
+        }
+        
+        // Global function untuk update total
+        window.updateTotalJumlahGlobal = function() {
+            let total = 0;
+            const cells = document.querySelectorAll('td.cell-jumlah');
+            if (cells.length > 0) {
+                cells.forEach(function(cell) {
+                    if (cell && cell.textContent) {
+                        let text = cell.textContent.trim();
+                        if (/^Rp\s*[\d,.]+$/.test(text)) {
+                            let val = text.replace(/[^\d]/g, '');
+                            if (val) total += parseInt(val);
+                        }
+                    }
+                });
+            }
+            
+            // Check if element exists before setting textContent
+            const totalElement = document.getElementById('totalJumlah');
+            if (totalElement) {
+                totalElement.textContent = 'Rp ' + total.toLocaleString('id-ID');
+            }
+        };
+        
+            window.updateTotalNilaiBantuan = function() {
+                let total = 0;
+                const cells = document.querySelectorAll('td.cell-nilai-bantuan');
+                if (cells.length > 0) {
+                    cells.forEach(function(cell) {
+                        if (cell && cell.textContent) {
+                            let text = cell.textContent.trim();
+                            if (/^Rp\s*[\d,.]+$/.test(text)) {
+                                let val = text.replace(/[^\d]/g, '');
+                                if (val) total += parseInt(val);
+                            } else if (/^0$/.test(text)) {
+                                // explicit 0 already handled by Rp 0 above; kept for safety
+                            }
+                        }
+                    });
+                }
+                const totalElement = document.getElementById('totalNilaiBantuan');
+                if (totalElement) {
+                    totalElement.textContent = 'Rp ' + total.toLocaleString('id-ID');
+                }
+            }
+
+            // Only call updates if table exists
+            if ($('#anggaranTable').length) {
+                updateTotalJumlah();
+                window.updateTotalNilaiBantuan();
+            }
+            
+            // Debug: Log nilai dari template
+            console.log('=== DEBUG TEMPLATE ANGGARAN BERTUMBUH ===');
+            console.log('Total Nilai Bantuan (Template):', {{ total_nilai_bantuan|int if total_nilai_bantuan else 0 }});
+            console.log('Batas Min Bertumbuh:', {{ batas_min_bertumbuh|int if batas_min_bertumbuh else 0 }});
+            console.log('Batas Max Bertumbuh:', {{ batas_max_bertumbuh|int if batas_max_bertumbuh else 0 }});
+            console.log('==============================');
+            
+            // Debug: Log data dari anggaran_data_flat
+            console.log('=== DEBUG ANGGARAN DATA FLAT ===');
+            {% if anggaran_data_flat %}
+                {% for row in anggaran_data_flat %}
+                    console.log('Row {{ loop.index }}:', {
+                        id: {{ row.id or 0 }},
+                        kegiatan_utama: '{{ row.kegiatan_utama or "N/A" }}',
+                        kegiatan: '{{ row.kegiatan or "N/A" }}',
+                        nama_barang: '{{ row.nama_barang or "N/A" }}',
+                        jumlah: {{ row.jumlah or 0 }},
+                        nilai_bantuan: {{ row.nilai_bantuan or 0 }},
+                        status_reviewer: '{{ row.status_reviewer or "N/A" }}'
+                    });
+                {% endfor %}
+            {% else %}
+                console.log('No anggaran_data_flat data');
+            {% endif %}
+            console.log('==============================');
+        });
+
+        function konfirmasiBantuan(anggaranId, status) {
+            let title = '';
+            let text = '';
+            let icon = '';
+            
+            if (status === 'sudah_direview') {
+                title = 'Input Nilai Bantuan';
+                text = 'Apakah Anda ingin memberikan bantuan untuk item ini?';
+                icon = 'question';
+            } else if (status === 'tolak_bantuan') {
+                title = 'Tolak Bantuan';
+                text = 'Apakah Anda yakin ingin menolak bantuan untuk item ini?';
+                icon = 'warning';
+            }
+            
+            Swal.fire({
+                title: title,
+                text: text,
+                icon: icon,
+                showCancelButton: true,
+                confirmButtonText: 'Ya',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                focusConfirm: false,
+                focusCancel: true,
+                customClass: {
+                    popup: 'animated fadeInDown'
+                },
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (status === 'sudah_direview') {
+                        // Tampilkan modal input nilai bantuan
+                        $('#anggaranId').val(anggaranId);
+                        $('#nilaiBantuan').val('');
+                        $('#modalNilaiBantuan').modal('show');
+                    } else if (status === 'tolak_bantuan') {
+                        // Langsung update status tolak dengan nilai 0
+                        console.log('Konfirmasi tolak bantuan untuk anggaran ID:', anggaranId);
+                        updateNilaiBantuan(anggaranId, 0, 'tolak_bantuan');
+                    }
+                }
+            });
+        }
+
+        function editNilaiBantuan(anggaranId, nilaiBantuan) {
+            console.log('editNilaiBantuan called with:', { anggaranId, nilaiBantuan });
+            
+            // Validate anggaranId
+            if (!anggaranId || anggaranId === '') {
+                console.error('anggaranId is empty or invalid');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'ID anggaran tidak valid!',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            // Set anggaran ID
+            $('#anggaranId').val(anggaranId);
+            
+            // Format the nilai bantuan to Rupiah format when editing
+            const formattedValue = formatRupiah(nilaiBantuan);
+            console.log('Formatted nilai bantuan:', formattedValue);
+            $('#nilaiBantuan').val(formattedValue);
+            
+            // Show modal
+            $('#modalNilaiBantuan').modal('show');
+        }
+
+        // Function to format number to Rupiah
+        function formatRupiah(angka) {
+            if (!angka || angka === 0) return '0';
+            
+            // Remove all non-digit characters
+            let number = angka.toString().replace(/[^\d]/g, '');
+            
+            if (number === '') return '0';
+            
+            // Convert to number and format
+            number = parseInt(number);
+            if (number === 0) return '0';
+            
+            return 'Rp ' + number.toLocaleString('id-ID');
+        }
+
+        // Function to parse Rupiah format to number
+        function parseRupiah(rupiahString) {
+            if (!rupiahString || rupiahString.trim() === '') return 0;
+            
+            // Remove all non-digit characters
+            const number = rupiahString.toString().replace(/[^\d]/g, '');
+            return parseInt(number) || 0;
+        }
+
+        // Add input formatting for nilai bantuan
+        $('#nilaiBantuan').on('input', function() {
+            let value = $(this).val();
+            
+            // If input is empty, allow it (untuk input 0)
+            if (!value || value.trim() === '') {
+                return;
+            }
+            
+            // If user types "0" or "Rp 0", allow it
+            if (value === '0' || value === 'Rp 0') {
+                $(this).val('0');
+                return;
+            }
+            
+            // If user types "Rp" or starts with "Rp", format it
+            if (value.toLowerCase().includes('rp') || value.startsWith('Rp')) {
+                // Remove existing formatting and reapply
+                value = value.replace(/[^\d]/g, '');
+                if (value) {
+                    $(this).val(formatRupiah(value));
+                } else {
+                    $(this).val('0');
+                }
+            } else if (value) {
+                // If it's just numbers, format it
+                const number = value.replace(/[^\d]/g, '');
+                if (number) {
+                    $(this).val(formatRupiah(number));
+                } else {
+                    $(this).val('0');
+                }
+            }
+        });
+
+        // Add focus event to select all text when focused
+        $('#nilaiBantuan').on('focus', function() {
+            $(this).select();
+        });
+
+        $('#btnSimpanNilaiBantuan').click(function(e) {
+            // Prevent default form submission
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('Button Simpan Nilai Bantuan clicked');
+            
+            const anggaranId = $('#anggaranId').val();
+            const nilaiBantuanInput = $('#nilaiBantuan').val();
+            
+            console.log('Raw input values:', { anggaranId, nilaiBantuanInput });
+            
+            // Parse the input value to get the actual number
+            const nilaiBantuan = parseRupiah(nilaiBantuanInput);
+            
+            console.log('Parsed nilai bantuan:', nilaiBantuan);
+            
+            // Validasi yang lebih fleksibel
+            if (nilaiBantuan < 0) {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Nilai bantuan tidak boleh negatif!',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        popup: 'animated fadeInDown'
+                    }
+                });
+                return;
+            }
+            
+            // Validasi anggaranId
+            if (!anggaranId || anggaranId === '') {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'ID anggaran tidak valid!',
+                    icon: 'error',
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        popup: 'animated fadeInDown'
+                    }
+                });
+                return;
+            }
+            
+            // Logika status otomatis berdasarkan nilai bantuan
+            let status;
+            if (nilaiBantuan === 0) {
+                status = 'tolak_bantuan';
+            } else if (nilaiBantuan > 0) {
+                status = 'sudah_direview';
+            } else {
+                status = 'tolak_bantuan'; // Default untuk nilai negatif
+            }
+            
+            console.log('Saving nilai bantuan:', {
+                anggaranId: anggaranId,
+                nilaiBantuanInput: nilaiBantuanInput,
+                nilaiBantuan: nilaiBantuan,
+                status: status
+            });
+            
+            // Call update function
+            updateNilaiBantuan(anggaranId, nilaiBantuan, status);
+            
+            // Return false to prevent form submission
+            return false;
+        });
+
+        function updateNilaiBantuan(anggaranId, nilaiBantuan, status) {
+            console.log('updateNilaiBantuan called with:', { anggaranId, nilaiBantuan, status });
+            
+            // Validate inputs
+            if (!anggaranId || anggaranId === '') {
+                console.error('anggaranId is empty or invalid');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'ID anggaran tidak valid!',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            if (nilaiBantuan === null || nilaiBantuan === undefined) {
+                console.error('nilaiBantuan is null or undefined');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Nilai bantuan tidak valid!',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            console.log('Inputs validated, showing loading...');
+            
+            Swal.fire({
+                title: 'Memproses...',
+                text: 'Sedang menyimpan data',
+                icon: 'info',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+                customClass: {
+                    popup: 'animated fadeInDown'
+                }
+            });
+
+            // Tentukan status yang akan dikirim ke backend
+            let statusToSend = status;
+            
+            // Logika untuk menentukan status berdasarkan nilai bantuan
+            if (nilaiBantuan > 0) {
+                statusToSend = 'sudah_direview';
+            } else if (nilaiBantuan === 0) {
+                statusToSend = 'tolak_bantuan';
+            }
+            
+            console.log('Status determination:', {
+                originalStatus: status,
+                nilaiBantuan: nilaiBantuan,
+                finalStatus: statusToSend
+            });
+
+            const requestData = {
+                anggaran_id: anggaranId,
+                nilai_bantuan: nilaiBantuan,
+                status_reviewer: statusToSend,
+                tipe_anggaran: 'bertumbuh'
+            };
+            
+            console.log('Sending data:', requestData);
+            console.log('Request URL:', '/reviewer/update_nilai_bantuan');
+            console.log('Request method:', 'POST');
+
+            fetch('/reviewer/update_nilai_bantuan', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(res => {
+                console.log('Response received:', res);
+                console.log('Response status:', res.status);
+                return res.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    // Close modal if open
+                    $('#modalNilaiBantuan').modal('hide');
+                    
+                    console.log('Updating UI with:', {
+                        anggaranId: anggaranId,
+                        statusReviewer: data.status_reviewer,
+                        nilaiBantuan: data.nilai_bantuan,
+                        statusAnggaran: data.status_anggaran
+                    });
+                    
+                    // Update UI tanpa reload - gunakan data dari backend
+                    updateRowUI(anggaranId, data.status_reviewer, data.nilai_bantuan, data.status_anggaran);
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: data.message,
+                        timer: 2000,
+                        showConfirmButton: false,
+                        customClass: {
+                            popup: 'animated fadeInDown'
+                        },
+                        showClass: {
+                            popup: 'animate__animated animate__fadeInDown'
+                        },
+                        hideClass: {
+                            popup: 'animate__animated animate__fadeOutUp'
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal',
+                        text: data.message,
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            popup: 'animated fadeInDown'
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                console.error('Error details:', {
+                    message: error.message,
+                    stack: error.stack
+                });
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Terjadi kesalahan saat menyimpan data: ' + error.message,
+                    confirmButtonText: 'OK',
+                    customClass: {
+                        popup: 'animated fadeInDown'
+                    }
+                });
+            });
+        }
+
+        // Function to update UI without reload
+        function updateRowUI(anggaranId, statusReviewer, nilaiBantuan, statusAnggaran) {
+            console.log('updateRowUI called with:', { anggaranId, statusReviewer, nilaiBantuan, statusAnggaran });
+            
+            const row = document.querySelector(`tr[data-anggaran-id="${anggaranId}"]`);
+            if (!row) {
+                console.error('Row not found for anggaran ID:', anggaranId);
+                return;
+            }
+            
+            console.log('Row found:', row);
+
+            // Add highlight animation
+            row.classList.add('updated');
+            setTimeout(() => {
+                row.classList.remove('updated');
+            }, 1000);
+
+            // Update status badge with animation
+            const statusContainer = row.querySelector('.status-container');
+            console.log('Status container found:', statusContainer);
+            
+            if (statusContainer) {
+                const statusCell = statusContainer.querySelector('.status-badge');
+                console.log('Status cell found:', statusCell);
+                
+                if (statusCell) {
+                    // Add fade out effect
+                    statusCell.classList.add('fade-out');
+                    
+                    setTimeout(() => {
+                        if (statusReviewer === 'sudah_direview') {
+                            if (statusAnggaran === 'revisi') {
+                                statusCell.className = 'status-badge status-revisi fade-in';
+                                statusCell.textContent = 'PERLU REVISI';
+                                statusCell.title = 'Sudah direview tapi perlu revisi';
+                            } else {
+                                statusCell.className = 'status-badge status-sudah fade-in';
+                                statusCell.textContent = 'SUDAH DIREVIEW';
+                                statusCell.title = 'Sudah direview dan disetujui dengan nilai bantuan';
+                            }
+                        } else if (statusReviewer === 'tolak_bantuan') {
+                            statusCell.className = 'status-badge status-tolak fade-in';
+                            statusCell.textContent = 'TOLAK BANTUAN';
+                            statusCell.title = 'Bantuan ditolak oleh reviewer';
+                        } else if (statusReviewer === 'belum_direview') {
+                            statusCell.className = 'status-badge status-belum fade-in';
+                            statusCell.textContent = 'BELUM DIREVIEW';
+                            statusCell.title = 'Belum direview oleh reviewer';
+                        }
+                        
+                        console.log('Status badge updated:', {
+                            statusReviewer: statusReviewer,
+                            statusAnggaran: statusAnggaran,
+                            nilaiBantuan: nilaiBantuan,
+                            badgeText: statusCell.textContent
+                        });
+                        
+                        // Remove fade-in class after animation
+                        setTimeout(() => {
+                            statusCell.classList.remove('fade-in');
+                        }, 300);
+                    }, 150);
+                }
+            }
+
+            // Update nilai bantuan with smooth transition
+            const nilaiBantuanCell = row.querySelector('td:nth-last-child(2)'); // Kolom nilai bantuan (kolom kedua dari kanan)
+            console.log('Nilai bantuan cell found:', nilaiBantuanCell);
+            
+            if (nilaiBantuanCell) {
+                nilaiBantuanCell.style.transition = 'all 0.3s ease';
+                
+                if (nilaiBantuan > 0) {
+                    nilaiBantuanCell.innerHTML = `<span class="nilai-bantuan">Rp ${parseInt(nilaiBantuan).toLocaleString('id-ID')}</span>`;
+                } else if (nilaiBantuan === 0) {
+                    nilaiBantuanCell.innerHTML = `<span class="text-danger">Rp 0</span>`;
+                } else {
+                    nilaiBantuanCell.innerHTML = `<span class="text-muted">-</span>`;
+                }
+                
+                console.log('Nilai bantuan cell updated:', {
+                    nilaiBantuan: nilaiBantuan,
+                    cellContent: nilaiBantuanCell.innerHTML
+                });
+            }
+
+            // Update action buttons with smooth transition
+            const actionCell = row.querySelector('td:last-child');
+            if (actionCell) {
+                actionCell.style.transition = 'all 0.3s ease';
+                
+                // Tampilkan tombol berdasarkan status
+                if (statusReviewer === 'belum_direview') {
+                    // Tampilkan tombol setujui dan tolak
+                    actionCell.innerHTML = `
+                        <div class="action-btn-group">
+                            <button class="action-btn btn-success" 
+                                    onclick="konfirmasiBantuan(${anggaranId}, 'sudah_direview')" 
+                                    title="Sudah Direview">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </button>
+                            <button class="action-btn btn-danger" 
+                                    onclick="konfirmasiBantuan(${anggaranId}, 'tolak_bantuan')" 
+                                    title="Tolak Bantuan">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // Tampilkan tombol edit untuk status lainnya (sudah_direview atau tolak_bantuan)
+                    actionCell.innerHTML = `
+                        <div class="action-btn-group">
+                            <button class="action-btn btn-warning" 
+                                    onclick="editNilaiBantuan(${anggaranId}, ${nilaiBantuan || 0})" 
+                                    title="Edit Nilai Bantuan">
+                                <i class="bi bi-pencil-fill"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+                
+                console.log('Action buttons updated:', {
+                    statusReviewer: statusReviewer,
+                    nilaiBantuan: nilaiBantuan,
+                    actionButtons: actionCell.innerHTML
+                });
+            }
+
+            // Update totals
+            updateTotalJumlahGlobal();
+            window.updateTotalNilaiBantuan();
+        }
+
+        // Prevent form submission
+        $('#formNilaiBantuan').on('submit', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        });
+        
+        // Reset modal when closed
+        $('#modalNilaiBantuan').on('hidden.bs.modal', function () {
+            $('#formNilaiBantuan')[0].reset();
+            $('#anggaranId').val('');
+        });
+    </script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+</body>
+
+</html>

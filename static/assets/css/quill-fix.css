@@ -1,0 +1,95 @@
+/* Quill Editor Fix CSS */
+.ql-editor {
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 12px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.ql-toolbar {
+    border: 1px solid #ccc;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    background: #f8f9fa;
+}
+
+.ql-container {
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+}
+
+/* Prevent deprecated event usage */
+.ql-editor * {
+    pointer-events: auto;
+}
+
+/* Modern scrollbar styling */
+.ql-editor::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ql-editor::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.ql-editor::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.ql-editor::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Ensure proper focus handling */
+.ql-editor:focus {
+    outline: none;
+    border-color: #435ebe;
+    box-shadow: 0 0 0 0.2rem rgba(67, 94, 190, 0.25);
+}
+
+/* Toolbar button styling */
+.ql-toolbar button {
+    border: none;
+    background: transparent;
+    padding: 6px 8px;
+    border-radius: 3px;
+    transition: background-color 0.2s;
+}
+
+.ql-toolbar button:hover {
+    background-color: #e9ecef;
+}
+
+.ql-toolbar button.ql-active {
+    background-color: #435ebe;
+    color: white;
+}
+
+/* Ensure proper container sizing */
+#catatanEditor, #quillEditor {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+/* Fix for mobile devices */
+@media (max-width: 768px) {
+    .ql-editor {
+        min-height: 150px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    .ql-toolbar button {
+        padding: 8px 10px;
+    }
+}
+
+
+

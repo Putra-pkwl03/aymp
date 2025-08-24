@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengelolaan Alat Produksi Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+
+        .modal-body .row.g-3 {
+            row-gap: 18px;
+        }
+
+        @media (max-width: 575.98px) {
+
+            .modal-header,
+            .modal-footer,
+            .modal-body {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .modal-body {
+                padding-top: 16px;
+                padding-bottom: 6px;
+            }
+        }
+
+        /* Styling untuk tombol tambah alat produksi */
+        .btn-tambah-bahan-custom {
+            background: #28a745;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-tambah-bahan-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            color: white;
+        }
+        
+        .icon-circle {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Styling untuk tombol aksi */
+
+        /* Styling untuk pesan no data */
+        .no-data-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .no-data-message i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .no-data-message h5 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .no-data-message p {
+            margin-bottom: 0;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .alert {
+                padding: 12px 16px;
+            }
+            
+            .alert .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            
+            .alert i {
+                margin-bottom: 8px;
+                margin-right: 0 !important;
+            }
+            
+            /* Responsive untuk table */
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+            
+            .table td, .table th {
+                padding: 0.5rem 0.25rem;
+            }
+            
+            /* Responsive untuk modal */
+            .modal-dialog {
+                margin: 0.5rem;
+                max-width: calc(100% - 1rem);
+            }
+            
+            /* Responsive untuk form */
+            .form-label {
+                font-size: 0.875rem;
+            }
+            
+            .form-control, .form-select {
+                font-size: 0.875rem;
+                padding: 0.5rem 0.75rem;
+            }
+            
+            /* Responsive untuk button */
+            .btn {
+                font-size: 0.875rem;
+                padding: 0.5rem 1rem;
+            }
+            
+            .btn-tambah-bahan-custom {
+                padding: 10px 20px;
+                font-size: 0.875rem;
+            }
+            
+            /* Responsive untuk page heading */
+            .page-heading h3 {
+                font-size: 1.5rem;
+            }
+            
+            .page-heading p {
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            /* Responsive untuk mobile kecil */
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+            
+            .table td, .table th {
+                padding: 0.375rem 0.125rem;
+            }
+            
+            /* Responsive untuk modal di mobile */
+            .modal-header {
+                padding: 15px 12px 10px 12px;
+            }
+            
+            .modal-body {
+                padding: 15px 12px 8px 12px;
+            }
+            
+            .modal-footer {
+                padding: 12px 12px;
+            }
+            
+            /* Responsive untuk form di mobile */
+            .form-label {
+                font-size: 0.8rem;
+                margin-bottom: 0.25rem;
+            }
+            
+            .form-control, .form-select {
+                font-size: 0.8rem;
+                padding: 0.375rem 0.5rem;
+            }
+            
+            /* Responsive untuk button di mobile */
+            .btn {
+                font-size: 0.8rem;
+                padding: 0.375rem 0.75rem;
+            }
+            
+            .btn-tambah-bahan-custom {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            /* Responsive untuk page heading di mobile */
+            .page-heading h3 {
+                font-size: 1.25rem;
+            }
+            
+            .page-heading p {
+                font-size: 0.875rem;
+            }
+            
+            /* Responsive untuk card */
+            .card-body {
+                padding: 1rem;
+            }
+            
+            /* Responsive untuk pagination */
+            .dataTables_wrapper .dataTables_paginate .page-link {
+                width: 32px;
+                height: 32px;
+                font-size: 0.875rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Responsive untuk mobile sangat kecil */
+            .table-responsive {
+                font-size: 0.75rem;
+            }
+            
+            .table td, .table th {
+                padding: 0.25rem 0.1rem;
+            }
+            
+            /* Responsive untuk modal di mobile kecil */
+            .modal-dialog {
+                margin: 0.25rem;
+                max-width: calc(100% - 0.5rem);
+            }
+            
+            .modal-header {
+                padding: 12px 8px 8px 8px;
+            }
+            
+            .modal-body {
+                padding: 12px 8px 6px 8px;
+            }
+            
+            .modal-footer {
+                padding: 10px 8px;
+            }
+            
+            /* Responsive untuk form di mobile kecil */
+            .form-label {
+                font-size: 0.75rem;
+            }
+            
+            .form-control, .form-select {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.375rem;
+            }
+            
+            /* Responsive untuk button di mobile kecil */
+            .btn {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .btn-tambah-bahan-custom {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+            
+            /* Responsive untuk page heading di mobile kecil */
+            .page-heading h3 {
+                font-size: 1.125rem;
+            }
+            
+            .page-heading p {
+                font-size: 0.8rem;
+            }
+            
+            /* Responsive untuk card di mobile kecil */
+            .card-body {
+                padding: 0.75rem;
+            }
+            
+            /* Responsive untuk pagination di mobile kecil */
+            .dataTables_wrapper .dataTables_paginate .page-link {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .no-data-message i {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+        
+        /* Styling untuk kolom harga jual */
+        .table th:nth-child(6),
+        .table td:nth-child(6) {
+            background-color: #f8fff9;
+            border-left: 3px solid #28a745;
+        }
+        
+        .table th:nth-child(6) {
+            color: #28a745;
+            font-weight: 700;
+        }
+        
+        .table td:nth-child(6) {
+            font-weight: 600;
+            color: #28a745;
+        }
+        
+        /* Responsive untuk kolom harga jual */
+        @media (max-width: 768px) {
+            .table th:nth-child(6),
+            .table td:nth-child(6) {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}"><img
+                                    src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo"
+                                    srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                            <ul class="submenu ">
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_laporan_akhir') }}">Laporan Akhir</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        <li class="sidebar-item active has-sub">
+                                <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Monitoring Mahasiswa</span>
+                                </a>
+                            <ul class="submenu active">
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                    </li>
+                                    <li class="submenu-item active">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                            </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                    </li>
+                                </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('pembimbing.daftar_penilaian_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-pencil-square"></i>
+                                <span>Penilaian Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('index') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Data Alat Produksi Mahasiswa</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Pantau alat produksi mahasiswa bimbinganmu di AYMP UNJAYA.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.das_pembimbing') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_alat_produksi') }}">Monitoring Alat Produksi</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Alat Produksi</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Tables start -->
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <div class="card" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+                                    <div>
+                                    <div style="font-weight:700;font-size:1.25rem;">Data Alat Produksi Mahasiswa</div>
+                                    {% if mahasiswa_info %}
+                                        <small class="text-muted">NIM: {{ mahasiswa_info.nim }} | Program Studi: {{ mahasiswa_info.program_studi }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                                    <div class="table-responsive">
+                                <table class="table mb-0" id="table1">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Tanggal Beli</th>
+                                                    <th>Nama Peralatan</th>
+                                                    <th>Quantity</th>
+                                                    <th>Harga</th>
+                                                    <th>Harga Jual</th>
+                                                    <th>Total</th>
+                                                    <th>Keterangan</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                        {% if alat_produksi_list %}
+                                            {% for alat in alat_produksi_list %}
+                                                <tr>
+                                                    <td>{{ loop.index }}</td>
+                                                    <td>{{ alat.tanggal_beli.strftime('%d/%m/%Y') if alat.tanggal_beli else '-' }}</td>
+                                                    <td>
+                                                        <div class="fw-bold">{{ alat.nama_alat|e }}</div>
+                                                    </td>
+                                                    <td>{{ alat.quantity }}</td>
+                                                    <td>Rp {{ "{:,.0f}".format(alat.harga) }}</td>
+                                                    <td>Rp {{ "{:,.0f}".format(alat.harga_jual) if alat.harga_jual else '0' }}</td>
+                                                    <td>Rp {{ "{:,.0f}".format(alat.total_alat_produksi) }}</td>
+                                                    <td>{{ alat.keterangan|e if alat.keterangan else '-' }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="8" class="text-center text-muted">
+                                                    <i class="bi bi-inbox" style="font-size: 2rem; color: #dee2e6;"></i>
+                                                    <br>
+                                                    <small>Tidak ada data alat produksi</small>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                            <th colspan="6" class="text-end">Total Semua</th>
+                                            <th>Rp {{ "{:,.0f}".format(alat_produksi_list | sum(attribute='total_alat_produksi')) }}</th>
+                                                    <th></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Basic Tables end -->
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}">
+    </script>
+    <script
+        src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+    <script>
+        $(document).ready(function() {
+            let jquery_datatable = $("#table1").DataTable({
+                    language: {
+                        "sProcessing":   "Sedang memproses...",
+                        "sLengthMenu":   "Tampilkan _MENU_ data",
+                        "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                        "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                        "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                        "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                        "sInfoPostFix":  "",
+                        "sSearch":       "Cari:",
+                        "sUrl":          "",
+                        "oPaginate": {
+                            "sFirst":    "Pertama",
+                            "sPrevious": "Sebelumnya",
+                            "sNext":     "Selanjutnya",
+                            "sLast":     "Terakhir"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                            "sSortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                        }
+                },
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]]
+            });
+        });
+    </script>
+
+</body>
+
+</html>
+

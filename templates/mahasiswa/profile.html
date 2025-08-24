@@ -1,0 +1,639 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/iconly/bold.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-mahasiswa.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+
+    <style>
+        .info-item {
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef !important;
+        }
+        
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #667eea !important;
+        }
+        
+        .avatar-circle {
+            transition: all 0.3s ease;
+        }
+        
+        .avatar-circle:hover {
+            transform: scale(1.05);
+        }
+        
+        .table-borderless th {
+            font-weight: 600 !important;
+            color: #6c757d !important;
+            border-bottom: 2px solid #dee2e6 !important;
+        }
+        
+        .table-borderless td {
+            vertical-align: middle;
+            padding: 1rem 0.75rem;
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+        
+        .badge.rounded-pill {
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .text-muted {
+            color: #6c757d !important;
+        }
+        
+        .fw-semibold {
+            font-weight: 600 !important;
+        }
+        .table th, .table td {
+            background: none !important;
+            border: none !important;
+        }
+        
+        /* Responsive untuk profile */
+        @media (max-width: 768px) {
+            .profile-header .avatar-circle {
+                width: 100px !important;
+                height: 100px !important;
+            }
+            
+            .profile-header .avatar-initial {
+                font-size: 2.5rem !important;
+            }
+            
+            .profile-header h3 {
+                font-size: 1.5rem !important;
+            }
+            
+            .profile-header p {
+                font-size: 1rem !important;
+            }
+            
+            .info-item {
+                margin-bottom: 1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .profile-header .avatar-circle {
+                width: 80px !important;
+                height: 80px !important;
+            }
+            
+            .profile-header .avatar-initial {
+                font-size: 2rem !important;
+            }
+            
+            .profile-header h3 {
+                font-size: 1.25rem !important;
+            }
+            
+            .profile-header p {
+                font-size: 0.9rem !important;
+            }
+            
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .table-borderless td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .profile-header .avatar-circle {
+                width: 60px !important;
+                height: 60px !important;
+            }
+            
+            .profile-header .avatar-initial {
+                font-size: 1.5rem !important;
+            }
+            
+            .profile-header h3 {
+                font-size: 1.1rem !important;
+            }
+            
+            .profile-header p {
+                font-size: 0.8rem !important;
+            }
+            
+            .card-body {
+                padding: 0.75rem;
+            }
+            
+            .table-borderless td {
+                padding: 0.5rem 0.25rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}"><img
+                                    src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo"
+                                    srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        {% if has_lolos_proposal %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin = 'lolos' - lengkap -->
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                <span>Pendanaan Hibah</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_akhir') }}">Laporan Akhir</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span>Produksi</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.pengelolaan_bahan_baku_mahasiswa') }}">Bahan Baku</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.aktivitas_produksi_mahasiswa') }}">Produksi</a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.pembelian_alat_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-tools"></i>
+                                <span>Alat Produksi</span>
+                            </a>
+                            
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.biaya_operasional_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-calculator"></i>
+                                <span>Biaya Operasional</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.biaya_non_operasional_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-wallet2"></i>
+                                <span>Biaya Lain-lain</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.laporan_penjualan_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-receipt"></i>
+                                    <span>Laporan Penjualan</span>
+                            </a>
+                            
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-graph-up"></i>
+                                    <span>Pelaporan Keuangan</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_laba_rugi_mahasiswa') }}">Laporan Laba Rugi</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_arus_kas_mahasiswa') }}">Laporan Arus Kas</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_neraca_mahasiswa') }}">Laporan Neraca</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% else %}
+                        <!-- Menu untuk mahasiswa dengan proposal status_admin != 'lolos' atau tanpa proposal - terbatas -->
+                        <li class="sidebar-item has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% endif %}
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.bimbingan') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('mahasiswa.profile_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-person-circle"></i>
+                                <span>Profile Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-star-fill"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+
+            </header>
+
+            <div class="page-heading">
+                <h3>Profile Mahasiswa</h3>
+                <p class="text-muted" style="font-size:1.2rem;">Lihat dan perbarui data profilmu di AYMP UNJAYA.</p>
+            </div>
+            <div class="page-content">
+                <section class="row">
+                    <div class="col-12">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-transparent border-0 pb-0">
+                                <h5 class="card-title mb-0 text-dark">
+                                    <i class="bi bi-person-circle me-2 text-primary"></i>
+                                    Data Profile
+                                </h5>
+                            </div>
+                            <div class="card-body pt-3">
+                                {% if mahasiswa_data %}
+                                <div class="row">
+                                    <div class="col-lg-3 col-md-4 text-center mb-4">
+                                        <!-- Avatar dengan inisial -->
+                                        <div class="avatar-wrapper mb-3">
+                                            <div class="avatar-circle" style="width: 120px; height: 120px; border-radius: 50%; background: #006400; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 4px 20px rgba(0, 100, 0, 0.3);">
+                                                <span style="font-size: 48px; font-weight: bold; color: white; text-transform: uppercase;">
+                                                    {% set nama_words = mahasiswa_data.nama_ketua.split() %}
+                                                    {% if nama_words|length >= 2 %}
+                                                        {{ nama_words[0][0] }}{{ nama_words[1][0] }}
+                                                    {% else %}
+                                                        {{ mahasiswa_data.nama_ketua[:2] }}
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <h5 class="mb-2 fw-bold text-dark">{{ mahasiswa_data.nama_ketua }}</h5>
+                                        <div class="mb-3">
+                                            {% if mahasiswa_data.status == 'aktif' %}
+                                                <span class="badge bg-success rounded-pill px-3 py-2">Akun Aktif</span>
+                                            {% elif mahasiswa_data.status == 'proses' %}
+                                                <span class="badge bg-warning rounded-pill px-3 py-2">Menunggu Verifikasi</span>
+                                            {% elif mahasiswa_data.status == 'tolak' %}
+                                                <span class="badge bg-danger rounded-pill px-3 py-2">Akun Ditolak</span>
+                                            {% elif mahasiswa_data.status == 'selesai' %}
+                                                <span class="badge rounded-pill px-3 py-2" style="background: linear-gradient(135deg, #0dcaf0 0%, #0aa2c0 100%); color: white;">Program Selesai</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary rounded-pill px-3 py-2">{{ mahasiswa_data.status|title }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-9 col-md-8">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="info-item p-3 border rounded-3 bg-light">
+                                                    <label class="form-label fw-bold text-muted small mb-1">Perguruan Tinggi</label>
+                                                    <p class="mb-0 fw-semibold text-dark">{{ mahasiswa_data.perguruan_tinggi }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="info-item p-3 border rounded-3 bg-light">
+                                                    <label class="form-label fw-bold text-muted small mb-1">Program Studi</label>
+                                                    <p class="mb-0 fw-semibold text-dark">{{ mahasiswa_data.program_studi }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="info-item p-3 border rounded-3 bg-light">
+                                                    <label class="form-label fw-bold text-muted small mb-1">NIM</label>
+                                                    <p class="mb-0 fw-semibold text-dark">{{ mahasiswa_data.nim }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="info-item p-3 border rounded-3 bg-light">
+                                                    <label class="form-label fw-bold text-muted small mb-1">Nama Lengkap</label>
+                                                    <p class="mb-0 fw-semibold text-dark">{{ mahasiswa_data.nama_ketua }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="info-item p-3 border rounded-3 bg-light">
+                                                    <label class="form-label fw-bold text-muted small mb-1">Email</label>
+                                                    <p class="mb-0 fw-semibold text-dark">{{ mahasiswa_data.email }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="info-item p-3 border rounded-3 bg-light">
+                                                    <label class="form-label fw-bold text-muted small mb-1">No. Telepon</label>
+                                                    <p class="mb-0 fw-semibold text-dark">{{ mahasiswa_data.no_telp }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="info-item p-3 border rounded-3 bg-light">
+                                                    <label class="form-label fw-bold text-muted small mb-1">Status Proposal</label>
+                                                    <p class="mb-0">
+                                                        {% if proposals %}
+                                                            {% set latest_proposal = proposals|sort(attribute='tanggal_buat', reverse=true)|first %}
+                                                            {% if latest_proposal.status == 'draf' %}
+                                                                <span class="badge bg-warning rounded-pill">Draf</span>
+                                                            {% elif latest_proposal.status == 'diajukan' %}
+                                                                <span class="badge bg-info rounded-pill">Diajukan</span>
+                                                            {% elif latest_proposal.status == 'disetujui' %}
+                                                                <span class="badge bg-success rounded-pill">Disetujui</span>
+                                                            {% elif latest_proposal.status == 'ditolak' %}
+                                                                <span class="badge bg-danger rounded-pill">Ditolak</span>
+                                                            {% elif latest_proposal.status == 'revisi' %}
+                                                                <span class="badge bg-warning rounded-pill">Revisi</span>
+                                                            {% else %}
+                                                                <span class="badge bg-secondary rounded-pill">{{ latest_proposal.status|title }}</span>
+                                                            {% endif %}
+                                                        {% else %}
+                                                            <span class="badge bg-secondary rounded-pill">Belum Mengajukan</span>
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="info-item p-3 border rounded-3 bg-light">
+                                                    <label class="form-label fw-bold text-muted small mb-1">Tanggal Daftar</label>
+                                                    <p class="mb-0 fw-semibold text-dark">
+                                                        {% if mahasiswa_data.tanggal_daftar %}
+                                                            {{ mahasiswa_data.tanggal_daftar.strftime('%d %B %Y') }}
+                                                        {% else %}
+                                                            -
+                                                        {% endif %}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Alert untuk status non-aktif -->
+                                        {% if mahasiswa_data.status != 'aktif' %}
+                                        <div class="alert {% if mahasiswa_data.status == 'selesai' %}alert-info{% else %}alert-warning{% endif %} border-0 mt-4" role="alert" style="background-color: {% if mahasiswa_data.status == 'selesai' %}#e8f4f8{% else %}#fff3cd{% endif %}; border-left: 4px solid {% if mahasiswa_data.status == 'selesai' %}#0dcaf0{% else %}#ffc107{% endif %};">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi {% if mahasiswa_data.status == 'selesai' %}bi-info-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %} me-3 {% if mahasiswa_data.status == 'selesai' %}text-info{% else %}text-warning{% endif %}" style="font-size: 1.2rem;"></i>
+                                                <div>
+                                                    <strong class="text-dark">{% if mahasiswa_data.status == 'selesai' %}Informasi{% else %}Perhatian!{% endif %}</strong> 
+                                                    {% if mahasiswa_data.status == 'proses' %}
+                                                        <span class="text-dark">Akun Anda sedang menunggu verifikasi dari admin. Anda hanya dapat mengakses menu pengajuan proposal.</span>
+                                                    {% elif mahasiswa_data.status == 'tolak' %}
+                                                        <span class="text-dark">Akun Anda telah ditolak. Silakan hubungi admin untuk informasi lebih lanjut.</span>
+                                                    {% elif mahasiswa_data.status == 'selesai' %}
+                                                        <span class="text-dark">Program Anda telah selesai. Anda tidak dapat membuat proposal baru atau mengakses fitur pengembangan usaha. Hubungi admin jika ada pertanyaan.</span>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% else %}
+                                <div class="text-center py-5">
+                                    <i class="bi bi-exclamation-circle text-warning" style="font-size: 3rem; opacity: 0.7;"></i>
+                                    <h5 class="mt-3 text-muted">Data Profile Tidak Ditemukan</h5>
+                                    <p class="text-muted">Terjadi kesalahan saat memuat data profile.</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Section Anggota Tim dan Dosen Pembimbing -->
+                {% if mahasiswa_data %}
+                <section class="row">
+                    <!-- Anggota Tim -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-transparent border-0 pb-0">
+                                <h5 class="card-title mb-0 text-dark">
+                                    Anggota Tim Proposal
+                                </h5>
+                            </div>
+                            <div class="card-body pt-3">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr class="border-bottom">
+                                                <th class="text-muted fw-normal" style="width: 50px;">No</th>
+                                                <th class="text-muted fw-normal">Nama</th>
+                                                <th class="text-muted fw-normal">NIM</th>
+                                                <th class="text-muted fw-normal">Perguruan Tinggi</th>
+                                                <th class="text-muted fw-normal">Program Studi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Ketua Tim -->
+                                            <tr class="border-bottom">
+                                                <td class="text-center">
+                                                    <span class="badge bg-success rounded-pill">1</span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-circle me-3" style="width: 45px; height: 45px; border-radius: 50%; background: #006400; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0, 100, 0, 0.3);">
+                                                            <span style="font-size: 18px; font-weight: bold; color: white; text-transform: uppercase;">
+                                                                {% set nama_words = mahasiswa_data.nama_ketua.split() %}
+                                                                {% if nama_words|length >= 2 %}
+                                                                    {{ nama_words[0][0] }}{{ nama_words[1][0] }}
+                                                                {% else %}
+                                                                    {{ mahasiswa_data.nama_ketua[:2] }}
+                                                                {% endif %}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <div class="fw-bold text-success">{{ mahasiswa_data.nama_ketua|e }}</div>
+                                                            <small class="badge bg-success rounded-pill">Ketua Tim</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-muted">{{ mahasiswa_data.nim|e }}</td>
+                                                <td class="text-muted">{{ mahasiswa_data.perguruan_tinggi|e }}</td>
+                                                <td class="text-muted">{{ mahasiswa_data.program_studi|e }}</td>
+                                            </tr>
+                                            <!-- Anggota Tim -->
+                                            {% for anggota in anggota_tim_list %}
+                                            <tr class="border-bottom">
+                                                <td class="text-center">
+                                                    <span class="text-muted">{{ loop.index + 1 }}</span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-circle me-3" style="width: 45px; height: 45px; border-radius: 50%; background: #90EE90; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(144, 238, 144, 0.3);">
+                                                            <span style="font-size: 18px; font-weight: bold; color: #333; text-transform: uppercase;">
+                                                                {{ anggota.nama[:2] }}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <div class="fw-bold text-dark">{{ anggota.nama }}</div>
+                                                            <small class="badge bg-light text-dark rounded-pill">Anggota</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-muted">{{ anggota.nim }}</td>
+                                                <td class="text-muted">{{ anggota.perguruan_tinggi }}</td>
+                                                <td class="text-muted">{{ anggota.program_studi }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dosen Pembimbing -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-transparent border-0 pb-0">
+                                <h5 class="card-title mb-0 text-dark">
+                                    <i class="bi bi-person-workspace me-2 text-success"></i>
+                                    Dosen Pembimbing
+                                </h5>
+                            </div>
+                            <div class="card-body pt-3">
+                                {% if dosen_pembimbing_list %}
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr class="border-bottom">
+                                                <th class="text-muted fw-normal" style="width: 50px;">No</th>
+                                                <th class="text-muted fw-normal">Nama Dosen</th>
+                                                <th class="text-muted fw-normal">NID</th>
+                                                <th class="text-muted fw-normal">Program Studi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for dosen in dosen_pembimbing_list %}
+                                            <tr class="border-bottom">
+                                                <td class="text-center">
+                                                    <span class="badge bg-primary rounded-pill">{{ loop.index }}</span>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-circle me-3" style="width: 45px; height: 45px; border-radius: 50%; background: #0066cc; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);">
+                                                            <span style="font-size: 18px; font-weight: bold; color: white; text-transform: uppercase;">
+                                                                {% set nama_words = dosen.dosen_pembimbing.split() %}
+                                                                {% if nama_words|length >= 2 %}
+                                                                    {{ nama_words[0][0] }}{{ nama_words[1][0] }}
+                                                                {% else %}
+                                                                    {{ dosen.dosen_pembimbing[:2] }}
+                                                                {% endif %}
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <div class="fw-bold text-primary">{{ dosen.dosen_pembimbing }}</div>
+                                                            <small class="badge bg-primary rounded-pill">Pembimbing</small>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td class="text-muted">{{ dosen.nid_dosen or '-' }}</td>
+                                                <td class="text-muted">{{ dosen.program_studi_dosen }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="text-center py-5">
+                                    <div class="mb-3">
+                                        <i class="bi bi-person-x text-muted" style="font-size: 3rem; opacity: 0.5;"></i>
+                                    </div>
+                                    <h6 class="text-muted mb-2">Belum Ada Dosen Pembimbing</h6>
+                                    <p class="text-muted small mb-0">Dosen pembimbing akan muncul setelah proposal disetujui.</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                {% endif %}
+
+            </div>
+
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <!-- ApexCharts -->
+    <script src="{{ url_for('static', filename='assets/vendors/apexcharts/apexcharts.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/js/pages/dashboard.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+</body>
+
+</html>
+

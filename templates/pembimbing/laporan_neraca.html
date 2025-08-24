@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Laporan Neraca Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-pembimbing.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    
+    <style>
+        /* Styling untuk tombol download */
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+            color: white;
+        }
+        
+        .btn-success:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+        }
+        
+        .btn-success:focus {
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+        }
+        
+        /* Styling untuk judul card header */
+        .card-header h5 {
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3) !important;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Responsive design untuk tombol download */
+        @media (max-width: 768px) {
+            .btn-success {
+                padding: 6px 12px !important;
+                font-size: 0.875rem;
+            }
+            
+            .btn-success i {
+                font-size: 0.9em;
+            }
+            
+            .card-header h5 {
+                font-size: 1.1rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .btn-success {
+                padding: 5px 10px !important;
+                font-size: 0.8rem;
+            }
+            
+            .btn-success i {
+                font-size: 0.85em;
+            }
+            
+            .card-header h5 {
+                font-size: 1rem;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}"><img
+                                    src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo"
+                                    srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                <span>Pendanaan Hibah</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_laporan_akhir') }}">Laporan Akhir</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item active has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu active">
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item active">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('pembimbing.daftar_penilaian_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-pencil-square"></i>
+                                <span>Penilaian Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                                <h3>Laporan Neraca Mahasiswa</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Lihat dan kelola laporan neraca mahasiswa bimbinganmu di AYMP UNJAYA.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.das_pembimbing') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_neraca') }}">Monitoring Laporan Neraca</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Laporan Neraca</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Laporan Neraca -->
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        {% if mahasiswa_info %}
+                        <div class="card shadow-sm" style="border-radius: 15px;">
+                            <div class="card-header text-white" style="border-radius: 15px 15px 0 0; background-color: #435ebe;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0" style="color: #ffffff; font-weight: 700; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">LAPORAN NERACA</h5>
+                                    <div>
+                                        <button type="button" class="btn btn-success btn-sm" onclick="downloadNeraca()" style="border-radius: 8px; font-weight: 600; padding: 8px 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.3s ease;">
+                                            <i class="bi bi-download me-2"></i>Download Laporan
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="text-center mb-4">
+                                    <h4 class="fw-bold text-dark mb-1">LAPORAN NERACA</h4>
+                                    <h5 class="text-muted mb-1">{{ mahasiswa_info.nama_ketua if mahasiswa_info else 'Perusahaan' }}</h5>
+                                    <p class="text-muted mb-0">Per Tanggal: {{ neraca_data.tanggal_neraca if neraca_data and neraca_data.tanggal_neraca else '31 Desember 2024' }}</p>
+                                </div>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" style="border: 1px solid #000; width: 100%;">
+                                        <thead>
+                                            <tr style="background-color: #f8f9fa; border: 1px solid #000;">
+                                                <th style="width: 60%; text-align: center; border: 1px solid #000; padding: 8px; font-weight: bold;">NAMA AKUN</th>
+                                                <th colspan="2" style="width: 40%; text-align: center; border: 1px solid #000; padding: 8px; font-weight: bold;">NOMINAL</th>
+                                            </tr>
+                                            <tr style="background-color: #f8f9fa; border: 1px solid #000;">
+                                                <th style="border: 1px solid #000; padding: 8px;"></th>
+                                                <th style="width: 20%; text-align: center; border: 1px solid #000; padding: 8px; font-weight: bold;">DEBIT</th>
+                                                <th style="width: 20%; text-align: center; border: 1px solid #000; padding: 8px; font-weight: bold;">KREDIT</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- A. ASET -->
+                                            <tr style="background-color: #e3f2fd; border: 1px solid #000;">
+                                                <td colspan="3" style="border: 1px solid #000; padding: 8px; font-weight: bold; font-size: 14px;">
+                                                    A. ASET
+                                                </td>
+                                            </tr>
+                                            
+                                            <!-- Aset Lancar -->
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px; font-weight: bold;">1. Aset Lancar</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Kas dan Setara Kas</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.kas_dan_setara_kas if neraca_data and neraca_data.kas_dan_setara_kas else 0) }}</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Piutang Usaha</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.piutang_usaha if neraca_data and neraca_data.piutang_usaha else 0) }}</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Persediaan</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.persediaan if neraca_data and neraca_data.persediaan else 0) }}</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Beban Dibayar di Muka</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.beban_dibayar_dimuka if neraca_data and neraca_data.beban_dibayar_dimuka else 0) }}</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">dst.</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="background-color: #fff3cd; border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px; font-weight: bold;">Total Aset Lancar</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right; font-weight: bold;">Rp. {{ "{:,.0f}".format(neraca_data.total_aset_lancar if neraca_data and neraca_data.total_aset_lancar else 0) }}</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            
+                                            <!-- Aset Tetap -->
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px; font-weight: bold;">2. Aset Tetap</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Tanah</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. 0</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Bangunan</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. 0</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Kendaraan</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. 0</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Peralatan dan Mesin</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.peralatan_dan_mesin if neraca_data and neraca_data.peralatan_dan_mesin else 0) }}</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Akumulasi Penyusutan</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.akumulasi_penyusutan if neraca_data and neraca_data.akumulasi_penyusutan else 0) }}</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="background-color: #fff3cd; border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px; font-weight: bold;">Total Aset Tetap (Setelah Penyusutan)</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right; font-weight: bold;">Rp. {{ "{:,.0f}".format(neraca_data.total_aset_tetap_bersih if neraca_data and neraca_data.total_aset_tetap_bersih else 0) }}</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            
+                                            <!-- Aset Lain-lain -->
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px; font-weight: bold;">3. Aset Lain-lain</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Investasi Jangka Panjang</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.investasi_jangka_panjang if neraca_data and neraca_data.investasi_jangka_panjang else 0) }}</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Hak Paten dan Merek Dagang</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.hak_paten_merek_dagang if neraca_data and neraca_data.hak_paten_merek_dagang else 0) }}</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">dst.</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="background-color: #fff3cd; border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px; font-weight: bold;">Total Aset Lain-lain</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right; font-weight: bold;">Rp. {{ "{:,.0f}".format(neraca_data.total_aset_lain_lain if neraca_data and neraca_data.total_aset_lain_lain else 0) }}</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            
+                                            <!-- Total Aset -->
+                                            <tr style="background-color: #007bff; color: white; border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">Total Aset Keseluruhan</td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right; font-weight: bold;">Rp. {{ "{:,.0f}".format(neraca_data.total_aset if neraca_data and neraca_data.total_aset else 0) }}</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            
+                                            <!-- B. LIABILITAS -->
+                                            <tr style="background-color: #f8d7da; border: 1px solid #000;">
+                                                <td colspan="3" style="border: 1px solid #000; padding: 8px; font-weight: bold; font-size: 14px;">
+                                                    B. LIABILITAS (KEWAJIBAN)
+                                                </td>
+                                            </tr>
+                                            
+                                            <!-- Liabilitas Jangka Pendek -->
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px; font-weight: bold;">1. Liabilitas Jangka Pendek</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Utang Usaha</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.utang_usaha if neraca_data and neraca_data.utang_usaha else 0) }}</td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Beban yang Masih Harus Dibayar</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.beban_harus_dibayar if neraca_data and neraca_data.beban_harus_dibayar else 0) }}</td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Utang Pajak</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.utang_pajak if neraca_data and neraca_data.utang_pajak else 0) }}</td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Utang Jangka Pendek Lainnya</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.utang_jangka_pendek_lainnya if neraca_data and neraca_data.utang_jangka_pendek_lainnya else 0) }}</td>
+                                            </tr>
+                                            <tr style="background-color: #fff3cd; border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px; font-weight: bold;">Total Liabilitas Jangka Pendek</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right; font-weight: bold;">Rp. {{ "{:,.0f}".format(neraca_data.total_liabilitas_jangka_pendek if neraca_data and neraca_data.total_liabilitas_jangka_pendek else 0) }}</td>
+                                            </tr>
+                                            
+                                            <!-- Liabilitas Jangka Panjang -->
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px; font-weight: bold;">2. Liabilitas Jangka Panjang</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Utang Bank</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.utang_bank if neraca_data and neraca_data.utang_bank else 0) }}</td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">Obligasi yang Diterbitkan</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. 0</td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 40px;">dst.</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="background-color: #fff3cd; border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px; font-weight: bold;">Total Liabilitas Jangka Panjang</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right; font-weight: bold;">Rp. {{ "{:,.0f}".format(neraca_data.total_liabilitas_jangka_panjang if neraca_data and neraca_data.total_liabilitas_jangka_panjang else 0) }}</td>
+                                            </tr>
+                                            
+                                            <!-- Total Liabilitas -->
+                                            <tr style="background-color: #dc3545; color: white; border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">Total Liabilitas</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right; font-weight: bold;">Rp. {{ "{:,.0f}".format(neraca_data.total_liabilitas if neraca_data and neraca_data.total_liabilitas else 0) }}</td>
+                                            </tr>
+                                            
+                                            <!-- C. EKUITAS -->
+                                            <tr style="background-color: #d4edda; border: 1px solid #000;">
+                                                <td colspan="3" style="border: 1px solid #000; padding: 8px; font-weight: bold; font-size: 14px;">
+                                                    C. EKUITAS
+                                                </td>
+                                            </tr>
+                                            
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px;">Modal Saham</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.modal_disetor if neraca_data and neraca_data.modal_disetor else 0) }}</td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px;">Laba Ditahan</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right;">Rp. {{ "{:,.0f}".format(neraca_data.laba_ditahan if neraca_data and neraca_data.laba_ditahan else 0) }}</td>
+                                            </tr>
+                                            <tr style="border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; padding-left: 20px;">dst.</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                            </tr>
+                                            <tr style="background-color: #28a745; color: white; border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">Total Ekuitas</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right; font-weight: bold;">Rp. {{ "{:,.0f}".format(neraca_data.total_ekuitas if neraca_data and neraca_data.total_ekuitas else 0) }}</td>
+                                            </tr>
+                                            
+                                            <!-- Total Liabilitas dan Ekuitas -->
+                                            <tr style="background-color: #007bff; color: white; border: 1px solid #000;">
+                                                <td style="border: 1px solid #000; padding: 8px; font-weight: bold;">Total Liabilitas dan Ekuitas</td>
+                                                <td style="border: 1px solid #000; padding: 8px;"></td>
+                                                <td style="border: 1px solid #000; padding: 8px; text-align: right; font-weight: bold;">Rp. {{ "{:,.0f}".format(neraca_data.total_liabilitas_dan_ekuitas if neraca_data and neraca_data.total_liabilitas_dan_ekuitas else 0) }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-warning" role="alert">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-exclamation-triangle me-3" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <h5 class="alert-heading mb-1">Data tidak ditemukan</h5>
+                                    <p class="mb-0">Data mahasiswa atau laporan neraca tidak ditemukan. Silakan kembali ke halaman monitoring laporan neraca.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_neraca') }}" class="btn btn-primary">
+                                <i class="bi bi-arrow-left me-2"></i>Kembali ke Monitoring Laporan Neraca
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+
+    <script>
+        function downloadNeraca() {
+            Swal.fire({
+                title: 'Download Laporan Neraca',
+                text: 'Pilih format file yang ingin didownload',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Excel',
+                cancelButtonText: 'PDF',
+                showDenyButton: true,
+                denyButtonText: 'Word',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    downloadNeracaFile('excel');
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    downloadNeracaFile('pdf');
+                } else if (result.isDenied) {
+                    downloadNeracaFile('word');
+                }
+            });
+        }
+
+        function downloadNeracaFile(format) {
+            // Tampilkan loading
+            Swal.fire({
+                title: 'Mengunduh...',
+                text: 'Sedang memproses laporan neraca...',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Buat form untuk download
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{{ url_for("pembimbing.download_neraca") }}';
+            
+            const formatInput = document.createElement('input');
+            formatInput.type = 'hidden';
+            formatInput.name = 'format';
+            formatInput.value = format;
+            
+            const proposalIdInput = document.createElement('input');
+            proposalIdInput.type = 'hidden';
+            proposalIdInput.name = 'proposal_id';
+            proposalIdInput.value = '{{ mahasiswa_info.proposal_id if mahasiswa_info else "" }}';
+            
+            form.appendChild(formatInput);
+            form.appendChild(proposalIdInput);
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+            
+            // Tutup loading setelah beberapa detik
+            setTimeout(() => {
+                Swal.close();
+                // Tampilkan pesan sukses
+                Swal.fire({
+                    title: 'Download Berhasil!',
+                    text: 'File laporan neraca telah berhasil diunduh.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }, 1500);
+        }
+    </script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+</body>
+
+</html>

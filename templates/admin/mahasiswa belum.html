@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahasiswa Belum Diverifikasi Admin - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <!-- <link rel="stylesheet" href="assets/vendors/jquery-datatables/jquery.dataTables.min.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/choices.js/choices.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+
+        .modal-body .row.g-3 {
+            row-gap: 18px;
+        }
+
+        @media (max-width: 575.98px) {
+
+            .modal-header,
+            .modal-footer,
+            .modal-body {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .modal-body {
+                padding-top: 16px;
+                padding-bottom: 6px;
+            }
+        }
+
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-circle:active,
+        .btn-circle:focus {
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.13);
+        }
+
+        .btn-circle i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.1em;
+            line-height: 1;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 7px;
+            vertical-align: middle;
+        }
+
+        .status-draft {
+            background: #facc15;
+        }
+
+        .status-active {
+            background: #22c55e;
+        }
+
+        .status-inactive {
+            background: #ef4444;
+        }
+
+        .status-text {
+            font-weight: 500;
+            color: #444;
+        }
+
+        .approval-buttons {
+            display: flex;
+            gap: 6px;
+        }
+
+        .status-display {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-rejected {
+            background: #ef4444;
+        }
+
+        .status-completed {
+            background: #17a2b8;
+        }
+
+        /* Styling dasar untuk tabel */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Responsive table */
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Info box styling */
+        .text-muted small {
+            font-size: 13px;
+        }
+
+        /* Modal styling */
+        .modal-lg {
+            max-width: 800px;
+        }
+
+        .modal-body .form-label {
+            font-weight: 600;
+            color: #3b3f5c;
+            margin-bottom: 8px;
+        }
+
+        .modal-body .form-control,
+        .modal-body .form-select {
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            padding: 10px 15px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .modal-body .form-control:focus,
+        .modal-body .form-select:focus {
+            border-color: #435ebe;
+            box-shadow: 0 0 0 0.2rem rgba(67, 94, 190, 0.25);
+            outline: none;
+        }
+
+        .modal-footer .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+
+        /* Fix untuk DataTables */
+        .dataTables_wrapper .dataTable {
+            width: 100% !important;
+        }
+
+        .dataTables_wrapper .dataTable th,
+        .dataTables_wrapper .dataTable td {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .dataTables_wrapper .dataTable tbody tr {
+            height: auto;
+        }
+        
+        /* Responsive styling untuk tombol aksi */
+        @media (max-width: 768px) {
+            .btn-circle {
+                width: 35px !important;
+                height: 35px !important;
+                font-size: 1rem !important;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .btn-circle {
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 0.9rem !important;
+            }
+        }
+        
+        /* Responsive untuk mahasiswa management */
+        @media (max-width: 768px) {
+            .mahasiswa-management .search-box {
+                margin-bottom: 1rem;
+            }
+            
+            .mahasiswa-management .filter-section {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .mahasiswa-management .btn-export {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 1rem;
+            }
+            
+            .btn-action-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn-action-group .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .mahasiswa-management .btn-circle {
+                width: 35px !important;
+                height: 35px !important;
+                font-size: 1rem !important;
+            }
+            
+            .status-display {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+            
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+            
+            .table td, .table th {
+                padding: 0.5rem 0.25rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .mahasiswa-management .btn-circle {
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 0.9rem !important;
+            }
+            
+            .table-responsive {
+                font-size: 0.75rem;
+            }
+            
+            .table td, .table th {
+                padding: 0.375rem 0.125rem;
+            }
+        }
+            height: auto;
+        }
+
+        /* Styling untuk pesan konfirmasi hapus */
+        .swal2-popup .text-start {
+            text-align: left !important;
+        }
+
+        .swal2-popup .text-start ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .swal2-popup .text-start li {
+            margin-bottom: 5px;
+            color: #3b3f5c;
+        }
+
+        .swal2-popup .text-danger {
+            color: #ef4444 !important;
+            font-weight: 600;
+        }
+
+        /* Styling untuk informasi mahasiswa */
+        .table td small {
+            line-height: 1.1;
+            display: block;
+            margin-top: 1px;
+        }
+
+        .table td small:first-of-type {
+            margin-top: 2px;
+        }
+
+        /* Card hover effect */
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+
+        /* Fallback styling untuk tabel jika DataTables gagal */
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Memastikan tabel responsive */
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Styling untuk tombol aksi */
+        .td-aksi {
+            white-space: nowrap;
+            min-width: 100px;
+        }
+
+        .td-aksi .btn-circle {
+            margin: 0 2px;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-admin.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    </head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('admin.das_admin') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.das_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.admin_daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  has-sub active">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Mahasiswa</span>
+                            </a>
+                            <ul class="submenu active">
+                                <li class="submenu-item active">
+                                    <a href="{{ url_for('admin.mahasiswa_belum_diverifikasi') }}">Belum Diverifikasi</a>
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.mahasiswa_sudah_diverifikasi') }}">Sudah Diverifikasi</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi-bar-chart-line"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-clock-history"></i>
+                                <span>Log Aktivitas</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_mahasiswa') }}">Mahasiswa</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_pembimbing') }}">Pembimbing</a> 
+                                </li>
+                                
+                            </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.daftar_nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-award"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.pengajuan_proposal') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Pengajuan Proposal</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_kemajuan') }}" class='sidebar-link'>
+                                <i class="bi bi-graph-up"></i>
+                                <span>Laporan Kemajuan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_akhir') }}" class='sidebar-link'>
+                                <i class="bi bi-clipboard-data"></i>
+                                <span>Laporan Akhir</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Pembimbing</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.reviewer') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Reviewer</span>
+                            </a>
+                                </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.data_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Admin</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.pengaturan') }}" class='sidebar-link'>
+                                <i class="bi bi-gear"></i>
+                                <span>Pengaturan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('index') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Mahasiswa Belum Diverifikasi</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Kelola data mahasiswa yang menunggu verifikasi di AYMP UNJAYA.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('admin.das_admin') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Mahasiswa Belum Diverifikasi</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Tables start -->
+                <section class="section">
+                    <div class="container-fluid mt-4">
+
+                        <div class="card"
+                            style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+                                <div>
+                                    <div style="font-weight:700;font-size:1.25rem;">Data Mahasiswa Belum Diverifikasi</div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table mb-0" id="table1">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama</th>
+                                            <th>NIM</th>
+                                            <th>Email</th>
+                                            <th>Program Studi</th>
+                                            <th>Status</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if mahasiswa_list and mahasiswa_list|length > 0 %}
+                                            {% for mahasiswa in mahasiswa_list %}
+                                            <tr>
+                                                <td></td>
+                                                <td>{{ mahasiswa.nama_ketua|e if mahasiswa.nama_ketua else '-' }}</td>
+                                                <td>{{ mahasiswa.nim|e if mahasiswa.nim else '-' }}</td>
+                                                <td>{{ mahasiswa.email|e if mahasiswa.email else '-' }}</td>
+                                                <td>{{ mahasiswa.program_studi|e if mahasiswa.program_studi else '-' }}</td>
+                                                <td>
+                                                    <div class="approval-buttons" id="approval-{{ mahasiswa.id }}">
+                                                        <button class="btn btn-circle" style="background:#22c55e;color:#fff;" 
+                                                                onclick="approveStudent({{ mahasiswa.id }})" title="Diterima">
+                                                            <i class="fa-solid fa-check"></i>
+                                                        </button>
+                                                        <button class="btn btn-circle" style="background:#ef4444;color:#fff;" 
+                                                                onclick="rejectStudent({{ mahasiswa.id }})" title="Tolak">
+                                                            <i class="fa-solid fa-xmark"></i>
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                                <td class="td-aksi">
+                                                    <button class="btn btn-circle" style="background:#102693;color:#fff;"
+                                                            title="Edit" onclick="editStudent({{ mahasiswa.id }})">
+                                                        <i class="fa-solid fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-circle" style="background:#f472b6;color:#fff;"
+                                                            title="Hapus" onclick="deleteStudent({{ mahasiswa.id }})">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="7" class="text-center py-5">
+                                                    <div class="d-flex flex-column align-items-center">
+                                                        <div class="mb-3">
+                                                            <i class="fa-solid fa-user-clock" style="font-size: 3rem; color: #d1d5db;"></i>
+                                                        </div>
+                                                        <h5 class="text-muted mb-2">Belum Ada Data Mahasiswa</h5>
+                                                        <p class="text-muted mb-0" style="font-size: 0.9rem;">
+                                                            Saat ini belum ada mahasiswa yang menunggu verifikasi.<br>
+                                                            Mahasiswa akan muncul di sini setelah mendaftar dengan status 'proses'.
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Basic Tables end -->
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Edit Mahasiswa -->
+    <div class="modal fade" id="editStudentModal" tabindex="-1" aria-labelledby="editStudentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editStudentModalLabel">Edit Data Mahasiswa</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editStudentForm">
+                        <input type="hidden" id="editStudentId" name="student_id">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="editNamaKetua" class="form-label">Nama Ketua</label>
+                                <input type="text" class="form-control" id="editNamaKetua" name="nama_ketua" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editNim" class="form-label">NIM</label>
+                                <input type="text" class="form-control" id="editNim" name="nim" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="editEmail" name="email" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editNoTelp" class="form-label">No. Telepon</label>
+                                <input type="text" class="form-control" id="editNoTelp" name="no_telp" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editPerguruanTinggi" class="form-label">Perguruan Tinggi</label>
+                                <input type="text" class="form-control" id="editPerguruanTinggi" name="perguruan_tinggi" required readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editProgramStudi" class="form-label">Program Studi</label>
+                                <select class="choices" id="editProgramStudi" name="program_studi" required>
+                                    <option value="">Pilih Program Studi</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editStatus" class="form-label">Status</label>
+                                <select class="form-select" id="editStatus" name="status" required>
+                                    <option value="proses">Proses</option>
+                                    <option value="aktif">Diterima</option>
+                                    <option value="tolak">Ditolak</option>
+                                    <option value="selesai">Selesai</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editPassword" class="form-label">Password Baru (Opsional)</label>
+                                <input type="password" class="form-control" id="editPassword" name="password" placeholder="Kosongkan jika tidak ingin mengubah password">
+                                <small class="text-muted">Minimal 1 karakter. Kosongkan jika tidak ingin mengubah password.</small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" onclick="saveStudentEdit()">Simpan Perubahan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}">
+    </script>
+    <script
+        src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/choices.js/choices.min.js') }}"></script>
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Tunggu sebentar untuk memastikan DOM sudah siap
+            setTimeout(function() {
+                try {
+                    // Pastikan tabel ada dan memiliki data yang valid
+                    var table = $("#table1");
+                    if (table.length > 0) {
+                        // Cek apakah tabel memiliki data yang valid (bukan hanya row kosong)
+                        var hasValidData = table.find('tbody tr').length > 0 && 
+                                         !table.find('tbody tr td[colspan]').length;
+                        
+                        if (hasValidData) {
+                            // Destroy DataTable jika sudah ada
+                            if ($.fn.DataTable.isDataTable('#table1')) {
+                                $('#table1').DataTable().destroy();
+                            }
+                            
+                            // Inisialisasi DataTable dengan konfigurasi sederhana
+                            var dataTable = table.DataTable({
+                                language: {
+                                    "sProcessing":   "Sedang memproses...",
+                                    "sLengthMenu":   "Tampilkan _MENU_ data",
+                                    "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                                    "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                                    "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                                    "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                                    "sSearch":       "Cari:",
+                                    "oPaginate": {
+                                        "sFirst":    "Pertama",
+                                        "sPrevious": "Sebelumnya",
+                                        "sNext":     "Selanjutnya",
+                                        "sLast":     "Terakhir"
+                                    }
+                                },
+                                pageLength: 10,
+                                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
+                                columnDefs: [
+                                    {
+                                        targets: [0], // Kolom No
+                                        orderable: false,
+                                        searchable: false
+                                    },
+                                    {
+                                        targets: [6], // Kolom Aksi
+                                        orderable: false,
+                                        searchable: false
+                                    }
+                                ],
+                                order: [[1, 'asc']], // Urutkan berdasarkan nama
+                                drawCallback: function(settings) {
+                                    // Update nomor urut setelah setiap draw
+                                    var api = this.api();
+                                    var rows = api.rows({page: 'current'}).nodes();
+                                    var start = api.page.info().start;
+                                    
+                                    $(rows).each(function(index) {
+                                        $(this).find('td:first').text(start + index + 1);
+                                    });
+                                },
+                                responsive: false, // Nonaktifkan responsive untuk menghindari konflik
+                                autoWidth: false,
+                                scrollX: true
+                            });
+                            
+                            console.log('DataTable initialized successfully');
+                            
+                            // Tambahkan event listener untuk update nomor urut
+                            dataTable.on('draw.dt', function() {
+                                var api = this.api();
+                                var rows = api.rows({page: 'current'}).nodes();
+                                var start = api.page.info().start;
+                                
+                                $(rows).each(function(index) {
+                                    $(this).find('td:first').text(start + index + 1);
+                                });
+                            });
+                        } else {
+                            console.log('Table has no valid data or has colspan rows, using fallback styling');
+                            table.addClass('table-striped table-hover');
+                        }
+                    } else {
+                        console.log('Table not found, using fallback styling');
+                    }
+                } catch (error) {
+                    console.error('Error initializing DataTable:', error);
+                    // Fallback: tampilkan tabel biasa jika DataTable gagal
+                    $("#table1").addClass('table-striped table-hover');
+                }
+            }, 100); // Tunggu 100ms
+        });
+
+        // Fungsi untuk approve mahasiswa
+        function approveStudent(studentId) {
+            try {
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: 'Apakah Anda yakin ingin menerima mahasiswa ini?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#22c55e',
+                    cancelButtonColor: '#ef4444',
+                    confirmButtonText: 'Ya, Terima',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Tampilkan loading
+                        Swal.fire({
+                            title: 'Memproses...',
+                            text: 'Sedang mengubah status mahasiswa',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // AJAX call ke endpoint update status
+                        fetch('/admin/update_status_mahasiswa', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                mahasiswa_id: studentId,
+                                status: 'aktif'
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: data.message,
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal!',
+                                    text: data.message || 'Terjadi kesalahan saat mengubah status',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'Terjadi kesalahan saat memproses permintaan',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    }
+                });
+            } catch (error) {
+                console.error('Error in approveStudent:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan saat memproses permintaan',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+
+        // Fungsi untuk reject mahasiswa
+        function rejectStudent(studentId) {
+            try {
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: 'Apakah Anda yakin ingin menolak mahasiswa ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Tolak',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Tampilkan loading
+                        Swal.fire({
+                            title: 'Memproses...',
+                            text: 'Sedang mengubah status mahasiswa',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // AJAX call ke endpoint update status
+                        fetch('/admin/update_status_mahasiswa', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                mahasiswa_id: studentId,
+                                status: 'tolak'
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: data.message,
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal!',
+                                    text: data.message || 'Terjadi kesalahan saat mengubah status',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'Terjadi kesalahan saat memproses permintaan',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    }
+                });
+            } catch (error) {
+                console.error('Error in rejectStudent:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan saat memproses permintaan',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+
+        // Fungsi untuk edit mahasiswa
+        function editStudent(studentId) {
+            try {
+                // Tampilkan loading
+                Swal.fire({
+                    title: 'Memuat Data...',
+                    text: 'Sedang mengambil data mahasiswa',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // AJAX call untuk load data mahasiswa
+                fetch(`/admin/get_mahasiswa_detail/${studentId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        Swal.close();
+                        if (data.success) {
+                            const mahasiswa = data.mahasiswa;
+                            
+                            // Isi form dengan data mahasiswa
+                            $('#editStudentId').val(mahasiswa.id || '');
+                            $('#editNamaKetua').val(mahasiswa.nama_ketua || '');
+                            $('#editNim').val(mahasiswa.nim || '');
+                            $('#editEmail').val(mahasiswa.email || '');
+                            $('#editNoTelp').val(mahasiswa.no_telp || '');
+                            $('#editPerguruanTinggi').val(mahasiswa.perguruan_tinggi || '');
+                            // Inisialisasi Choices untuk Program Studi dan set nilai
+                            try {
+                                const selectEl = document.getElementById('editProgramStudi');
+                                if (!window.editProgramStudiChoices) {
+                                    window.editProgramStudiChoices = new Choices(selectEl, {
+                                        searchEnabled: true,
+                                        placeholder: true,
+                                        placeholderValue: 'Pilih Program Studi',
+                                        itemSelectText: '',
+                                        shouldSort: true,
+                                        searchResultLimit: 10
+                                    });
+                                } else {
+                                    window.editProgramStudiChoices.clearChoices();
+                                }
+                                // Muat daftar program studi dari server
+                                fetch('/admin/get_program_studi_list')
+                                  .then(res => res.json())
+                                  .then(ps => {
+                                      if (ps && ps.success && Array.isArray(ps.program_studi_list)) {
+                                          const choices = ps.program_studi_list.map(row => ({ value: row.nama_program_studi, label: row.nama_program_studi }));
+                                          window.editProgramStudiChoices.setChoices(choices, 'value', 'label', true);
+                                          if (mahasiswa.program_studi) {
+                                              window.editProgramStudiChoices.setChoiceByValue(mahasiswa.program_studi);
+                                          }
+                                      }
+                                  })
+                                  .catch(() => {
+                                      // fallback: isi option minimal dengan nilai saat ini
+                                      if (mahasiswa.program_studi) {
+                                          window.editProgramStudiChoices.setChoices([{ value: mahasiswa.program_studi, label: mahasiswa.program_studi, selected: true }], 'value', 'label', true);
+                                      }
+                                  });
+                            } catch (e) { console.error('Init Choices error:', e); }
+                            $('#editStatus').val(mahasiswa.status || 'proses');
+                            
+                            // Tampilkan modal
+                            $('#editStudentModal').modal('show');
+                            
+                            // Reset password field
+                            $('#editPassword').val('');
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal!',
+                                text: data.message || 'Terjadi kesalahan saat mengambil data',
+                                confirmButtonText: 'OK'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Terjadi kesalahan saat mengambil data mahasiswa',
+                            confirmButtonText: 'OK'
+                        });
+                    });
+            } catch (error) {
+                console.error('Error in editStudent:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan saat memproses permintaan',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+
+        // Fungsi untuk delete mahasiswa
+        function deleteStudent(studentId) {
+            try {
+                Swal.fire({
+                    title: 'Konfirmasi Hapus',
+                    html: `
+                        <div class="text-start">
+                            <p><strong>Anda yakin ingin menghapus mahasiswa ini?</strong></p>
+                            <p class="text-danger">Tindakan ini akan menghapus:</p>
+                            <ul>
+                                <li>Data mahasiswa</li>
+                                <li>Semua proposal terkait</li>
+                                <li>Semua file proposal dan laporan</li>
+                                <li>Semua data monitoring (produksi, penjualan, dll)</li>
+                                <li>Semua anggaran dan laporan</li>
+                            </ul>
+                            <p class="text-danger"><strong>Tindakan ini tidak dapat dibatalkan!</strong></p>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Hapus Permanen',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Tampilkan loading
+                        Swal.fire({
+                            title: 'Menghapus Data...',
+                            text: 'Sedang menghapus data mahasiswa dan semua file terkait',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // AJAX call ke endpoint delete mahasiswa
+                        fetch('/admin/delete_mahasiswa', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                mahasiswa_id: studentId
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: data.message,
+                                    confirmButtonText: 'OK'
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal!',
+                                    text: data.message || 'Terjadi kesalahan saat menghapus data',
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: 'Terjadi kesalahan saat menghapus data',
+                                confirmButtonText: 'OK'
+                            });
+                        });
+                    }
+                });
+            } catch (error) {
+                console.error('Error in deleteStudent:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan saat memproses permintaan',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+
+        // Fungsi untuk save edit mahasiswa
+        function saveStudentEdit() {
+            try {
+                // Validasi form
+                const form = document.getElementById('editStudentForm');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                // Tampilkan loading
+                Swal.fire({
+                    title: 'Menyimpan...',
+                    text: 'Sedang menyimpan perubahan data mahasiswa',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Ambil data dari form
+                const formData = {
+                    student_id: $('#editStudentId').val(),
+                    nama_ketua: $('#editNamaKetua').val(),
+                    nim: $('#editNim').val(),
+                    email: $('#editEmail').val(),
+                    no_telp: $('#editNoTelp').val(),
+                    perguruan_tinggi: $('#editPerguruanTinggi').val(),
+                    program_studi: (window.editProgramStudiChoices ? window.editProgramStudiChoices.getValue(true) : $('#editProgramStudi').val()),
+                    status: $('#editStatus').val(),
+                    password: $('#editPassword').val() // Tambahkan password
+                };
+
+                // AJAX call ke endpoint update mahasiswa
+                fetch('/admin/update_mahasiswa_data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: data.message,
+                            confirmButtonText: 'OK'
+                        }).then(() => {
+                            $('#editStudentModal').modal('hide');
+                            location.reload();
+        });
+
+        // Reset Choices saat modal ditutup
+        $('#editStudentModal').on('hidden.bs.modal', function () {
+            try {
+                if (window.editProgramStudiChoices) {
+                    window.editProgramStudiChoices.removeActiveItems();
+                }
+            } catch (e) {}
+        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal!',
+                            text: data.message || 'Terjadi kesalahan saat menyimpan data',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat menyimpan data',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            } catch (error) {
+                console.error('Error in saveStudentEdit:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Terjadi kesalahan saat memproses permintaan',
+                    confirmButtonText: 'OK'
+                });
+            }
+        }
+    </script>
+
+</body>
+
+</html>

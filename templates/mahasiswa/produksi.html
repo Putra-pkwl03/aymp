@@ -1,0 +1,1759 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengelolaan Produksi Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+    <style>
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+
+        .modal-body .row.g-3 {
+            row-gap: 18px;
+        }
+
+        @media (max-width: 575.98px) {
+
+            .modal-header,
+            .modal-footer,
+            .modal-body {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .modal-body {
+                padding-top: 16px;
+                padding-bottom: 6px;
+            }
+        }
+
+        .btn-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1rem;
+            border: none;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07);
+            transition: box-shadow 0.2s;
+        }
+
+        .btn-circle:active,
+        .btn-circle:focus {
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.13);
+        }
+
+        .btn-circle i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.1em;
+            line-height: 1;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 7px;
+            vertical-align: middle;
+        }
+
+        .status-draf {
+            background: #facc15;
+        }
+
+        .status-text {
+            font-weight: 500;
+            color: #444;
+        }
+
+        /* Styling untuk alert notifications */
+        .alert {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .alert-warning {
+            border-left-color: #ffc107;
+        }
+        
+        .alert-success {
+            border-left-color: #28a745;
+        }
+        
+        .alert-danger {
+            border-left-color: #dc3545;
+        }
+        
+        .alert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .alert .btn-close {
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .alert .btn-close:hover {
+            opacity: 1;
+        }
+        
+        .alert i {
+            flex-shrink: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .alert {
+                padding: 12px 16px;
+            }
+            
+            .alert .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            
+            .alert i {
+                margin-bottom: 8px;
+                margin-right: 0 !important;
+            }
+        }
+
+        .proposal-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .proposal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-color: #22c55e !important;
+        }
+
+        .proposal-card .card-header {
+            transition: all 0.3s ease;
+            background: #f8f9fa !important;
+            color: #495057;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .btn-tambah-produksi {
+            background: rgba(255, 255, 255, 0.2) !important;
+            border: 2px solid rgba(255, 255, 255, 0.8) !important;
+            color: white !important;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-tambah-produksi:hover {
+            background: rgba(255, 255, 255, 0.3) !important;
+            transform: scale(1.05);
+        }
+
+        .btn-edit-produksi {
+            background: #435ebe !important;
+            color: white !important;
+        }
+
+        .btn-edit-produksi:hover {
+            background: #25396f !important;
+            transform: scale(1.1);
+        }
+
+        .btn-hapus-produksi {
+            background: #dc3545 !important;
+            color: white !important;
+        }
+
+        .btn-hapus-produksi:hover {
+            background: #c82333 !important;
+            transform: scale(1.1);
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .no-data-message i {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .table tfoot th {
+            font-weight: 600;
+            color: #495057;
+            border-top: 2px solid #dee2e6;
+        }
+
+        .table tfoot th:last-child {
+            color: #1565c0;
+            font-weight: 700;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .bahan-baku-list {
+            max-height: 100px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+
+        .bahan-baku-item {
+            padding: 2px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .bahan-baku-item:last-child {
+            border-bottom: none;
+        }
+
+        .quantity-list, .harga-list {
+            max-height: 100px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+
+        .quantity-item, .harga-item {
+            padding: 2px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .quantity-item:last-child, .harga-item:last-child {
+            border-bottom: none;
+        }
+
+        .bahan-baku-section {
+            max-height: 120px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 8px;
+            background-color: #f8f9fa;
+        }
+
+        .selected-bahan-baku {
+            background-color: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 4px;
+            padding: 4px 8px;
+            margin: 2px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .remove-bahan-baku {
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .btn-tambah-produk-custom {
+            display: inline-flex;
+            align-items: center;
+            background: #4b7c5a;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 6px 22px 6px 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            gap: 10px;
+        }
+        .btn-tambah-produk-custom:hover {
+            background: #356346;
+        }
+        .btn-tambah-produk-custom .icon-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            color: #388e3c;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            margin-right: 8px;
+            font-size: 1.3em;
+            font-weight: bold;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            line-height: 1;
+        }
+        .btn-tambah-produk-custom .bi-plus {
+            font-weight: bold !important;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .selected-bahan-baku-item {
+            background: #eaf6fd;
+            border: 1px solid #90caf9;
+            border-radius: 8px;
+            padding: 10px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 1rem;
+        }
+        .selected-bahan-baku-item .bahan-info {
+            color: #333;
+        }
+        .selected-bahan-baku-item .btn-remove-bahan {
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+            transition: background 0.2s;
+        }
+        .selected-bahan-baku-item .btn-remove-bahan:hover {
+            background: #b52a37;
+        }
+        
+        /* Styling untuk input quantity yang invalid */
+        .quantity-input.invalid {
+            border-color: #dc3545 !important;
+            background-color: #fff5f5 !important;
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+        }
+        
+        .quantity-input.valid {
+            border-color: #28a745 !important;
+            background-color: #f8fff9 !important;
+        }
+        
+        /* Tooltip untuk input quantity */
+        .quantity-input[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-top: -30px;
+            margin-left: -50px;
+        }
+        
+        /* Styling untuk alert info */
+        .alert-info {
+            background: #e3f2fd;
+            border: 1px solid #90caf9;
+            color: #1565c0;
+        }
+        
+        .alert-info .bi-info-circle {
+            color: #1976d2;
+        }
+        
+        .alert-info ul {
+            margin-bottom: 0;
+        }
+        
+        .alert-info li {
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+        
+        .alert-info li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .alert-info strong {
+            color: #0d47a1;
+            font-weight: 600;
+        }
+    </style>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-mahasiswa.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .info-hpp-userfriendly {
+            background: #e3f2fd;
+            border: 1.5px solid #42a5f5;
+            color: #0d47a1;
+            font-size: 1.05rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px 0 rgba(100,181,246,0.08);
+            padding: 1.1em 1.3em 1.1em 1.1em;
+            margin-bottom: 1.2em;
+        }
+        .info-hpp-userfriendly .bi-info-circle {
+            color: #1976d2;
+            font-size: 1.7rem;
+            margin-top: 2px;
+            margin-right: 0.7em;
+            flex-shrink: 0;
+        }
+        .info-title {
+            font-size: 1.18rem;
+            font-weight: 700;
+            color: #1565c0;
+            margin-bottom: 0.3em;
+            letter-spacing: 0.01em;
+        }
+        .info-list {
+            margin-left: 1.2em;
+            margin-bottom: 0;
+            padding-left: 0.2em;
+        }
+        .info-label {
+            font-weight: 600;
+            color: #1976d2;
+        }
+        .info-formula {
+            font-family: 'Consolas', 'monospace';
+            color: #0d47a1;
+            margin-left: 0.5em;
+        }
+        .info-note {
+            color: #1565c0;
+            font-size: 0.98rem;
+            margin-top: 0.7em;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+        .info-note .bi-lightbulb {
+            color: #ffd600;
+            font-size: 1.2em;
+            margin-right: 0.3em;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}"><img
+                                    src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo"
+                                    srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        {% if has_lolos_proposal %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin = 'lolos' - lengkap -->
+                            <li class="sidebar-item  has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                                <ul class="submenu ">
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_akhir') }}">Laporan Akhir</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="sidebar-item active has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span>Produksi</span>
+                                </a>
+                                <ul class="submenu active">
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.pengelolaan_bahan_baku_mahasiswa') }}"> Bahan
+                                            Baku</a>
+                                    </li>
+                                    <li class="submenu-item active">
+                                        <a href="{{ url_for('mahasiswa.aktivitas_produksi_mahasiswa') }}">Produksi</a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li class="sidebar-item ">
+                                <a href="{{ url_for('mahasiswa.pembelian_alat_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-tools"></i>
+                                    <span>Alat Produksi</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item ">
+                                <a href="{{ url_for('mahasiswa.biaya_operasional_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-calculator"></i>
+                                    <span>Biaya Operasional</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item ">
+                                <a href="{{ url_for('mahasiswa.biaya_non_operasional_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-wallet2"></i>
+                                    <span>Biaya Lain-lain</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item ">
+                                <a href="{{ url_for('mahasiswa.laporan_penjualan_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-receipt"></i>
+                                    <span>Laporan Penjualan</span>
+                                </a>
+                                
+                            </li>
+
+
+                            <li class="sidebar-item  has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-graph-up"></i>
+                                    <span>Pelaporan Keuangan</span>
+                                </a>
+                                <ul class="submenu ">
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_laba_rugi_mahasiswa') }}">Laporan Laba Rugi</a>
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_arus_kas_mahasiswa') }}">Laporan Arus Kas</a> 
+                                    </li>
+                                    <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_neraca_mahasiswa') }}">Laporan Neraca</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% else %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin != 'lolos' atau tanpa proposal - terbatas -->
+                            <li class="sidebar-item active has-sub">
+                                <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                                <ul class="submenu active">
+                                    <li class="submenu-item active">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.bimbingan') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.profile_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-person-circle"></i>
+                                <span>Profile Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-star-fill"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Aktivitas Produksi</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Kelola proses produksi usahamu di AYMP UNJAYA.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Aktivitas Produksi</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Tables start -->
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        {% if proposal_data %}
+                            {% for proposal_id, data in proposal_data.items() %}
+                            <div class="card proposal-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-0">{{ data.proposal.judul_usaha }}</h5>
+                                        <small class="text-muted">{{ data.proposal.kategori }} - Tahun NIB: {% if data.proposal.tahun_nib and data.proposal.tahun_nib != '0' %}{{ data.proposal.tahun_nib }}{% else %}Tidak ada{% endif %}</small>
+                                    </div>
+                                    <button class="btn btn-tambah-produk-custom" onclick="tambahProduksi({{ data.proposal.id }})" {% if status_mahasiswa == 'selesai' %}disabled style="opacity:0.6;cursor:not-allowed;"{% endif %}>
+                                        <span class="icon-circle">
+                                            <i class="bi bi-plus"></i>
+                                        </span>
+                                        Tambah Produk
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    {% if data.produksi %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="tableProduksi{{ data.proposal.id }}">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Nama Produk</th>
+                                                    <th>Bahan Baku</th>
+                                                    <th>Quantity</th>
+                                                    <th>Harga</th>
+                                                    <th>Total</th>
+                                                    <th>Jumlah Produk</th>
+                                                    <th>HPP</th>
+                                                    <th>Harga Jual</th>
+                                                    <th>Aksi</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for produksi in data.produksi %}
+                                                <tr>
+                                                    <td>{{ loop.index }}</td>
+                                                    <td>{{ produksi.nama_produk|e }}</td>
+                                                    <td>
+                                                        <div class="bahan-baku-list">
+                                                            {% for bahan in produksi.bahan_baku %}
+                                                            <div class="bahan-baku-item">
+                                                                {{ bahan.nama_bahan|e }}
+                                                            </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="quantity-list">
+                                                            {% for bahan in produksi.bahan_baku %}
+                                                            <div class="quantity-item">
+                                                                {{ bahan.quantity_digunakan|int }} {{ bahan.satuan|e }}
+                                                            </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="harga-list">
+                                                            {% for bahan in produksi.bahan_baku %}
+                                                            <div class="harga-item">
+                                                                Rp {{ "{:,.0f}".format(bahan.harga_satuan) }}
+                                                            </div>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </td>
+                                                    <td>Rp {{ "{:,.0f}".format(produksi.total_biaya) }}</td>
+                                                    <td>{{ produksi.jumlah_produk }}</td>
+                                                    <td>Rp {{ "{:,.0f}".format(produksi.hpp) }}</td>
+                                                    <td class="harga-jual-col">Rp {{ "{:,.0f}".format(produksi.harga_jual) }}</td>
+                                                    <td>
+                                                        <button class="btn btn-circle btn-edit-produksi" onclick="editProduksi({{ produksi.id }})" title="Edit" {% if status_mahasiswa == 'selesai' %}disabled style="opacity:0.6;cursor:not-allowed;"{% endif %}>
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                        <button class="btn btn-circle btn-hapus-produksi" onclick="hapusProduksi({{ produksi.id }})" title="Hapus" {% if status_mahasiswa == 'selesai' %}disabled style="opacity:0.6;cursor:not-allowed;"{% endif %}>
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <th colspan="8" class="text-end">Total Harga Jual</th>
+                                                    <th id="grandTotalHargaJual_{{ data.proposal.id }}">Rp 0</th>
+                                                    <th></th>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="no-data-message">
+                                        <i class="bi bi-gear"></i>
+                                        <h5>Belum ada data produksi</h5>
+                                        <p>Klik tombol "Tambah Produksi" untuk menambahkan data produksi pertama Anda.</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="no-data-message">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <h5>Tidak ada proposal yang lolos</h5>
+                                    <p>Anda harus memiliki proposal yang sudah disetujui untuk dapat mengelola produksi.</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+                <!-- Basic Tables end -->
+            </div>
+
+
+        </div>
+    </div>
+
+    <!-- Modal Tambah Produksi -->
+    <div class="modal fade" id="modalProduksi" tabindex="-1" aria-labelledby="modalProduksiLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalProduksiLabel">Tambah Produksi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formProduksi">
+                    <div class="modal-body">
+                        <input type="hidden" id="proposalId" name="proposal_id">
+                        
+                        <!-- Informasi Perhitungan User Friendly -->
+                        <div class="alert info-hpp-userfriendly mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-info-circle"></i>
+                                <div>
+                                    <div class="info-title mb-1"><strong>Informasi Perhitungan Produksi</strong></div>
+                                    <ul class="info-list mb-0">
+                                        <li>
+                                            <span class="info-label">HPP Dasar</span>
+                                            <span class="info-formula">= Total Biaya &divide; Jumlah Produksi</span>
+                                        </li>
+                                        <li>
+                                            <span class="info-label">Harga Jual</span>
+                                            <span class="info-formula">= HPP Dasar + (Persentase Laba &times; HPP Dasar)</span>
+                                        </li>
+                                    </ul>
+                                    <div class="info-note mt-2">
+                                        <i class="bi bi-lightbulb"></i>
+                                        Harga jual dihitung otomatis sesuai persentase laba yang Anda isi.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-6 mb-2">
+                                <label for="namaProduk" class="form-label">Nama Produk <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="namaProduk" name="nama_produk" required placeholder="Contoh: Tahu Crispy">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="tanggalProduksi" class="form-label">Tanggal Produksi <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="tanggalProduksi" name="tanggal_produksi" required placeholder="Pilih tanggal produksi">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="jumlahProduk" class="form-label">Jumlah Produk <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="jumlahProduk" name="jumlah_produk" min="1" required placeholder="Contoh: 100">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="persentaseLaba" class="form-label">Persentase Laba (%) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="persentaseLaba" name="persentase_laba" min="0" max="100" required placeholder="Contoh: 20">
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden input untuk harga jual yang dihitung otomatis -->
+                        <input type="hidden" id="hargaJualHidden" name="harga_jual">
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6>Pilih Bahan Baku</h6>
+                                <div class="bahan-baku-section" id="bahanBakuSection">
+                                    <p class="text-muted">Pilih bahan baku yang akan digunakan untuk produksi</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6>Bahan Baku yang Dipilih</h6>
+                                <div id="selectedBahanBaku">
+                                    <p class="text-muted">Belum ada bahan baku yang dipilih</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Total Biaya</label>
+                                <div class="form-control-plaintext" id="totalBiaya">Rp 0</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">HPP Dasar</label>
+                                <div class="form-control-plaintext" id="hppDasarDisplay">Rp 0</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Harga Jual</label>
+                                <div class="form-control-plaintext text-success fw-bold" id="hargaJualDisplay">Rp 0</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Margin</label>
+                                <div class="form-control-plaintext" id="marginDisplay">Rp 0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Produksi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Produksi -->
+    <div class="modal fade" id="modalEditProduksi" tabindex="-1" aria-labelledby="modalEditProduksiLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalEditProduksiLabel">Edit Produksi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formEditProduksi">
+                    <div class="modal-body">
+                        <input type="hidden" id="editProduksiId" name="produksi_id">
+                        <input type="hidden" id="editProposalId" name="proposal_id">
+                        
+                        <!-- Informasi Perhitungan User Friendly (Edit) -->
+                        <div class="alert info-hpp-userfriendly mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="bi bi-info-circle"></i>
+                                <div>
+                                    <div class="info-title mb-1"><strong>Informasi Perhitungan Produksi</strong></div>
+                                    <ul class="info-list mb-0">
+                                        <li>
+                                            <span class="info-label">HPP Dasar</span>
+                                            <span class="info-formula">= Total Biaya &divide; Jumlah Produksi</span>
+                                        </li>
+                                        <li>
+                                            <span class="info-label">Harga Jual</span>
+                                            <span class="info-formula">= HPP Dasar + (Persentase Laba &times; HPP Dasar)</span>
+                                        </li>
+                                    </ul>
+                                    <div class="info-note mt-2">
+                                        <i class="bi bi-lightbulb"></i>
+                                        Harga jual dihitung otomatis sesuai persentase laba yang Anda isi.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-6 mb-2">
+                                <label for="editNamaProduk" class="form-label">Nama Produk <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="editNamaProduk" name="nama_produk" required placeholder="Contoh: Tahu Crispy">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="editTanggalProduksi" class="form-label">Tanggal Produksi <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="editTanggalProduksi" name="tanggal_produksi" required placeholder="Pilih tanggal produksi">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="editJumlahProduk" class="form-label">Jumlah Produk <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="editJumlahProduk" name="jumlah_produk" min="1" required placeholder="Contoh: 100">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="editPersentaseLaba" class="form-label">Persentase Laba (%) <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="editPersentaseLaba" name="persentase_laba" min="0" max="100" required placeholder="Contoh: 20">
+                            </div>
+                        </div>
+                        
+                        <!-- Hidden input untuk harga jual yang dihitung otomatis -->
+                        <input type="hidden" id="editHargaJualHidden" name="harga_jual">
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6>Pilih Bahan Baku</h6>
+                                <div class="bahan-baku-section" id="editBahanBakuSection">
+                                    <p class="text-muted">Pilih bahan baku yang akan digunakan untuk produksi</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h6>Bahan Baku yang Dipilih</h6>
+                                <div id="editSelectedBahanBaku">
+                                    <p class="text-muted">Belum ada bahan baku yang dipilih</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Total Biaya</label>
+                                <div class="form-control-plaintext" id="editTotalBiaya">Rp 0</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">HPP Dasar</label>
+                                <div class="form-control-plaintext" id="editHppDasarDisplay">Rp 0</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Harga Jual</label>
+                                <div class="form-control-plaintext text-success fw-bold" id="editHargaJualDisplay">Rp 0</div>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Margin</label>
+                                <div class="form-control-plaintext" id="editMarginDisplay">Rp 0</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Update Produksi</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}">
+    </script>
+    <script
+        src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+    <script>
+        let selectedBahanBaku = [];
+        let availableBahanBaku = [];
+        let editSelectedBahanBaku = [];
+        let editAvailableBahanBaku = [];
+
+        // Inisialisasi DataTable untuk setiap tabel
+        $(document).ready(function() {
+            {% for proposal_id, data in proposal_data.items() %}
+                {% if data.produksi %}
+                $('#tableProduksi{{ data.proposal.id }}').DataTable({
+                    responsive: true,
+                    language: {
+                        "sProcessing":   "Sedang memproses...",
+                        "sLengthMenu":   "Tampilkan _MENU_ data",
+                        "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                        "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                        "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                        "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                        "sInfoPostFix":  "",
+                        "sSearch":       "Cari:",
+                        "sUrl":          "",
+                        "oPaginate": {
+                            "sFirst":    "Pertama",
+                            "sPrevious": "Sebelumnya",
+                            "sNext":     "Selanjutnya",
+                            "sLast":     "Terakhir"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                            "sSortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                        }
+                    }
+                });
+                
+                // Hitung total harga jual untuk tabel ini
+                let grandTotalHargaJual = 0;
+                $('#tableProduksi{{ data.proposal.id }} tbody tr').each(function() {
+                    let val = $(this).find('.harga-jual-col').text().replace(/[^\d]/g, '');
+                    grandTotalHargaJual += Number(val) || 0;
+                });
+                // Format grandTotal dengan titik
+                let grandTotalHargaJualStr = grandTotalHargaJual.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                $('#grandTotalHargaJual_{{ data.proposal.id }}').text('Rp ' + grandTotalHargaJualStr);
+                {% endif %}
+            {% endfor %}
+        });
+
+        // Fungsi untuk menambah produksi
+        function tambahProduksi(proposalId) {
+            {% if status_mahasiswa == 'selesai' %}
+            Swal.fire('Akses Dibatasi', 'Anda tidak dapat menambahkan produksi karena status akun Anda adalah "selesai".', 'warning');
+            return;
+            {% endif %}
+            
+            $('#modalProduksiLabel').text('Tambah Produksi');
+            $('#formProduksi')[0].reset();
+            $('#proposalId').val(proposalId);
+            selectedBahanBaku = [];
+            updateSelectedBahanBaku();
+            
+            // Load bahan baku yang tersedia
+            loadBahanBaku(proposalId);
+            
+            // Trigger update perhitungan setelah modal dibuka
+            setTimeout(() => {
+                updateCalculations();
+            }, 100);
+            
+            $('#modalProduksi').modal('show');
+        }
+
+        // Load bahan baku yang tersedia
+        function loadBahanBaku(proposalId) {
+            $.ajax({
+                url: `/mahasiswa/get_bahan_baku_for_produksi/${proposalId}`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        availableBahanBaku = response.data;
+                        displayBahanBaku();
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Terjadi kesalahan saat mengambil data bahan baku', 'error');
+                }
+            });
+        }
+
+        // Tampilkan bahan baku yang tersedia
+        function displayBahanBaku() {
+            const section = $('#bahanBakuSection');
+            section.empty();
+            
+            if (availableBahanBaku.length === 0) {
+                section.html('<p class="text-danger">Tidak ada bahan baku yang tersedia</p>');
+                return;
+            }
+            
+            availableBahanBaku.forEach(bahan => {
+                const bahanDiv = $(`
+                    <div class="selected-bahan-baku" data-bahan-id="${bahan.id}">
+                        <div>
+                            <strong>${bahan.nama_bahan}</strong><br>
+                            <small>Stok: ${bahan.quantity} ${bahan.satuan} | Harga: Rp ${Math.round(bahan.harga_satuan).toLocaleString('id-ID')}</small>
+                        </div>
+                        <div>
+                            <input type="number" class="form-control form-control-sm quantity-input" 
+                                   style="width: 80px; display: inline-block;" 
+                                   placeholder="Qty" min="0" max="${bahan.quantity}" 
+                                   data-bahan-id="${bahan.id}"
+                                   data-max-quantity="${bahan.quantity}"
+                                   data-satuan="${bahan.satuan}">
+
+                        </div>
+                    </div>
+                `);
+                section.append(bahanDiv);
+            });
+        }
+
+
+
+        // Validasi real-time pada input quantity
+        function validateQuantityInput(input) {
+            const quantityValue = parseFloat(input.value) || 0;
+            const maxQuantity = parseFloat(input.getAttribute('data-max-quantity'));
+            const satuan = input.getAttribute('data-satuan');
+            
+            // Hapus class sebelumnya
+            input.classList.remove('invalid', 'valid');
+            
+            // Validasi quantity tidak boleh melebihi stok
+            if (quantityValue > maxQuantity) {
+                input.classList.add('invalid');
+                input.title = `Maksimal ${maxQuantity} ${satuan}`;
+            } else if (quantityValue < 0) {
+                input.classList.add('invalid');
+                input.title = 'Quantity tidak boleh negatif';
+            } else if (quantityValue > 0) {
+                input.classList.add('valid');
+                input.title = '';
+            } else {
+                input.title = '';
+            }
+        }
+
+        // Update quantity bahan baku dengan validasi real-time dan auto-add
+        function updateBahanBakuQuantity(bahanId, quantity) {
+            const bahan = availableBahanBaku.find(b => b.id === bahanId);
+            const quantityInput = $(`[data-bahan-id="${bahanId}"] input`);
+            const quantityValue = parseFloat(quantity) || 0;
+            
+            // Validasi quantity tidak boleh melebihi stok
+            if (quantityValue > bahan.quantity) {
+                Swal.fire('Error', `Quantity tidak boleh melebihi stok yang tersedia (${bahan.quantity} ${bahan.satuan})`, 'error');
+                quantityInput.val(bahan.quantity);
+                return;
+            }
+            
+            // Validasi quantity tidak boleh negatif
+            if (quantityValue < 0) {
+                Swal.fire('Error', 'Quantity tidak boleh negatif', 'error');
+                quantityInput.val(0);
+                return;
+            }
+            
+            // Update quantity input jika valid
+            quantityInput.val(quantityValue);
+            
+            // Auto-add atau update bahan baku ke selected list
+            if (quantityValue > 0) {
+                // Cek apakah bahan sudah ada di list
+                const existingIndex = selectedBahanBaku.findIndex(b => b.bahan_baku_id === bahanId);
+                if (existingIndex !== -1) {
+                    // Update quantity jika sudah ada
+                    selectedBahanBaku[existingIndex].quantity_digunakan = quantityValue;
+                } else {
+                    // Tambahkan bahan baru ke list
+                    selectedBahanBaku.push({
+                        bahan_baku_id: bahanId,
+                        nama_bahan: bahan.nama_bahan,
+                        quantity_digunakan: quantityValue,
+                        harga_satuan: bahan.harga_satuan,
+                        satuan: bahan.satuan
+                    });
+                }
+                updateSelectedBahanBaku();
+                updateCalculations();
+            } else {
+                // Jika quantity 0 atau kosong, hapus dari selected list
+                const existingIndex = selectedBahanBaku.findIndex(b => b.bahan_baku_id === bahanId);
+                if (existingIndex !== -1) {
+                    selectedBahanBaku.splice(existingIndex, 1);
+                    updateSelectedBahanBaku();
+                    updateCalculations();
+                }
+            }
+        }
+
+        // Update tampilan bahan baku yang dipilih
+        function updateSelectedBahanBaku() {
+            const container = $('#selectedBahanBaku');
+            container.empty();
+            
+            if (selectedBahanBaku.length === 0) {
+                container.html('<p class="text-muted">Belum ada bahan baku yang dipilih</p>');
+                return;
+            }
+            
+            selectedBahanBaku.forEach((bahan, index) => {
+                const subtotal = Math.round(bahan.quantity_digunakan * bahan.harga_satuan);
+                const bahanDiv = $(`
+                    <div class="selected-bahan-baku-item">
+                        <div class="bahan-info">
+                            <strong>${bahan.nama_bahan}</strong>
+                            <div>${bahan.quantity_digunakan} ${bahan.satuan} × Rp ${Math.round(bahan.harga_satuan).toLocaleString('id-ID')} = Rp ${subtotal.toLocaleString('id-ID')}</div>
+                        </div>
+                        <button type="button" class="btn-remove-bahan" onclick="removeBahanBaku(${index})">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `);
+                container.append(bahanDiv);
+            });
+        }
+
+        // Hapus bahan baku dari list
+        function removeBahanBaku(index) {
+            selectedBahanBaku.splice(index, 1);
+            updateSelectedBahanBaku();
+            updateCalculations();
+        }
+
+        // Update perhitungan
+        function updateCalculations() {
+            const totalBiaya = selectedBahanBaku.reduce((total, bahan) => {
+                return total + (bahan.quantity_digunakan * bahan.harga_satuan);
+            }, 0);
+            
+            const jumlahProduk = parseInt($('#jumlahProduk').val()) || 0;
+            const persentaseLaba = parseFloat($('#persentaseLaba').val()) || 0;
+            
+            // HPP Dasar = Total Biaya ÷ Jumlah Produk
+            const hppDasar = jumlahProduk > 0 ? Math.round(totalBiaya / jumlahProduk) : 0;
+            
+            // Harga Jual = HPP Dasar + (Persentase Laba × HPP Dasar)
+            const hargaJual = Math.round(hppDasar + (persentaseLaba / 100 * hppDasar));
+            
+            $('#totalBiaya').text(`Rp ${Math.round(totalBiaya).toLocaleString('id-ID')}`);
+            $('#hppDasarDisplay').text(`Rp ${hppDasar.toLocaleString('id-ID')}`);
+            $('#hargaJualDisplay').text(`Rp ${hargaJual.toLocaleString('id-ID')}`);
+            $('#marginDisplay').text(`Rp ${(hargaJual - hppDasar).toLocaleString('id-ID')}`);
+            
+            // Update hidden input untuk harga jual
+            $('#hargaJualHidden').val(hargaJual);
+        }
+
+        // Event listener untuk input quantity
+        $(document).on('input', '.quantity-input', function() {
+            const bahanId = parseInt($(this).data('bahan-id'));
+            const quantity = parseFloat($(this).val()) || 0;
+            
+            // Validasi real-time
+            validateQuantityInput(this);
+            
+            // Update bahan baku quantity
+            updateBahanBakuQuantity(bahanId, quantity);
+        });
+
+        // Event listener untuk input quantity (alternatif untuk memastikan event terdeteksi)
+        $(document).on('change keyup paste', '.quantity-input', function() {
+            const bahanId = parseInt($(this).data('bahan-id'));
+            const quantity = parseFloat($(this).val()) || 0;
+            
+            // Validasi real-time
+            validateQuantityInput(this);
+            
+            // Update bahan baku quantity
+            updateBahanBakuQuantity(bahanId, quantity);
+        });
+
+        // Event listener khusus untuk memastikan bahan baku dihapus ketika quantity dikosongkan
+        $(document).on('blur', '.quantity-input', function() {
+            const bahanId = parseInt($(this).data('bahan-id'));
+            const quantity = parseFloat($(this).val()) || 0;
+            
+            // Jika quantity 0 atau kosong, pastikan bahan baku dihapus dari list
+            if (quantity <= 0) {
+                const existingIndex = selectedBahanBaku.findIndex(b => b.bahan_baku_id === bahanId);
+                if (existingIndex !== -1) {
+                    selectedBahanBaku.splice(existingIndex, 1);
+                    updateSelectedBahanBaku();
+                    updateCalculations();
+                }
+            }
+        });
+
+        // Event listener untuk input jumlah produk dan persentase laba
+        $('#jumlahProduk, #persentaseLaba').on('input', function() {
+            updateCalculations();
+        });
+
+        // Handle form submission untuk tambah produksi
+        $('#formProduksi').on('submit', function(e) {
+            e.preventDefault();
+            
+            if (selectedBahanBaku.length === 0) {
+                Swal.fire('Error', 'Pilih minimal satu bahan baku', 'error');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            
+            // Tambahkan data bahan baku sebagai JSON string
+            formData.append('bahan_baku_data', JSON.stringify(selectedBahanBaku));
+            
+            $.ajax({
+                url: '/mahasiswa/tambah_produksi',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('Berhasil', response.message, 'success');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Terjadi kesalahan saat menyimpan data', 'error');
+                }
+            });
+        });
+
+        // Fungsi untuk edit produksi
+        function editProduksi(produksiId) {
+            {% if status_mahasiswa == 'selesai' %}
+            Swal.fire('Akses Dibatasi', 'Anda tidak dapat mengedit produksi karena status akun Anda adalah "selesai".', 'warning');
+            return;
+            {% endif %}
+            
+            $.ajax({
+                url: `/mahasiswa/get_produksi/${produksiId}`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        $('#modalEditProduksiLabel').text('Edit Produksi');
+                        $('#editProduksiId').val(response.data.id);
+                        $('#editProposalId').val(response.data.proposal_id);
+                        $('#editNamaProduk').val(response.data.nama_produk);
+                        $('#editTanggalProduksi').val(response.data.tanggal_produksi);
+                        $('#editJumlahProduk').val(response.data.jumlah_produk);
+                        $('#editPersentaseLaba').val(response.data.persentase_laba);
+                        
+                        // Load bahan baku untuk edit
+                        loadBahanBakuForEdit(response.data.proposal_id, response.data.bahan_baku);
+                        
+                        $('#modalEditProduksi').modal('show');
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Terjadi kesalahan saat mengambil data', 'error');
+                }
+            });
+        }
+
+        // Load bahan baku untuk edit
+        function loadBahanBakuForEdit(proposalId, existingBahanBaku) {
+            $.ajax({
+                url: `/mahasiswa/get_bahan_baku_for_produksi/${proposalId}`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        editAvailableBahanBaku = response.data;
+                        editSelectedBahanBaku = existingBahanBaku || [];
+                        displayBahanBakuForEdit();
+                        updateEditCalculations();
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Terjadi kesalahan saat mengambil data bahan baku', 'error');
+                }
+            });
+        }
+
+        // Tampilkan bahan baku untuk edit
+        function displayBahanBakuForEdit() {
+            const section = $('#editBahanBakuSection');
+            section.empty();
+            
+            if (editAvailableBahanBaku.length === 0) {
+                section.html('<p class="text-danger">Tidak ada bahan baku yang tersedia</p>');
+                return;
+            }
+            
+            editAvailableBahanBaku.forEach(bahan => {
+                const existingBahan = editSelectedBahanBaku.find(b => b.bahan_baku_id === bahan.id);
+                const quantity = existingBahan ? existingBahan.quantity_digunakan : 0;
+                
+                const bahanDiv = $(`
+                    <div class="selected-bahan-baku" data-bahan-id="${bahan.id}">
+                        <div>
+                            <strong>${bahan.nama_bahan}</strong><br>
+                            <small>Stok: ${bahan.quantity} ${bahan.satuan} | Harga: Rp ${Math.round(bahan.harga_satuan).toLocaleString('id-ID')}</small>
+                        </div>
+                        <div>
+                            <input type="number" class="form-control form-control-sm quantity-input" 
+                                   style="width: 80px; display: inline-block;" 
+                                   placeholder="Qty" min="0" max="${bahan.quantity}" 
+                                   value="${quantity}"
+                                   data-bahan-id="${bahan.id}"
+                                   data-max-quantity="${bahan.quantity}"
+                                   data-satuan="${bahan.satuan}">
+                        </div>
+                    </div>
+                `);
+                section.append(bahanDiv);
+            });
+            
+            updateEditSelectedBahanBaku();
+        }
+
+        // Update tampilan bahan baku yang dipilih untuk edit
+        function updateEditSelectedBahanBaku() {
+            const container = $('#editSelectedBahanBaku');
+            container.empty();
+            
+            if (editSelectedBahanBaku.length === 0) {
+                container.html('<p class="text-muted">Belum ada bahan baku yang dipilih</p>');
+                return;
+            }
+            
+            editSelectedBahanBaku.forEach((bahan, index) => {
+                const subtotal = Math.round(bahan.quantity_digunakan * bahan.harga_satuan);
+                const bahanDiv = $(`
+                    <div class="selected-bahan-baku-item">
+                        <div class="bahan-info">
+                            <strong>${bahan.nama_bahan}</strong>
+                            <div>${bahan.quantity_digunakan} ${bahan.satuan} × Rp ${Math.round(bahan.harga_satuan).toLocaleString('id-ID')} = Rp ${subtotal.toLocaleString('id-ID')}</div>
+                        </div>
+                        <button type="button" class="btn-remove-bahan" onclick="removeEditBahanBaku(${index})">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `);
+                container.append(bahanDiv);
+            });
+        }
+
+        // Hapus bahan baku dari list edit
+        function removeEditBahanBaku(index) {
+            editSelectedBahanBaku.splice(index, 1);
+            updateEditSelectedBahanBaku();
+            updateEditCalculations();
+        }
+
+        // Update perhitungan untuk edit
+        function updateEditCalculations() {
+            const totalBiaya = editSelectedBahanBaku.reduce((total, bahan) => {
+                return total + (bahan.quantity_digunakan * bahan.harga_satuan);
+            }, 0);
+            
+            const jumlahProduk = parseInt($('#editJumlahProduk').val()) || 0;
+            const persentaseLaba = parseFloat($('#editPersentaseLaba').val()) || 0;
+            
+            // HPP Dasar = Total Biaya ÷ Jumlah Produk
+            const hppDasar = jumlahProduk > 0 ? Math.round(totalBiaya / jumlahProduk) : 0;
+            
+            // Harga Jual = HPP Dasar + (Persentase Laba × HPP Dasar)
+            const hargaJual = Math.round(hppDasar + (persentaseLaba / 100 * hppDasar));
+            
+            $('#editTotalBiaya').text(`Rp ${Math.round(totalBiaya).toLocaleString('id-ID')}`);
+            $('#editHppDasarDisplay').text(`Rp ${hppDasar.toLocaleString('id-ID')}`);
+            $('#editHargaJualDisplay').text(`Rp ${hargaJual.toLocaleString('id-ID')}`);
+            $('#editMarginDisplay').text(`Rp ${(hargaJual - hppDasar).toLocaleString('id-ID')}`);
+            
+            // Update hidden input untuk harga jual
+            $('#editHargaJualHidden').val(hargaJual);
+        }
+
+        // Event listener untuk input quantity edit
+        $(document).on('input', '#editBahanBakuSection .quantity-input', function() {
+            const bahanId = parseInt($(this).data('bahan-id'));
+            const quantity = parseFloat($(this).val()) || 0;
+            
+            // Validasi real-time
+            validateQuantityInput(this);
+            
+            // Update bahan baku quantity untuk edit
+            updateEditBahanBakuQuantity(bahanId, quantity);
+        });
+
+        // Event listener untuk input quantity edit (alternatif untuk memastikan event terdeteksi)
+        $(document).on('change keyup paste', '#editBahanBakuSection .quantity-input', function() {
+            const bahanId = parseInt($(this).data('bahan-id'));
+            const quantity = parseFloat($(this).val()) || 0;
+            
+            // Validasi real-time
+            validateQuantityInput(this);
+            
+            // Update bahan baku quantity untuk edit
+            updateEditBahanBakuQuantity(bahanId, quantity);
+        });
+
+        // Update quantity bahan baku untuk edit
+        function updateEditBahanBakuQuantity(bahanId, quantity) {
+            const bahan = editAvailableBahanBaku.find(b => b.id === bahanId);
+            const quantityInput = $(`#editBahanBakuSection [data-bahan-id="${bahanId}"] input`);
+            const quantityValue = parseFloat(quantity) || 0;
+            
+            // Validasi quantity tidak boleh melebihi stok
+            if (quantityValue > bahan.quantity) {
+                Swal.fire('Error', `Quantity tidak boleh melebihi stok yang tersedia (${bahan.quantity} ${bahan.satuan})`, 'error');
+                quantityInput.val(bahan.quantity);
+                return;
+            }
+            
+            // Validasi quantity tidak boleh negatif
+            if (quantityValue < 0) {
+                Swal.fire('Error', 'Quantity tidak boleh negatif', 'error');
+                quantityInput.val(0);
+                return;
+            }
+            
+            // Update quantity input jika valid
+            quantityInput.val(quantityValue);
+            
+            // Auto-add atau update bahan baku ke selected list
+            if (quantityValue > 0) {
+                // Cek apakah bahan sudah ada di list
+                const existingIndex = editSelectedBahanBaku.findIndex(b => b.bahan_baku_id === bahanId);
+                if (existingIndex !== -1) {
+                    // Update quantity jika sudah ada
+                    editSelectedBahanBaku[existingIndex].quantity_digunakan = quantityValue;
+                } else {
+                    // Tambahkan bahan baru ke list
+                    editSelectedBahanBaku.push({
+                        bahan_baku_id: bahanId,
+                        nama_bahan: bahan.nama_bahan,
+                        quantity_digunakan: quantityValue,
+                        harga_satuan: bahan.harga_satuan,
+                        satuan: bahan.satuan
+                    });
+                }
+                updateEditSelectedBahanBaku();
+                updateEditCalculations();
+            } else {
+                // Jika quantity 0 atau kosong, hapus dari selected list
+                const existingIndex = editSelectedBahanBaku.findIndex(b => b.bahan_baku_id === bahanId);
+                if (existingIndex !== -1) {
+                    editSelectedBahanBaku.splice(existingIndex, 1);
+                    updateEditSelectedBahanBaku();
+                    updateEditCalculations();
+                }
+            }
+        }
+
+        // Event listener untuk input jumlah produk dan persentase laba edit
+        $('#editJumlahProduk, #editPersentaseLaba').on('input', function() {
+            updateEditCalculations();
+        });
+
+        // Event listener khusus untuk memastikan bahan baku dihapus ketika quantity dikosongkan
+        $(document).on('blur', '#editBahanBakuSection .quantity-input', function() {
+            const bahanId = parseInt($(this).data('bahan-id'));
+            const quantity = parseFloat($(this).val()) || 0;
+            
+            // Jika quantity 0 atau kosong, pastikan bahan baku dihapus dari list
+            if (quantity <= 0) {
+                const existingIndex = editSelectedBahanBaku.findIndex(b => b.bahan_baku_id === bahanId);
+                if (existingIndex !== -1) {
+                    editSelectedBahanBaku.splice(existingIndex, 1);
+                    updateEditSelectedBahanBaku();
+                    updateEditCalculations();
+                }
+            }
+        });
+
+        // Handle form submission untuk edit produksi
+        $('#formEditProduksi').on('submit', function(e) {
+            e.preventDefault();
+            
+            if (editSelectedBahanBaku.length === 0) {
+                Swal.fire('Error', 'Pilih minimal satu bahan baku', 'error');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            
+            // Tambahkan data bahan baku sebagai JSON string
+            formData.append('bahan_baku_data', JSON.stringify(editSelectedBahanBaku));
+            
+            $.ajax({
+                url: '/mahasiswa/update_produksi',
+                method: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('Berhasil', response.message, 'success');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        Swal.fire('Error', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    Swal.fire('Error', 'Terjadi kesalahan saat menyimpan data', 'error');
+                }
+            });
+        });
+
+        // Fungsi untuk hapus produksi
+        function hapusProduksi(produksiId) {
+            {% if status_mahasiswa == 'selesai' %}
+            Swal.fire('Akses Dibatasi', 'Anda tidak dapat menghapus produksi karena status akun Anda adalah "selesai".', 'warning');
+            return;
+            {% endif %}
+            
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: 'Apakah Anda yakin ingin menghapus data produksi ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '/mahasiswa/delete_produksi',
+                        method: 'POST',
+                        data: {
+                            produksi_id: produksiId
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire('Berhasil', response.message, 'success');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1500);
+                            } else {
+                                Swal.fire('Error', response.message, 'error');
+                            }
+                        },
+                        error: function() {
+                            Swal.fire('Error', 'Terjadi kesalahan saat menghapus data', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Hitung total saat modal dibuka
+        $('#modalProduksi').on('shown.bs.modal', function() {
+            updateCalculations();
+        });
+
+        $('#modalEditProduksi').on('shown.bs.modal', function() {
+            updateEditCalculations();
+        });
+    </script>
+
+</body>
+
+</html>

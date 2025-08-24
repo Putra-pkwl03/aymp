@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/iconly/bold.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-mahasiswa.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+
+    <style>
+        /* Styling untuk avatar anggota tim */
+        .avatar-initial {
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .avatar-initial:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Warna avatar berdasarkan huruf awal */
+        .avatar-initial.bg-primary {
+            background:rgb(0, 154, 46) !important;
+        }
+        
+        .avatar-initial.bg-secondary {
+            background: #6c757d !important;
+        }
+        
+        /* Warna untuk ketua (hijau tua) */
+        .avatar-initial.bg-ketua {
+            background: #006400 !important; /* Dark green */
+        }
+        
+        /* Warna untuk anggota (hijau muda) */
+        .avatar-initial.bg-anggota {
+            background: #90EE90 !important; /* Light green */
+            color: #333 !important; /* Dark text for better contrast */
+        }
+        
+        /* Styling untuk card anggota tim */
+        .anggota-card {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            margin-bottom: 8px;
+        }
+        
+        .anggota-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border-color:rgb(1, 146, 45);
+        }
+        
+        .anggota-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Styling untuk avatar section */
+        .avatar-section {
+            flex-shrink: 0;
+        }
+        
+        /* Styling untuk info section */
+        .info-section {
+            min-width: 0;
+        }
+        
+        /* Styling untuk nama anggota */
+        .nama-anggota h5 {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            line-height: 1.2;
+        }
+        
+        /* Styling untuk detail anggota */
+        .detail-anggota {
+            font-size: 0.875rem;
+        }
+        
+        .detail-anggota i {
+            color: #6c757d;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .detail-anggota span {
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        /* Styling untuk info items */
+        .nim-info, .prodi-info, .kampus-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
+        .kampus-info {
+            margin-bottom: 0;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .avatar-initial {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 20px !important;
+            }
+            
+            .nama-anggota h5 {
+                font-size: 1rem;
+            }
+            
+            .detail-anggota {
+                font-size: 0.8rem;
+            }
+            
+            .anggota-card {
+                margin-bottom: 6px;
+            }
+            
+            .anggota-card .d-flex {
+                padding: 12px !important;
+            }
+            
+            /* Responsive untuk stats cards */
+            .col-6.col-lg-3.col-md-6 {
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+                margin-bottom: 1rem;
+            }
+            
+            /* Responsive untuk chart header */
+            .card-header.d-flex {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 1rem !important;
+            }
+            
+            .chart-filter {
+                width: 100% !important;
+                justify-content: space-between !important;
+            }
+            
+            .chart-filter select {
+                min-width: 120px !important;
+                flex: 1 !important;
+            }
+            
+            /* Responsive untuk layout utama */
+            .col-12.col-lg-9,
+            .col-12.col-lg-3 {
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .avatar-initial {
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 18px !important;
+            }
+            
+            .nama-anggota h5 {
+                font-size: 0.95rem;
+            }
+            
+            .detail-anggota {
+                font-size: 0.75rem;
+            }
+            
+            .anggota-card .d-flex {
+                padding: 10px !important;
+            }
+            
+            /* Responsive untuk stats cards di mobile kecil */
+            .col-6.col-lg-3.col-md-6 {
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+                margin-bottom: 1rem;
+            }
+            
+            /* Responsive untuk chart filter */
+            .chart-filter {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                gap: 0.5rem !important;
+            }
+            
+            .chart-filter label {
+                font-size: 0.8rem !important;
+            }
+            
+            .chart-filter select {
+                min-width: 100% !important;
+            }
+            
+            /* Responsive untuk text dan spacing */
+            .card-title {
+                font-size: 1rem !important;
+            }
+            
+            .text-muted {
+                font-size: 0.8rem !important;
+            }
+            
+            .badge {
+                font-size: 0.65rem !important;
+                padding: 0.3rem 0.6rem !important;
+            }
+            
+            /* Responsive untuk avatar di profile card */
+            .avatar.avatar-lg .avatar-initial {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 20px !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Responsive untuk mobile sangat kecil */
+            .page-heading h3 {
+                font-size: 1.5rem !important;
+            }
+            
+            .page-heading p {
+                font-size: 1rem !important;
+            }
+            
+            .card-body {
+                padding: 1rem !important;
+            }
+            
+            .card-body.px-3.py-4-5 {
+                padding: 1rem !important;
+            }
+            
+            .stats-icon {
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 1.2rem !important;
+            }
+            
+            .stats-icon i {
+                font-size: 1.2rem !important;
+            }
+            
+            /* Responsive untuk anggota tim di mobile kecil */
+            .anggota-card .d-flex {
+                padding: 8px !important;
+            }
+            
+            .avatar-initial.rounded-circle {
+                width: 40px !important;
+                height: 40px !important;
+                font-size: 16px !important;
+            }
+            
+            /* Responsive footer */
+            .footer {
+                text-align: center !important;
+            }
+            
+            .footer .float-start,
+            .footer .float-end {
+                float: none !important;
+                display: block !important;
+                margin-bottom: 0.5rem !important;
+            }
+            
+            .footer .float-end {
+                margin-bottom: 0 !important;
+            }
+        }
+
+        /* Styling untuk stats cards */
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .stats-icon i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.5rem;
+            line-height: 1;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* Memastikan icon Bootstrap terpusat */
+        .bi {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .stats-icon:hover {
+            transform: scale(1.05);
+        }
+
+        /* Card styling tanpa gradient */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Text styling */
+        .font-extrabold {
+            font-weight: 800;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}"><img
+                                    src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo"
+                                    srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        {% if has_lolos_proposal %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin = 'lolos' - lengkap -->
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                <span>Pendanaan Hibah</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_akhir') }}">Laporan Akhir</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span>Produksi</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.pengelolaan_bahan_baku_mahasiswa') }}"> Bahan Bakuu</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.aktivitas_produksi_mahasiswa') }}">Produksi</a>
+                                </li>
+
+                            </ul>
+                        </li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.pembelian_alat_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-tools"></i>
+                                    <span>Alat Produksi</span>
+                            </a>    
+                        </li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.biaya_operasional_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-calculator"></i>
+                                <span>Biaya Operasional</span>
+                            </a>
+                        </li>
+                        
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.biaya_non_operasional_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-wallet2"></i>
+                                <span>Biaya Lain-lain</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.laporan_penjualan_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-receipt"></i>
+                                    <span>Laporan Penjualan</span>
+                            </a>
+
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-graph-up"></i>
+                                    <span>Pelaporan Keuangan</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_laba_rugi_mahasiswa') }}">Laporan Laba Rugi</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_arus_kas_mahasiswa') }}">Laporan Arus Kas</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_neraca_mahasiswa') }}">Laporan Neraca</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% else %}
+                        <!-- Menu untuk mahasiswa dengan proposal status_admin != 'lolos' atau tanpa proposal - terbatas -->
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% endif %}
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.bimbingan') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.profile_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-person-circle"></i>
+                                <span>Profile Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-star-fill"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+
+            </header>
+
+            <div class="page-heading">
+                <h3>Selamat datang, {{ session.get('nama', 'Mahasiswa')|e }}!</h3>
+                <p class="text-muted" style="font-size:1.2rem;">Sebagai {{ session.get('user_type', 'Mahasiswa')|e }} | NIM: {{ session.get('nim', 'N/A')|e }}</p>
+            </div>
+            <div class="page-content">
+                <section class="row">
+                    <div class="col-12 col-lg-9">
+                        <div class="row">
+                            <div class="col-6 col-lg-3 col-md-6">
+                                <div class="card">
+                                    <div class="card-body px-3 py-4-5">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="stats-icon" style="background-color: #28a745;">
+                                                    <i class="bi bi-cash-stack" style="color: white;"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h6 class="text-muted font-semibold">Total Pendapatan</h6>
+                                                <h6 class="font-extrabold mb-0" style="color: #28a745;">Rp {{ "{:,.0f}".format(total_pendapatan|default(0)) }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-lg-3 col-md-6">
+                                <div class="card">
+                                    <div class="card-body px-3 py-4-5">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="stats-icon" style="background-color: #ffc107;">
+                                                    <i class="bi bi-gear-fill" style="color: white;"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h6 class="text-muted font-semibold">Total Biaya Produksi</h6>
+                                                <h6 class="font-extrabold mb-0" style="color: #ffc107;">Rp {{ "{:,.0f}".format(total_biaya_produksi|default(0)) }}</h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-lg-3 col-md-6">
+                                <div class="card">
+                                    <div class="card-body px-3 py-4-5">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="stats-icon" style="background-color: #435ebe;">
+                                                    <i class="bi bi-bar-chart" style="color: white;"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h6 class="text-muted font-semibold">Laba Rugi/Kotor</h6>
+                                                <h6 class="font-extrabold mb-0" style="color: #435ebe;">
+                                                    Rp {{ "{:,.0f}".format(total_laba_kotor|default(0)) }}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-lg-3 col-md-6">
+                                <div class="card">
+                                    <div class="card-body px-3 py-4-5">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="stats-icon" style="background-color: #6f42c1;">
+                                                    <i class="bi bi-calculator-fill" style="color: white;"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h6 class="text-muted font-semibold">Laba Rugi/Bersih</h6>
+                                                <h6 class="font-extrabold mb-0" style="color: #6f42c1;">
+                                                    Rp {{ "{:,.0f}".format(total_laba_bersih|default(0)) }}
+                                                </h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4>Grafik Produksi vs Penjualan</h4>
+                                        <div class="chart-filter d-flex align-items-center gap-2">
+                                            <label for="chartPeriodFilter" class="form-label mb-0 fw-semibold text-muted" style="font-size: 0.875rem;">
+                                                <i class="bi bi-funnel me-1"></i>Filter Periode:
+                                            </label>
+                                            <select id="chartPeriodFilter" class="form-select form-select-sm" style="width: auto; min-width: 150px;">
+                                                <option value="daily">Harian (7 Hari)</option>
+                                                <option value="weekly">Mingguan (1 Bulan)</option>
+                                                <option value="monthly">Bulanan (1 Tahun)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="chart-produksi-penjualan"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-3">
+                        <div class="card">
+                            <div class="card-body py-4 px-5">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar avatar-lg">
+                                        <div class="avatar-initial rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold; color: white;">
+                                            {{ session.get('nama', 'M')[0].upper() }}
+                                        </div>
+                                    </div>
+                                    <div class="ms-3 name">
+                                        <h6 class="font-bold mb-1">{{ session.get('nama', 'Mahasiswa')|e }}</h6>
+                                        <small class="text-muted d-block mb-1">{{ session.get('program_studi', 'Program Studi')|e }}</small>
+                                        <small class="text-muted">NIM: {{ session.get('nim', 'N/A')|e }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>Anggota Tim</h4>
+                            </div>
+                            <div class="card-content pb-4">
+                                {% if anggota_tim_list %}
+                                    <div class="row g-3">
+                                        {% for anggota in anggota_tim_list %}
+                                        <div class="col-12">
+                                            <div class="anggota-card">
+                                                <div class="d-flex align-items-center p-3">
+                                                    <div class="avatar-section me-3">
+                                                        <div class="avatar-initial rounded-circle {% if anggota.nim == session.get('nim') %}bg-ketua{% else %}bg-anggota{% endif %} d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold;">
+                                                            {{ anggota.nama[0].upper() if anggota.nama else '?' }}
+                                                        </div>
+                                                    </div>
+                                                    <div class="info-section flex-grow-1">
+                                                        <div class="nama-anggota mb-1">
+                                                            <h5 class="mb-0 fw-bold {% if anggota.nim == session.get('nim') %}text-success{% endif %}">{{ anggota.nama|e }}{% if anggota.nim == session.get('nim') %} <small class="badge bg-success text-white ms-2">Ketua</small>{% endif %}</h5>
+                                                        </div>
+                                                        <div class="detail-anggota">
+                                                            <div class="nim-info mb-1">
+                                                                <i class="bi bi-person-badge me-1"></i>
+                                                                <span class="text-muted">{{ anggota.nim|e }}</span>
+                                                            </div>
+                                                            <div class="prodi-info mb-1">
+                                                                <i class="bi bi-award me-1"></i>
+                                                                <span class="text-muted">{{ anggota.program_studi|e }}</span>
+                                                            </div>
+                                                            <div class="kampus-info">
+                                                                <i class="bi bi-building me-1"></i>
+                                                                <span class="text-muted">{{ anggota.perguruan_tinggi|e }}</span>
+                                    </div>
+                                    </div>
+                                </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-4">
+                                        <div class="avatar-initial rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold; color: white;">
+                                            <i class="bi bi-people" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"></i>
+                                        </div>
+                                        <h6 class="text-muted mb-1">Belum ada anggota tim</h6>
+                                        <small class="text-muted">Tambahkan anggota tim di menu Pengajuan Proposal</small>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/apexcharts/apexcharts.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/pages/dashboard.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+    <script>
+        // Data untuk chart dari backend
+        var chartData = {
+            daily: {
+                dates: {{ chart_dates|tojson }},
+                produksi: {{ chart_produksi|tojson }},
+                penjualan: {{ chart_penjualan|tojson }}
+            },
+            weekly: {
+                dates: {{ chart_weekly_dates|tojson }},
+                produksi: {{ chart_weekly_produksi|tojson }},
+                penjualan: {{ chart_weekly_penjualan|tojson }}
+            },
+            monthly: {
+                dates: {{ chart_monthly_dates|tojson }},
+                produksi: {{ chart_monthly_produksi|tojson }},
+                penjualan: {{ chart_monthly_penjualan|tojson }}
+            }
+        };
+
+        var currentPeriod = 'daily';
+        var chart;
+
+        // Fungsi untuk update chart
+        function updateChart(period) {
+            var data = chartData[period];
+            
+            // Cek apakah semua data kosong
+            var allZeroProduksi = data.produksi.every(function(value) { return value === 0; });
+            var allZeroPenjualan = data.penjualan.every(function(value) { return value === 0; });
+            var hasNoData = allZeroProduksi && allZeroPenjualan;
+            
+            var options = {
+                series: [{
+                    name: 'Jumlah Produk (Produksi)',
+                    data: data.produksi,
+                    color: '#435ebe'
+                }, {
+                    name: 'Quantity Penjualan',
+                    data: data.penjualan,
+                    color: '#28a745'
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    stacked: false,
+                    toolbar: {
+                        show: true,
+                        tools: {
+                            download: true,
+                            selection: false,
+                            zoom: true,
+                            zoomin: true,
+                            zoomout: true,
+                            pan: true,
+                            reset: true
+                        }
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        endingShape: 'rounded'
+                    },
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent']
+                },
+                xaxis: {
+                    categories: data.dates,
+                    title: { 
+                        text: period === 'daily' ? 'Hari' : period === 'weekly' ? 'Minggu' : 'Bulan'
+                    }
+                },
+                yaxis: {
+                    title: {
+                        text: 'Jumlah',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: 600
+                        }
+                    },
+                    min: 0,
+                    max: function() {
+                        var maxProduksi = Math.max(...data.produksi);
+                        var maxPenjualan = Math.max(...data.penjualan);
+                        var maxValue = Math.max(maxProduksi, maxPenjualan);
+                        // Jika semua data 0, set max ke 10 untuk tampilan yang lebih baik
+                        return hasNoData ? 10 : Math.ceil(maxValue * 1.2);
+                    }(),
+                    tickAmount: 6
+                },
+                fill: {
+                    opacity: 1
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return val + " unit"
+                        }
+                    }
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'center',
+                    fontSize: '14px',
+                    fontWeight: 600
+                },
+                grid: {
+                    borderColor: '#e7e7e7',
+                    row: {
+                        colors: ['#f3f3f3', 'transparent'],
+                        opacity: 0.5
+                    },
+                },
+                responsive: [{
+                    breakpoint: 1024,
+                    options: {
+                        chart: {
+                            height: 300
+                        }
+                    }
+                }, {
+                    breakpoint: 768,
+                    options: {
+                        chart: {
+                            height: 250
+                        },
+                        legend: {
+                            position: 'bottom'
+                        },
+                        xaxis: {
+                            labels: {
+                                style: {
+                                    fontSize: '10px'
+                                }
+                            }
+                        },
+                        yaxis: {
+                            labels: {
+                                style: {
+                                    fontSize: '10px'
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    breakpoint: 576,
+                    options: {
+                        chart: {
+                            height: 200
+                        },
+                        legend: {
+                            position: 'bottom',
+                            fontSize: '12px'
+                        },
+                        xaxis: {
+                            labels: {
+                                style: {
+                                    fontSize: '8px'
+                                }
+                            }
+                        },
+                        yaxis: {
+                            labels: {
+                                style: {
+                                    fontSize: '8px'
+                                }
+                            }
+                        }
+                    }
+                }, {
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            height: 180
+                        },
+                        legend: {
+                            position: 'bottom',
+                            fontSize: '10px'
+                        },
+                        xaxis: {
+                            labels: {
+                                style: {
+                                    fontSize: '7px'
+                                }
+                            }
+                        },
+                        yaxis: {
+                            labels: {
+                                style: {
+                                    fontSize: '7px'
+                                }
+                            }
+                        }
+                    }
+                }]
+            };
+
+            if (chart) {
+                chart.destroy();
+            }
+            
+            chart = new ApexCharts(document.querySelector("#chart-produksi-penjualan"), options);
+            chart.render();
+            
+            // Tampilkan pesan jika tidak ada data
+            if (hasNoData) {
+                // Tambahkan pesan di bawah chart
+                var chartContainer = document.querySelector("#chart-produksi-penjualan");
+                var existingMessage = chartContainer.querySelector('.no-data-message');
+                if (!existingMessage) {
+                    var messageDiv = document.createElement('div');
+                    messageDiv.className = 'no-data-message text-center mt-3';
+                    messageDiv.innerHTML = '<div class="alert alert-info"><i class="bi bi-info-circle me-2"></i>Belum ada data produksi dan penjualan. Silakan tambahkan data di menu Produksi dan Penjualan.</div>';
+                    chartContainer.appendChild(messageDiv);
+                }
+            } else {
+                // Hapus pesan jika ada data
+                var chartContainer = document.querySelector("#chart-produksi-penjualan");
+                var existingMessage = chartContainer.querySelector('.no-data-message');
+                if (existingMessage) {
+                    existingMessage.remove();
+                }
+            }
+        }
+
+        // Event listener untuk filter
+        document.getElementById('chartPeriodFilter').addEventListener('change', function() {
+            currentPeriod = this.value;
+            updateChart(currentPeriod);
+        });
+
+        // Inisialisasi chart dengan data harian
+        updateChart('daily');
+    </script>
+</body>
+
+</html>

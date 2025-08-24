@@ -1,0 +1,2348 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengajuan Anggaran Awal Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <!-- <link rel="stylesheet" href="assets/vendors/jquery-datatables/jquery.dataTables.min.css"> -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+    <style>
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        /* Modal Styles */
+        .modal-xl {
+            max-width: 1200px;
+        }
+
+        .modal-header {
+            background: #435ebe;
+            color: white;
+            border-bottom: none;
+        }
+
+        .modal-header .btn-close {
+            filter: invert(1);
+        }
+
+        .barang-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .barang-item:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .barang-item h6 {
+            color: #435ebe !important;
+            font-weight: 600;
+        }
+
+        .form-label.fw-bold {
+            color: #3b3f5c;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #435ebe;
+            box-shadow: 0 0 0 0.2rem rgba(67, 94, 190, 0.25);
+        }
+
+        .input-group-text {
+            background-color: #f8f9fa;
+            border-color: #d1d5db;
+            color: #6c757d;
+        }
+
+        .btn-outline-danger {
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-danger:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-outline-primary {
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(67, 94, 190, 0.3);
+        }
+
+        .modal-footer .btn {
+            border-radius: 8px;
+            padding: 10px 25px;
+            font-weight: 500;
+        }
+
+        .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+        }
+
+        /* Animation for modal */
+        .modal.fade .modal-dialog {
+            transition: transform 0.3s ease-out;
+            transform: translate(0, -50px);
+        }
+
+        .modal.show .modal-dialog {
+            transform: none;
+        }
+
+        .kegiatan-item {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .kegiatan-item:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            border-color: #435ebe;
+            transform: translateY(-3px);
+        }
+
+        .kegiatan-item h6 {
+            color: #435ebe !important;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .kegiatan-item .card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .kegiatan-item .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .barang-item h6 {
+            color: #22c55e !important;
+            font-weight: 600;
+        }
+
+        /* Enhanced Table Responsiveness */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .table {
+            margin-bottom: 0;
+            min-width: 1200px; /* Ensure minimum width for readability */
+        }
+
+        .table th, .table td {
+            padding: 12px 8px;
+            vertical-align: middle;
+            word-wrap: break-word;
+            white-space: normal;
+            border: 1px solid #dee2e6;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            font-size: 0.85rem;
+            line-height: 1.3;
+            color: #495057;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table td {
+            font-size: 0.85rem;
+            line-height: 1.3;
+            color: #212529;
+        }
+
+        /* Status column styling */
+        .table th:last-child,
+        .table td:last-child {
+            width: 8%;
+        }
+
+        /* Enhanced Responsive Breakpoints */
+        @media (max-width: 1600px) {
+            .table th, .table td {
+                font-size: 0.8rem;
+                padding: 10px 6px;
+            }
+        }
+
+        @media (max-width: 1400px) {
+            .table th, .table td {
+                font-size: 0.75rem;
+                padding: 8px 5px;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .table th, .table td {
+                font-size: 0.7rem;
+                padding: 6px 4px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .table th, .table td {
+                font-size: 0.65rem;
+                padding: 5px 3px;
+            }
+            
+            .table {
+                min-width: 1000px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .table th, .table td {
+                font-size: 0.6rem;
+                padding: 4px 2px;
+            }
+            
+            .table {
+                min-width: 900px;
+            }
+            
+            /* Optimize button sizes for mobile */
+            .btn-lihat-link {
+                font-size: 0.7rem !important;
+                padding: 0.2rem 0.6rem !important;
+            }
+            
+            .badge {
+                font-size: 0.6rem;
+                padding: 0.25rem 0.5rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .table th, .table td {
+                font-size: 0.55rem;
+                padding: 3px 1px;
+            }
+            
+            .table {
+                min-width: 800px;
+            }
+            
+            /* Stack info in mobile */
+            .card-header {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            
+            .page-heading .row {
+                flex-direction: column;
+            }
+            
+            .page-heading .col-12 {
+                order: 1;
+                margin-bottom: 15px;
+            }
+        }
+
+        /* Mobile-first table improvements */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* Ensure table fits without horizontal scroll on larger screens */
+        @media (min-width: 1600px) {
+            .card-body .table-responsive {
+                overflow-x: visible;
+            }
+            
+            .table {
+                min-width: auto;
+                width: 100%;
+            }
+        }
+
+        /* Action Buttons with Circle Background - Vertical Layout */
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2px 0;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .action-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(67, 94, 190, 0.25);
+        }
+
+        .btn-edit {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #2563EB;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #EF4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #DC2626;
+            color: white;
+        }
+
+        /* Action column styling - Vertical Layout */
+        .table td:last-child {
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        /* Action buttons container for vertical layout */
+        .action-buttons-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            min-height: 40px;
+            justify-content: center;
+        }
+
+        /* Enhanced button styling */
+        .action-btn i {
+            transition: transform 0.2s ease;
+        }
+
+        .action-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-completed {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Total Row Styling */
+        .total-row {
+            background: #f8f9fa;
+            font-weight: 700;
+        }
+
+        .total-row td {
+            border-top: 2px solid #dee2e6;
+        }
+
+        #totalJumlah {
+            background: #e3f2fd;
+            color: #1976d2;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* SweetAlert2 Custom Styling */
+        .swal2-popup {
+            border-radius: 15px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .swal2-title {
+            color: #3b3f5c;
+            font-weight: 700;
+        }
+
+        .swal2-content {
+            color: #6c757d;
+        }
+
+        .swal2-confirm {
+            background: #435ebe !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-cancel {
+            background: #6c757d !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-success-circular-line-left,
+        .swal2-success-circular-line-right,
+        .swal2-success-fix {
+            background-color: transparent !important;
+        }
+
+        .swal2-icon.swal2-success {
+            border-color: #435ebe !important;
+        }
+
+        .swal2-icon.swal2-success [class^='swal2-success-line'] {
+            background-color: #435ebe !important;
+        }
+
+        .swal2-icon.swal2-success .swal2-success-ring {
+            border-color: #435ebe !important;
+        }
+
+        /* Modal Edit Header - Neutral Color */
+        #modalEditAnggaran .modal-header {
+            background: #f8f9fa;
+            color: #3b3f5c;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        #modalEditAnggaran .modal-header .btn-close {
+            filter: none;
+        }
+
+        /* Modal Tambah Kegiatan Header - Neutral Color */
+        #modalTambahKegiatan .modal-header {
+            background: #f8f9fa;
+            color: #3b3f5c;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        #modalTambahKegiatan .modal-header .btn-close {
+            filter: none;
+        }
+
+        /* Disabled button styling */
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #6c757d !important;
+            color: #fff !important;
+            border: none !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn:disabled:hover {
+            background: #6c757d !important;
+            color: #fff !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .form-select:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #e9ecef;
+            border-color: #ced4da;
+        }
+
+        .form-select:disabled:focus {
+            border-color: #ced4da;
+            box-shadow: none;
+        }
+
+        /* Info message styling */
+        .info-message {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        .input-group .form-control {
+            border-radius: 8px 0 0 8px;
+            font-size: 0.95rem;
+            padding: 0.5rem 0.75rem;
+        }
+        .input-group .btn {
+            border-radius: 0;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .input-group .btn-primary {
+            border-radius: 0 8px 8px 0;
+        }
+        .input-group .btn-outline-primary {
+            border-right: none;
+        }
+        @media (max-width: 500px) {
+            .input-group .form-control, .input-group .btn {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.5rem;
+            }
+        }
+        .btn-lihat-link {
+            background: #435ebe !important;
+            color: #fff !important;
+            border-radius: 1.5rem !important;
+            font-size: 0.8rem !important;
+            padding: 0.25rem 0.9rem !important;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .btn-lihat-link:hover {
+            background: #25396f !important;
+            color: #fff !important;
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-mahasiswa.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        {% if has_lolos_proposal %}
+                            <!-- Menu untuk mahasiswa dengan proposal status_admin = 'lolos' - lengkap -->
+                        <li class="sidebar-item active has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                <span>Pendanaan Hibah</span>
+                            </a>
+                            <ul class="submenu active">
+                                <li class="submenu-item active">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_akhir') }}">Laporan Akhir</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-gear-fill"></i>
+                                    <span>Produksi</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.pengelolaan_bahan_baku_mahasiswa') }}">Bahan Baku</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.aktivitas_produksi_mahasiswa') }}">Produksi</a>
+                                </li>
+
+                            </ul>
+                        </li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.pembelian_alat_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-tools"></i>
+                                <span>Alat Produksi</span>
+                            </a>
+                            
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.biaya_operasional_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-calculator"></i>
+                                <span>Biaya Operasional</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.biaya_non_operasional_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-wallet2"></i>
+                                <span>Biaya Lain-lain</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.laporan_penjualan_mahasiswa') }}" class='sidebar-link'>
+                                    <i class="bi bi-receipt"></i>
+                                    <span>Laporan Penjualan</span>
+                            </a>
+                            
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-graph-up"></i>
+                                    <span>Pelaporan Keuangan</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_laba_rugi_mahasiswa') }}">Laporan Laba Rugi</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_arus_kas_mahasiswa') }}">Laporan Arus Kas</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('mahasiswa.laporan_neraca_mahasiswa') }}">Laporan Neraca</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% else %}
+                        <!-- Menu untuk mahasiswa dengan proposal status_admin != 'lolos' atau tanpa proposal - terbatas -->
+                        <li class="sidebar-item active has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                    <span>Pendanaan Hibah</span>
+                                </a>
+                            <ul class="submenu active">
+                                <li class="submenu-item active">
+                                        <a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% endif %}
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('mahasiswa.bimbingan') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('mahasiswa.profile_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-person-circle"></i>
+                                <span>Profile Mahasiswa</span>
+                            </a>
+                                </li>
+                                <li class="sidebar-item">
+                                    <a href="{{ url_for('mahasiswa.nilai_mahasiswa') }}" class='sidebar-link'>
+                                        <i class="bi bi-star-fill"></i>
+                                        <span>Nilai Mahasiswa</span>
+                                    </a>
+                                </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Pengajuan Anggaran Awal</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Ajukan anggaran awal untuk memulai usahamu di AYMP UNJAYA.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('mahasiswa.dashboard_mahasiswa') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url_for('mahasiswa.proposal') }}">Pengajuan Proposal</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Pengajuan Anggaran Awal</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Tables start -->
+                <section class="section">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span>Pengajuan Anggaran Awal</span>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <button class="btn btn-success btn-sm rounded-circle" onclick="downloadExcelAnggaran('awal')" title="Download Excel Anggaran Awal" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="fa fa-download" style="font-size: 16px;"></i>
+                                </button>
+                                <div style="display: flex; align-items: center;">
+                                    <select class="form-select" id="kegiatanSelect" style="min-width: 250px; border-radius: 2rem 0 0 2rem; border-right: none; height: 44px;" 
+                                           {% if not proposal_info or proposal_info.status not in ['draf', 'revisi'] %}disabled{% endif %}
+                                           title="{% if not proposal_info or proposal_info.status not in ['draf', 'revisi'] %}Dropdown dinonaktifkan karena proposal dalam status {{ proposal_info.status|upper if proposal_info else 'TIDAK DITEMUKAN' }}{% else %}Pilih kegiatan utama untuk menambah anggaran{% endif %}">
+                                        <option value="">-- Pilih Kegiatan Utama --</option>
+                                        <option value="Pengembangan Produk/Riset">Pengembangan Produk/Riset</option>
+                                        <option value="Produksi">Produksi</option>
+                                        <option value="Legalitas, perizinan, sertifikasi, dan standarisasi">Legalitas, perizinan, sertifikasi, dan standarisasi</option>
+                                        <option value="Belanja ATK dan Penunjang">Belanja ATK dan Penunjang</option>
+                                    </select>
+                                    <button class="btn" id="tambahKegiatanBtn" style="background: #22c55e; color: #fff; border-radius: 0 2rem 2rem 0; height: 44px; width: 48px; display: flex; align-items: center; justify-content: center; border: none; margin-left: -1px;"
+                                            {% if not proposal_info or proposal_info.status not in ['draf', 'revisi'] %}disabled{% endif %}
+                                            title="{% if not proposal_info or proposal_info.status not in ['draf', 'revisi'] %}Tombol dinonaktifkan karena proposal dalam status {{ proposal_info.status|upper if proposal_info else 'TIDAK DITEMUKAN' }}{% else %}Tambah anggaran baru{% endif %}">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {% if not proposal_info or proposal_info.status not in ['draf', 'revisi'] %}
+                                <div class="info-message">
+                                    <i class="fa fa-info-circle me-2"></i>
+                                    <strong>Informasi:</strong> Dropdown dan tombol tambah anggaran dinonaktifkan karena proposal dalam status 
+                                    {% if proposal_info and proposal_info.status == 'diajukan' %}
+                                        <span class="badge bg-info">DIAJUKAN</span>
+                                    {% elif proposal_info and proposal_info.status == 'disetujui' %}
+                                        <span class="badge bg-success">DISETUJUI</span>
+                                    {% elif proposal_info and proposal_info.status == 'ditolak' %}
+                                        <span class="badge bg-danger">DITOLAK</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ proposal_info.status|upper if proposal_info else 'TIDAK DITEMUKAN' }}</span>
+                                    {% endif %}.
+                                    Anda hanya dapat menambah anggaran baru jika proposal dalam status <span class="badge bg-secondary">DRAF</span> atau <span class="badge bg-warning text-dark">REVISI</span>.
+                                </div>
+                            {% endif %}
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle text-center" style="width: 100%; font-size: 0.85rem;">
+                                    <thead>
+                                        <tr>
+                                            <th rowspan="2" style="vertical-align:middle; width: 15%;">Kegiatan Utama</th>
+                                            <th colspan="6" style="width: 55%;">Rencana</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 10%;">Keterangan/<br>Ref. Harga</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 10%;">Target Capaian<br>H = Output A</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 10%;">Penanggung Jawab</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 5%;">Status</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 12%;">Jumlah Nilai Bantuan</th>
+                                            <th rowspan="2" style="vertical-align:middle; width: 5%;">Aksi</th>
+                                        </tr>
+                                        <tr>
+                                            <th style="width: 10%;">Kegiatan<br>A</th>
+                                            <th style="width: 12%">Nama Barang<br>B</th>
+                                            <th style="width: 8%">Kuantitas<br>C</th>
+                                            <th style="width: 8%">Satuan<br>D</th>
+                                            <th style="width: 12%">Harga Satuan<br>E</th>
+                                            <th style="width: 10%">Jumlah (Rp)<br>F=C×E</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                     {% if not anggaran_data_flat %}
+                                            <tr>
+                                                <td colspan="13" class="text-center py-4">
+                                                    <div class="alert alert-info mb-0">
+                                                        <i class="fa fa-info-circle me-2"></i>
+                                                        <strong>Belum ada data anggaran untuk proposal ini.</strong><br>
+                                                        
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% else %}
+                                        {% for row in anggaran_data_flat %}
+                                            <tr>
+                                                {% if row.show_kegiatan_utama %}
+                                                    <td rowspan="{{ row.kegiatan_utama_rowspan }}">{{ row.kegiatan_utama|e }}</td>
+                                                {% endif %}
+                                                {% if row.show_kegiatan %}
+                                                    <td rowspan="{{ row.kegiatan_rowspan }}">{{ row.kegiatan|e }}</td>
+                                                {% endif %}
+                                                <td>{{ row.nama_barang|e }}</td>
+                                                <td>{{ row.kuantitas }}</td>
+                                                <td>{{ row.satuan|e }}</td>
+                                                <td>Rp {{ "{:,}".format(row.harga_satuan|int) }}</td>
+                                                <td class="cell-jumlah">Rp {{ "{:,}".format(row.jumlah|int) }}</td>
+                                                <td>
+                                                    {% if row.keterangan %}
+                                                        {% set keterangan_lower = row.keterangan|lower %}
+                                                        {% if 'http' in keterangan_lower or 'www' in keterangan_lower or '.com' in keterangan_lower or '.id' in keterangan_lower or '.org' in keterangan_lower or '.net' in keterangan_lower or '.co' in keterangan_lower or '.ac' in keterangan_lower or '.go' in keterangan_lower %}
+                                                            <button class="btn btn-primary btn-sm btn-lihat-link lihat-keterangan-btn" data-keterangan="{{ row.keterangan|e }}" data-link="{{ row.keterangan|e }}" style="border-radius: 1.5rem; padding: 0.25rem 0.9rem; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.3rem;">
+                                                                <i class="fa fa-external-link-alt me-1"></i>Lihat
+                                                            </button>
+                                                        {% else %}
+                                                            <span class="text-muted">{{ row.keterangan|e }}</span>
+                                                        {% endif %}
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                                {% if row.show_target_capaian %}
+                                                    <td rowspan="{{ row.target_capaian_rowspan }}">{{ row.target_capaian|e }}</td>
+                                                {% endif %}
+                                                {% if row.show_penanggung_jawab %}
+                                                    <td rowspan="{{ row.penanggung_jawab_rowspan }}">{{ row.penanggung_jawab }}</td>
+                                                {% endif %}
+                                                <td>
+                                                    {% if row.status == 'disetujui' %}
+                                                        <span class="badge bg-success">{{ row.status|upper }}</span>
+                                                    {% elif row.status == 'ditolak' %}
+                                                        <span class="badge bg-danger">{{ row.status|upper }}</span>
+                                                    {% elif row.status == 'revisi' %}
+                                                        <span class="badge bg-warning text-dark">{{ row.status|upper }}</span>
+                                                    {% elif row.status == 'diajukan' %}
+                                                        <span class="badge bg-info">{{ row.status|upper }}</span>
+                                                    {% else %}
+                                                        <span class="badge bg-secondary">{{ row.status|upper }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="cell-nilai-bantuan">
+                                                    {% if row.nilai_bantuan and row.nilai_bantuan > 0 %}
+                                                        <span class="text-success fw-bold">Rp {{ "{:,}".format(row.nilai_bantuan|int) }}</span>
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    {% if row.status in ['draf', 'revisi'] %}
+                                                    <div class="action-buttons-container">
+                                                        <button class="action-btn btn-edit" title="Edit" onclick="editKegiatan('{{ row.id }}', '{{ row.status }}')">
+                                                            <i class="fa fa-pen"></i>
+                                                        </button>
+                                                        <button class="action-btn btn-delete" title="Hapus" onclick="deleteKegiatan('{{ row.id }}')">
+                                                            <i class="fa fa-trash-alt"></i>
+                                                        </button>
+                                                    </div>
+                                                    {% else %}
+                                                    <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        {% endif %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr class="total-row">
+                                            <td colspan="6" class="text-end fw-bold">TOTAL ANGGARAN:
+                                                <span id="badgeTotalStatus" class="badge ms-2" style="display:none"></span>
+                                            </td>
+                                            <td id="totalJumlah" class="fw-bold">Rp 0</td>
+                                            <td colspan="6"></td>
+                                        </tr>
+                                        <tr class="total-row" style="background:#e8f5e8;">
+                                            <td colspan="6" class="text-end fw-bold text-success">
+                                                <i class="fa-solid fa-money-bill-wave me-1"></i>TOTAL NILAI BANTUAN:
+                                            </td>
+                                            <td id="totalNilaiBantuan" class="fw-bold text-success">Rp {{ "{:,}".format(total_nilai_bantuan|int) }}</td>
+                                            <td colspan="6"></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <!-- Modal Keterangan/Ref. Harga -->
+                <div class="modal fade" id="modalKeterangan" tabindex="-1" aria-labelledby="modalKeteranganLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header" style="background: #f8f9fa; color: #3b3f5c; border-bottom: 1px solid #dee2e6;">
+                        <h5 class="modal-title" id="modalKeteranganLabel">Keterangan / Ref. Harga</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup" style="filter: none;"></button>
+                      </div>
+                      <div class="modal-body">
+                        <p id="isiKeterangan"></p>
+                        <div id="linkContainer" style="display:none;">
+                            <hr>
+                            <div class="input-group">
+                                <input type="text" id="linkKeterangan" class="form-control" readonly>
+                                <button class="btn btn-outline-primary" type="button" onclick="copyLink()">
+                                    <i class="fa fa-copy me-1"></i>Copy
+                                </button>
+                                <a id="linkKeteranganBtn" href="#" target="_blank" class="btn btn-primary">
+                                    <i class="fa fa-external-link-alt me-1"></i>Buka
+                                </a>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Basic Tables end -->
+            </div>
+
+            <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+            <script src="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.all.min.js') }}"></script>
+            <!-- Custom JS harus setelah jQuery dan plugin -->
+            <script>
+              $(document).on('click', '.lihat-keterangan-btn', function() {
+                var keterangan = $(this).data('keterangan');
+                var link = $(this).data('link');
+                var isLink = false;
+                var linkLower = link ? link.toLowerCase() : '';
+                if (linkLower.includes('http') || linkLower.includes('www') || linkLower.includes('.com') || linkLower.includes('.id') || linkLower.includes('.org') || linkLower.includes('.net') || linkLower.includes('.co') || linkLower.includes('.ac') || linkLower.includes('.go')) {
+                    isLink = true;
+                }
+                if (isLink) {
+                    $('#isiKeterangan').text(''); // Jangan tampilkan teks link
+                    $('#linkKeterangan').val(linkLower); // Selalu tampilkan lowercase
+                    $('#linkKeteranganBtn').attr('href', link);
+                    $('#linkContainer').show();
+                } else {
+                    $('#isiKeterangan').text(keterangan); // Tampilkan keterangan biasa
+                    $('#linkContainer').hide();
+                }
+                $('#modalKeterangan').modal('show');
+              });
+
+              // Function to copy link
+              window.copyLink = function() {
+                var linkInput = document.getElementById('linkKeterangan');
+                linkInput.select();
+                linkInput.setSelectionRange(0, 99999); // For mobile devices
+                
+                try {
+                    navigator.clipboard.writeText(linkInput.value);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Link berhasil disalin ke clipboard',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                } catch (err) {
+                    // Fallback for older browsers
+                    document.execCommand('copy');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Link berhasil disalin ke clipboard',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+              };
+            </script>
+
+            <!-- Modal Tambah Kegiatan -->
+            <div class="modal fade" id="modalTambahKegiatan" tabindex="-1" aria-labelledby="modalTambahKegiatanLabel" aria-hidden="true">
+                <div class="modal-dialog modal-xl">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalTambahKegiatanLabel">Tambah Kegiatan Utama: <span id="judulKegiatan"></span></h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formTambahKegiatan">
+                                <!-- Kegiatan Utama (Read-only) -->
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <label for="kegiatanUtama" class="form-label fw-bold">Kegiatan Utama</label>
+                                        <input type="text" class="form-control" id="kegiatanUtama" readonly>
+                                    </div>
+                                </div>
+
+                                <!-- Daftar Kegiatan Section -->
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="mb-0 fw-bold">Daftar Kegiatan</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="daftarKegiatanContainer">
+                                            <div class="kegiatan-item mb-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h6 class="mb-0 text-primary">Kegiatan #1</h6>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger hapus-kegiatan">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                                
+                                                <!-- Form Kegiatan -->
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Kegiatan</label>
+                                                        <input type="text" class="form-control kegiatan-nama" placeholder="Masukkan kegiatan" required>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label fw-bold">Penanggung Jawab</label>
+                                                        <input type="text" class="form-control penanggung-jawab" placeholder="Masukkan penanggung jawab" required>
+                                                    </div>
+                                                </div>
+                                                
+                                                <!-- Target Capaian -->
+                                                <div class="row mb-3">
+                                                    <div class="col-md-12">
+                                                        <label class="form-label fw-bold">Target Capaian</label>
+                                                        <textarea class="form-control target-capaian" rows="3" placeholder="Masukkan target capaian" required></textarea>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Daftar Barang untuk Kegiatan ini -->
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <h6 class="mb-0 fw-bold">Daftar Barang</h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="daftar-barang-kegiatan">
+                                                            <div class="barang-item mb-3">
+                                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                    <h6 class="mb-0 text-success">Barang #1</h6>
+                                                                    <button type="button" class="btn btn-sm btn-outline-danger hapus-barang">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </button>
+                                                                </div>
+                                                                
+                                                                <!-- Baris 1: Nama Barang | Kuantitas -->
+                                                                <div class="row mb-2">
+                                                                    <div class="col-md-6">
+                                                                        <label class="form-label fw-bold">Nama Barang</label>
+                                                                        <input type="text" class="form-control nama-barang" placeholder="Masukkan nama barang" required>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <label class="form-label fw-bold">Kuantitas</label>
+                                                                        <input type="number" class="form-control kuantitas" placeholder="Masukkan kuantitas" required>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <!-- Baris 2: Satuan | Harga Satuan -->
+                                                                <div class="row mb-2">
+                                                                    <div class="col-md-6">
+                                                                        <label class="form-label fw-bold">Satuan</label>
+                                                                        <input type="text" class="form-control satuan" placeholder="Masukkan satuan (Unit, Pcs, Set, dll)" required>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <label class="form-label fw-bold">Harga Satuan</label>
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-text">Rp</span>
+                                                                            <input type="number" class="form-control harga-satuan" placeholder="Masukkan harga satuan" required>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <!-- Baris 3: Jumlah (Rp) | Keterangan/Ref.Harga -->
+                                                                <div class="row mb-2">
+                                                                    <div class="col-md-6">
+                                                                        <label class="form-label fw-bold">Jumlah (Rp)</label>
+                                                                        <div class="input-group">
+                                                                            <span class="input-group-text">Rp</span>
+                                                                            <input type="text" class="form-control jumlah-rp" placeholder="0" readonly>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <label class="form-label fw-bold">Keterangan/Ref.Harga</label>
+                                                                        <input type="text" class="form-control keterangan" placeholder="Masukkan keterangan atau referensi harga">
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <hr class="my-3">
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <!-- Tombol Tambah Barang untuk Kegiatan ini -->
+                                                        <div class="text-center">
+                                                            <button type="button" class="btn btn-outline-success tambah-barang-btn">
+                                                                <i class="fa fa-plus me-2"></i>Tambah Barang
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <hr class="my-4">
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Tombol Tambah Kegiatan -->
+                                        <div class="text-center">
+                                            <button type="button" class="btn btn-outline-primary" id="tambahKegiatanModalBtn">
+                                                <i class="fa fa-plus me-2"></i>Tambah Kegiatan
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="button" class="btn btn-primary" id="simpanKegiatanBtn">
+                                <i class="fa fa-save me-2"></i>Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Edit Anggaran -->
+            <div class="modal fade" id="modalEditAnggaran" tabindex="-1" aria-labelledby="modalEditAnggaranLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalEditAnggaranLabel">Edit Anggaran</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="formEditAnggaran">
+                                <input type="hidden" id="editAnggaranId">
+                                <input type="hidden" id="editAnggaranStatus">
+                                
+                                <!-- Editable fields -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Kegiatan Utama</label>
+                                        <input type="text" class="form-control" id="editKegiatanUtama">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Kegiatan</label>
+                                        <input type="text" class="form-control" id="editKegiatan">
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Nama Barang</label>
+                                        <input type="text" class="form-control" id="editNamaBarang">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Penanggung Jawab</label>
+                                        <input type="text" class="form-control" id="editPenanggungJawab">
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Satuan</label>
+                                        <input type="text" class="form-control" id="editSatuan" placeholder="Masukkan satuan">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Harga Satuan</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="number" class="form-control" id="editHargaSatuan" step="1">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Target Capaian</label>
+                                        <textarea class="form-control" id="editTargetCapaian" rows="3"></textarea>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Keterangan</label>
+                                        <input type="text" class="form-control" id="editKeterangan">
+                                    </div>
+                                </div>
+                                
+                                <!-- Editable fields -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Kuantitas</label>
+                                        <input type="number" class="form-control" id="editKuantitas" required min="1">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Jumlah (Rp)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="text" class="form-control" id="editJumlah" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Nilai Bantuan (Readonly) -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold text-success">
+                                            <i class="fa-solid fa-money-bill-wave me-1"></i>Nilai Bantuan (Rp)
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">Rp</span>
+                                            <input type="text" class="form-control" id="editNilaiBantuan" readonly style="background-color: #f8f9fa; color: #198754; font-weight: 600;">
+                                        </div>
+                                        <small class="text-muted">Nilai bantuan yang ditetapkan reviewer (tidak dapat diubah)</small>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Status Revisi</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fa-solid fa-exclamation-triangle text-warning"></i>
+                                            </span>
+                                            <input type="text" class="form-control" id="editStatusRevisi" readonly style="background-color: #fff3cd; color: #856404; font-weight: 600;">
+                                        </div>
+                                        <small class="text-muted">Status revisi anggaran</small>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                            <button type="button" class="btn btn-primary" id="simpanEditBtn">
+                                <i class="fa fa-save me-2"></i>Simpan Perubahan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <script>
+        // Jquery Datatable
+        let jquery_datatable = $("#table1").DataTable({
+                                language: {
+                        "sProcessing":   "Sedang memproses...",
+                        "sLengthMenu":   "Tampilkan _MENU_ data",
+                        "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                        "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                        "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                        "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                        "sInfoPostFix":  "",
+                        "sSearch":       "Cari:",
+                        "sUrl":          "",
+                        "oPaginate": {
+                            "sFirst":    "Pertama",
+                            "sPrevious": "Sebelumnya",
+                            "sNext":     "Selanjutnya",
+                            "sLast":     "Terakhir"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                            "sSortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                        }
+                    }
+        });
+
+        // Modal functionality
+        $(document).ready(function() {
+            // Handle kegiatan selection and button click (header button)
+            $('#tambahKegiatanBtn').click(function() {
+                // Check if button is disabled
+                if ($(this).prop('disabled')) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Fitur Dinonaktifkan',
+                        text: 'Dropdown dan tombol tambah anggaran dinonaktifkan karena sudah ada anggaran dengan status diajukan, disetujui, atau ditolak.',
+                        confirmButtonColor: '#435ebe',
+                        confirmButtonText: 'OK'
+                    });
+                    return;
+                }
+                
+                const selectedKegiatan = $('#kegiatanSelect').val();
+                if (selectedKegiatan && selectedKegiatan !== '-- Pilih Kegiatan Utama --') {
+                    $('#judulKegiatan').text(selectedKegiatan);
+                    $('#kegiatanUtama').val(selectedKegiatan);
+                    $('#modalTambahKegiatan').modal('show');
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Peringatan',
+                        text: 'Silakan pilih kegiatan utama terlebih dahulu!',
+                        confirmButtonColor: '#435ebe',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+
+            // Add new kegiatan (modal button)
+            $('#tambahKegiatanModalBtn').click(function() {
+                const kegiatanCount = $('.kegiatan-item').length + 1;
+                const newKegiatan = `
+                    <div class="kegiatan-item mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0 text-primary">Kegiatan #${kegiatanCount}</h6>
+                            <button type="button" class="btn btn-sm btn-outline-danger hapus-kegiatan">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Form Kegiatan -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Kegiatan</label>
+                                <input type="text" class="form-control kegiatan-nama" placeholder="Masukkan kegiatan" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Penanggung Jawab</label>
+                                <input type="text" class="form-control penanggung-jawab" placeholder="Masukkan penanggung jawab" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Target Capaian -->
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Target Capaian</label>
+                                <textarea class="form-control target-capaian" rows="3" placeholder="Masukkan target capaian" required></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Daftar Barang untuk Kegiatan ini -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0 fw-bold">Daftar Barang</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="daftar-barang-kegiatan">
+                                    <div class="barang-item mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="mb-0 text-success">Barang #1</h6>
+                                            <button type="button" class="btn btn-sm btn-outline-danger hapus-barang">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Baris 1: Nama Barang | Kuantitas -->
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Nama Barang</label>
+                                                <input type="text" class="form-control nama-barang" placeholder="Masukkan nama barang" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Kuantitas</label>
+                                                <input type="number" class="form-control kuantitas" placeholder="Masukkan kuantitas" required>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Baris 2: Satuan | Harga Satuan -->
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Satuan</label>
+                                                <input type="text" class="form-control satuan" placeholder="Masukkan satuan (Unit, Pcs, Set, dll)" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Harga Satuan</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="number" class="form-control harga-satuan" placeholder="Masukkan harga satuan" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Baris 3: Jumlah (Rp) | Keterangan/Ref.Harga -->
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Jumlah (Rp)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="text" class="form-control jumlah-rp" placeholder="0" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Keterangan/Ref.Harga</label>
+                                                <input type="text" class="form-control keterangan" placeholder="Masukkan keterangan atau referensi harga">
+                                            </div>
+                                        </div>
+                                        
+                                        <hr class="my-3">
+                                    </div>
+                                </div>
+                                
+                                <!-- Tombol Tambah Barang untuk Kegiatan ini -->
+                                <div class="text-center">
+                                    <button type="button" class="btn btn-outline-success tambah-barang-btn">
+                                        <i class="fa fa-plus me-2"></i>Tambah Barang
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                    </div>
+                `;
+                $('#daftarKegiatanContainer').append(newKegiatan);
+                updateKegiatanNumbers();
+            });
+
+            // Remove kegiatan
+            $(document).on('click', '.hapus-kegiatan', function() {
+                $(this).closest('.kegiatan-item').remove();
+                updateKegiatanNumbers();
+            });
+
+            // Add new barang to specific kegiatan
+            $(document).on('click', '.tambah-barang-btn', function() {
+                const kegiatanContainer = $(this).closest('.kegiatan-item');
+                const barangContainer = kegiatanContainer.find('.daftar-barang-kegiatan');
+                const barangCount = barangContainer.find('.barang-item').length + 1;
+                
+                const newBarang = `
+                    <div class="barang-item mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0 text-success">Barang #${barangCount}</h6>
+                            <button type="button" class="btn btn-sm btn-outline-danger hapus-barang">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Baris 1: Nama Barang | Kuantitas -->
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Nama Barang</label>
+                                <input type="text" class="form-control nama-barang" placeholder="Masukkan nama barang" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Kuantitas</label>
+                                <input type="number" class="form-control kuantitas" placeholder="Masukkan kuantitas" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Baris 2: Satuan | Harga Satuan -->
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Satuan</label>
+                                <input type="text" class="form-control satuan" placeholder="Masukkan satuan (Unit, Pcs, Set, dll)" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Harga Satuan</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number" class="form-control harga-satuan" placeholder="Masukkan harga satuan" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Baris 3: Jumlah (Rp) | Keterangan/Ref.Harga -->
+                        <div class="row mb-2">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Jumlah (Rp)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="text" class="form-control jumlah-rp" placeholder="0" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Keterangan/Ref.Harga</label>
+                                <input type="text" class="form-control keterangan" placeholder="Masukkan keterangan atau referensi harga">
+                            </div>
+                        </div>
+                        
+                        <hr class="my-3">
+                    </div>
+                `;
+                barangContainer.append(newBarang);
+                updateBarangNumbers();
+            });
+
+            // Remove barang item
+            $(document).on('click', '.hapus-barang', function() {
+                $(this).closest('.barang-item').remove();
+                updateBarangNumbers();
+            });
+
+            // Calculate jumlah when kuantitas or harga satuan changes
+            $(document).on('input', '.kuantitas, .harga-satuan', function() {
+                const item = $(this).closest('.barang-item');
+                const kuantitas = parseFloat(item.find('.kuantitas').val()) || 0;
+                const hargaSatuan = parseFloat(item.find('.harga-satuan').val()) || 0;
+                const jumlah = kuantitas * hargaSatuan;
+                
+                item.find('.jumlah-rp').val(jumlah.toLocaleString('id-ID'));
+            });
+
+            // Update kegiatan numbers
+            function updateKegiatanNumbers() {
+                $('.kegiatan-item').each(function(index) {
+                    $(this).find('h6').text(`Kegiatan #${index + 1}`);
+                });
+            }
+
+            // Update barang numbers
+            function updateBarangNumbers() {
+                $('.kegiatan-item').each(function() {
+                    const barangContainer = $(this).find('.daftar-barang-kegiatan');
+                    barangContainer.find('.barang-item').each(function(index) {
+                        $(this).find('h6').text(`Barang #${index + 1}`);
+                    });
+                });
+            }
+
+            // Handle form submission
+            $('#simpanKegiatanBtn').click(function() {
+                if ($('#formTambahKegiatan')[0].checkValidity()) {
+                    // Ambil id_proposal dari query string
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const id_proposal = urlParams.get('proposal_id');
+
+                    // Show loading
+                    Swal.fire({
+                        title: 'Menyimpan...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Kumpulkan data dari seluruh kegiatan utama di halaman
+                    let daftar_kegiatan_utama = [];
+                    let totalBaru = 0;
+                    // Asumsikan setiap kali user klik tambah kegiatan utama, akan render modal baru
+                    // dan user submit satu kegiatan utama beserta daftar_kegiatan di dalamnya
+                    // Jadi, kita simpan ke localStorage sementara, lalu submit semua sekaligus
+                    // Untuk demo, kita submit satu kegiatan utama saja dari modal aktif
+                    const kegiatanUtama = $('#kegiatanUtama').val();
+                    let daftar_kegiatan = [];
+                    $('.kegiatan-item').each(function() {
+                        const kegiatan = {
+                            kegiatan: $(this).find('.kegiatan-nama').val(),
+                            penanggung_jawab: $(this).find('.penanggung-jawab').val(),
+                            target_capaian: $(this).find('.target-capaian').val(),
+                            daftar_barang: []
+                        };
+                        $(this).find('.barang-item').each(function() {
+                            const barang = {
+                                nama_barang: $(this).find('.nama-barang').val(),
+                                kuantitas: $(this).find('.kuantitas').val(),
+                                satuan: $(this).find('.satuan').val(),
+                                harga_satuan: $(this).find('.harga-satuan').val(),
+                                jumlah: $(this).find('.jumlah-rp').val().replace(/\D/g, ''),
+                                keterangan: $(this).find('.keterangan').val()
+                            };
+                            totalBaru += parseInt(barang.jumlah || '0');
+                            kegiatan.daftar_barang.push(barang);
+                        });
+                        daftar_kegiatan.push(kegiatan);
+                    });
+                    daftar_kegiatan_utama.push({
+                        kegiatan_utama: kegiatanUtama,
+                        daftar_kegiatan: daftar_kegiatan
+                    });
+
+                    // Validasi maksimal sebelum submit
+                    const maxBatas = {{ (batas_max_awal or 0)|int }};
+                    const kandidatTotal = (window.currentTotalAnggaran || 0) + (totalBaru || 0);
+                    if (maxBatas && kandidatTotal > maxBatas) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Melebihi Maksimal',
+                            text: 'Total anggaran setelah penambahan (Rp ' + kandidatTotal.toLocaleString('id-ID') + ') melebihi batas maksimal (Rp ' + maxBatas.toLocaleString('id-ID') + ').',
+                        });
+                        return;
+                    }
+
+                    // Kirim ke backend
+                    fetch('/mahasiswa/tambah_anggaran_awal', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            id_proposal: id_proposal,
+                            daftar_kegiatan_utama: daftar_kegiatan_utama
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: 'Data berhasil disimpan!',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                            location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: 'Gagal: ' + data.message
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Terjadi kesalahan saat menyimpan data'
+                        });
+                    });
+                    $('#modalTambahKegiatan').modal('hide');
+                    resetForm();
+                } else {
+                    $('#formTambahKegiatan')[0].reportValidity();
+                }
+            });
+
+            // Function to format currency
+            function formatRupiah(amount) {
+                return new Intl.NumberFormat('id-ID').format(amount);
+            }
+
+            // Function to edit kegiatan
+            window.editKegiatan = function(anggaranId, status) {
+                // Fetch data for this anggaran item
+                fetch(`/mahasiswa/get_anggaran/${anggaranId}?tabel=anggaran_awal`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Populate modal with data
+                            $('#editAnggaranId').val(data.anggaran.id);
+                            $('#editAnggaranStatus').val(status);
+                            $('#editKegiatanUtama').val(data.anggaran.kegiatan_utama);
+                            $('#editKegiatan').val(data.anggaran.kegiatan);
+                            $('#editNamaBarang').val(data.anggaran.nama_barang);
+                            $('#editPenanggungJawab').val(data.anggaran.penanggung_jawab);
+                            $('#editSatuan').val(data.anggaran.satuan);
+                            $('#editHargaSatuan').val(data.anggaran.harga_satuan);
+                            $('#editTargetCapaian').val(data.anggaran.target_capaian);
+                            $('#editKeterangan').val(data.anggaran.keterangan);
+                            $('#editKuantitas').val(data.anggaran.kuantitas);
+                            $('#editJumlah').val(formatRupiah(data.anggaran.jumlah));
+                            
+                            // Set nilai bantuan (readonly)
+                            const nilaiBantuan = data.anggaran.nilai_bantuan || 0;
+                            $('#editNilaiBantuan').val(formatRupiah(nilaiBantuan));
+                            
+                            // Debug: log nilai bantuan yang diambil dari database
+                            console.log('Nilai bantuan dari database:', {
+                                raw: data.anggaran.nilai_bantuan,
+                                parsed: nilaiBantuan,
+                                formatted: formatRupiah(nilaiBantuan)
+                            });
+                            
+                            // Set status revisi
+                            const statusRevisi = data.anggaran.status === 'revisi' ? 'Perlu Revisi' : 
+                                               data.anggaran.status === 'disetujui' ? 'Disetujui' : 
+                                               data.anggaran.status === 'draf' ? 'Draf' : 'Belum Direview';
+                            $('#editStatusRevisi').val(statusRevisi);
+                            
+                            // Update warna status revisi
+                            if (data.anggaran.status === 'revisi') {
+                                $('#editStatusRevisi').css({
+                                    'background-color': '#f8d7da',
+                                    'color': '#721c24',
+                                    'border-color': '#f5c6cb'
+                                });
+                            } else if (data.anggaran.status === 'disetujui') {
+                                $('#editStatusRevisi').css({
+                                    'background-color': '#d1edff',
+                                    'color': '#0c5460',
+                                    'border-color': '#bee5eb'
+                                });
+                            }
+                            
+                            // Set field permissions based on status
+                            if (status === 'revisi' || status === 'draf') {
+                                // All fields editable for revision or draft, except kegiatan utama
+                                $('#editKegiatan, #editNamaBarang, #editPenanggungJawab, #editSatuan, #editHargaSatuan, #editTargetCapaian, #editKeterangan, #editKuantitas').prop('readonly', false);
+                                $('#editSatuan').prop('disabled', false);
+                                // Kegiatan utama selalu readonly
+                                $('#editKegiatanUtama').prop('readonly', true);
+                            } else {
+                                // No fields editable for other statuses
+                                $('#editKegiatanUtama, #editKegiatan, #editNamaBarang, #editPenanggungJawab, #editSatuan, #editHargaSatuan, #editTargetCapaian, #editKeterangan, #editKuantitas').prop('readonly', true);
+                                $('#editSatuan').prop('disabled', true);
+                            }
+                            
+                            // Bersihkan pesan error sebelum menampilkan modal
+                            $('#editJumlah').next('.text-danger').remove();
+                            $('#editJumlah').css({
+                                'background-color': '#fff',
+                                'color': '#000',
+                                'border-color': '#ced4da'
+                            });
+                            
+                            // Simpan jumlah lama untuk validasi maksimal saat edit
+                            $('#formEditAnggaran').find('#editJumlahOld').remove();
+                            $('<input type="hidden" id="editJumlahOld" />')
+                                .val(parseInt(data.anggaran.jumlah || 0))
+                                .appendTo('#formEditAnggaran');
+
+                            // Show modal
+                            $('#modalEditAnggaran').modal('show');
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: 'Gagal mengambil data: ' + data.message
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Terjadi kesalahan saat mengambil data'
+                        });
+                    });
+            }
+
+            // Calculate jumlah when kuantitas or harga satuan changes in edit modal
+            $(document).on('input', '#editKuantitas, #editHargaSatuan', function() {
+                const kuantitas = parseFloat($('#editKuantitas').val()) || 0;
+                const hargaSatuan = parseFloat($('#editHargaSatuan').val().replace(/[^\d]/g, '')) || 0;
+                const jumlah = kuantitas * hargaSatuan;
+                
+                // Perbaikan parsing nilai bantuan - hapus semua karakter non-digit
+                const nilaiBantuanRaw = $('#editNilaiBantuan').val();
+                const nilaiBantuan = parseFloat(nilaiBantuanRaw.replace(/[^\d]/g, '')) || 0;
+                
+                $('#editJumlah').val(formatRupiah(jumlah));
+                
+                // Hapus pesan error yang sudah ada
+                $('#editJumlah').next('.text-danger').remove();
+                
+                // Validasi jika jumlah melebihi nilai bantuan
+                if (nilaiBantuan > 0 && jumlah > nilaiBantuan) {
+                    $('#editJumlah').css({
+                        'background-color': '#f8d7da',
+                        'color': '#721c24',
+                        'border-color': '#f5c6cb'
+                    });
+                    $('#editJumlah').after('<small class="text-danger d-block mt-1"><i class="fa-solid fa-exclamation-triangle me-1"></i>Jumlah melebihi nilai bantuan!</small>');
+                } else {
+                    $('#editJumlah').css({
+                        'background-color': '#fff',
+                        'color': '#000',
+                        'border-color': '#ced4da'
+                    });
+                }
+                
+                console.log('Validasi jumlah:', {
+                    kuantitas: kuantitas,
+                    hargaSatuan: hargaSatuan,
+                    jumlah: jumlah,
+                    nilaiBantuan: nilaiBantuan,
+                    nilaiBantuanRaw: nilaiBantuanRaw,
+                    kurang: nilaiBantuan > 0 && jumlah > nilaiBantuan
+                });
+            });
+
+            // Handle edit form submission
+            $('#simpanEditBtn').click(function() {
+                if ($('#formEditAnggaran')[0].checkValidity()) {
+                    const anggaranId = $('#editAnggaranId').val();
+                    const status = $('#editAnggaranStatus').val();
+                    
+                    // Validasi nilai bantuan sebelum submit
+                    const jumlahBaru = parseInt($('#editJumlah').val().replace(/\D/g, '')) || 0;
+                    const nilaiBantuanRaw = $('#editNilaiBantuan').val();
+                    const nilaiBantuan = parseFloat(nilaiBantuanRaw.replace(/[^\d]/g, '')) || 0;
+                    
+                    // Cek apakah jumlah melebihi nilai bantuan
+                    if (nilaiBantuan > 0 && jumlahBaru > nilaiBantuan) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validasi Gagal',
+                            text: 'Jumlah anggaran (Rp ' + formatRupiah(jumlahBaru) + ') melebihi nilai bantuan (Rp ' + formatRupiah(nilaiBantuan) + '). Silakan sesuaikan jumlah anggaran.',
+                            confirmButtonColor: '#d33'
+                        });
+                        return;
+                    }
+                    
+                    // Validasi maksimal saat edit
+                    const maxBatas = {{ (batas_max_awal or 0)|int }};
+                    const jumlahLama = (function(){
+                        const raw = $('#formEditAnggaran').find('#editJumlahOld').val();
+                        return parseInt(raw || '0') || 0;
+                    })();
+                    const kandidatTotal = (window.currentTotalAnggaran || 0) - (jumlahLama || 0) + (jumlahBaru || 0);
+                    if (maxBatas && kandidatTotal > maxBatas) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Melebihi Maksimal',
+                            text: 'Total anggaran setelah perubahan (Rp ' + kandidatTotal.toLocaleString('id-ID') + ') melebihi batas maksimal (Rp ' + maxBatas.toLocaleString('id-ID') + ').',
+                        });
+                        return;
+                    }
+                    
+                    // Show loading
+                    Swal.fire({
+                        title: 'Menyimpan...',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Prepare data based on status
+                    let updateData = {
+                        id: anggaranId,
+                        tabel: 'anggaran_awal'
+                    };
+                    
+                    if (status === 'revisi' || status === 'draf') {
+                        // Kirim semua field jika status revisi atau draf, kecuali kegiatan utama
+                        updateData = {
+                            ...updateData,
+                            kegiatan: $('#editKegiatan').val(),
+                            nama_barang: $('#editNamaBarang').val(),
+                            penanggung_jawab: $('#editPenanggungJawab').val(),
+                            satuan: $('#editSatuan').val(),
+                            harga_satuan: $('#editHargaSatuan').val(),
+                            target_capaian: $('#editTargetCapaian').val(),
+                            keterangan: $('#editKeterangan').val(),
+                            kuantitas: $('#editKuantitas').val(),
+                            jumlah: $('#editJumlah').val().replace(/\D/g, '')
+                        };
+                    } else {
+                        // Tidak ada field yang bisa diubah selain status draf/revisi
+                        updateData = {
+                            ...updateData
+                        };
+                    }
+                    
+                    // Send update request
+                    fetch('/mahasiswa/update_anggaran', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(updateData)
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: 'Data berhasil diperbarui!',
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: 'Gagal memperbarui data: ' + data.message
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Terjadi kesalahan saat memperbarui data'
+                        });
+                    });
+                    
+                    $('#modalEditAnggaran').modal('hide');
+                } else {
+                    $('#formEditAnggaran')[0].reportValidity();
+                }
+            });
+
+            // Function to delete kegiatan
+            window.deleteKegiatan = function(anggaranId) {
+                Swal.fire({
+                    title: 'Konfirmasi Hapus',
+                    text: 'Apakah Anda yakin ingin menghapus data anggaran ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, Hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Show loading
+                        Swal.fire({
+                            title: 'Menghapus...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        fetch('/mahasiswa/delete_anggaran', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                id: anggaranId,
+                                tabel: 'anggaran_awal'
+                            })
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil',
+                                    text: 'Data anggaran berhasil dihapus!',
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Gagal',
+                                    text: 'Gagal menghapus data: ' + data.message
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Terjadi kesalahan saat menghapus data'
+                            });
+                        });
+                    }
+                });
+            }
+
+            // Reset form when modal is closed
+            $('#modalTambahKegiatan').on('hidden.bs.modal', function() {
+                resetForm();
+            });
+
+            $('#modalEditAnggaran').on('hidden.bs.modal', function() {
+                // Clear edit form
+                $('#formEditAnggaran')[0].reset();
+                $('#editAnggaranId').val('');
+            });
+
+            function resetForm() {
+                $('#formTambahKegiatan')[0].reset();
+                $('#daftarKegiatanContainer').html(`
+                    <div class="kegiatan-item mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0 text-primary">Kegiatan #1</h6>
+                            <button type="button" class="btn btn-sm btn-outline-danger hapus-kegiatan">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Form Kegiatan -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Kegiatan</label>
+                                <input type="text" class="form-control kegiatan-nama" placeholder="Masukkan kegiatan" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Penanggung Jawab</label>
+                                <input type="text" class="form-control penanggung-jawab" placeholder="Masukkan penanggung jawab" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Target Capaian -->
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <label class="form-label fw-bold">Target Capaian</label>
+                                <textarea class="form-control target-capaian" rows="3" placeholder="Masukkan target capaian" required></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Daftar Barang untuk Kegiatan ini -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0 fw-bold">Daftar Barang</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="daftar-barang-kegiatan">
+                                    <div class="barang-item mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="mb-0 text-success">Barang #1</h6>
+                                            <button type="button" class="btn btn-sm btn-outline-danger hapus-barang">
+                                                <i class="fa fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Baris 1: Nama Barang | Kuantitas -->
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Nama Barang</label>
+                                                <input type="text" class="form-control nama-barang" placeholder="Masukkan nama barang" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Kuantitas</label>
+                                                <input type="number" class="form-control kuantitas" placeholder="Masukkan kuantitas" required>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Baris 2: Satuan | Harga Satuan -->
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Satuan</label>
+                                                <input type="text" class="form-control satuan" placeholder="Masukkan satuan (Unit, Pcs, Set, dll)" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Harga Satuan</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="number" class="form-control harga-satuan" placeholder="Masukkan harga satuan" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Baris 3: Jumlah (Rp) | Keterangan/Ref.Harga -->
+                                        <div class="row mb-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Jumlah (Rp)</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text">Rp</span>
+                                                    <input type="text" class="form-control jumlah-rp" placeholder="0" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Keterangan/Ref.Harga</label>
+                                                <input type="text" class="form-control keterangan" placeholder="Masukkan keterangan atau referensi harga">
+                                            </div>
+                                        </div>
+                                        
+                                        <hr class="my-3">
+                                    </div>
+                                </div>
+                                
+                                <!-- Tombol Tambah Barang untuk Kegiatan ini -->
+                                <div class="text-center">
+                                    <button type="button" class="btn btn-outline-success tambah-barang-btn">
+                                        <i class="fa fa-plus me-2"></i>Tambah Barang
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                    </div>
+                `);
+            }
+
+            function updateTotalJumlah() {
+                let total = 0;
+                document.querySelectorAll('td.cell-jumlah').forEach(function(cell) {
+                    let text = cell.textContent.trim();
+                    if (/^Rp\s*[\d,.]+$/.test(text)) {
+                        let val = text.replace(/[^\d]/g, '');
+                        if (val) total += parseInt(val);
+                    }
+                });
+                document.getElementById('totalJumlah').textContent = 'Rp ' + total.toLocaleString('id-ID');
+                window.currentTotalAnggaran = total;
+
+                // Badge status total terhadap batas min/max dari server (jika disediakan)
+                const minBatas = {{ (batas_min_awal or 0)|int }};
+                const maxBatas = {{ (batas_max_awal or 0)|int }};
+                const badge = document.getElementById('badgeTotalStatus');
+                if (!badge) return;
+                // Reset
+                badge.style.display = 'inline-block';
+                badge.className = 'badge ms-2';
+                if (minBatas && total < minBatas) {
+                    badge.classList.add('bg-warning', 'text-dark');
+                    badge.textContent = 'Kurang dari minimal';
+                } else if (maxBatas && total > maxBatas) {
+                    badge.classList.add('bg-danger');
+                    badge.textContent = 'Melebihi maksimal';
+                } else {
+                    badge.classList.add('bg-success');
+                    badge.textContent = 'Dalam batas';
+                }
+                let info = [];
+                if (minBatas) info.push('Minimal: Rp ' + minBatas.toLocaleString('id-ID'));
+                if (maxBatas) info.push('Maksimal: Rp ' + maxBatas.toLocaleString('id-ID'));
+                badge.setAttribute('title', info.length ? info.join(' | ') : 'Tidak dibatasi');
+                try { var tt = bootstrap.Tooltip.getInstance(badge); if (tt) tt.dispose(); new bootstrap.Tooltip(badge); } catch(e) {}
+            }
+            function updateTotalNilaiBantuan() {
+                let total = 0;
+                // Hanya hitung sel pada tbody agar footer tidak ikut terakumulasi
+                document.querySelectorAll('tbody td.cell-nilai-bantuan').forEach(function(cell) {
+                    const text = cell.textContent.trim();
+                    const match = text.match(/Rp\s*[\d,.]+/);
+                    if (match) {
+                        const num = match[0].replace(/[^\d]/g, '');
+                        total += parseInt(num) || 0;
+                    }
+                });
+                const el = document.getElementById('totalNilaiBantuan');
+                if (el) el.textContent = 'Rp ' + total.toLocaleString('id-ID');
+            }
+            // Initial call
+            updateTotalJumlah();
+            updateTotalNilaiBantuan();
+            // If table changes dynamically, you can call updateTotalJumlah() again after changes
+
+        // Tampilkan alert jika belum ada data anggaran
+        try {
+            const bodyRowCount = document.querySelectorAll('table.table tbody tr').length;
+            if (bodyRowCount === 0) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Belum ada data anggaran',
+                    text: 'Silakan tambahkan data anggaran terlebih dahulu melalui tombol Tambah.',
+                    confirmButtonColor: '#435ebe'
+                });
+            }
+        } catch(e) {}
+
+            // Handle disabled dropdown change
+            $('#kegiatanSelect').on('change', function() {
+                if ($(this).prop('disabled')) {
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Fitur Dinonaktifkan',
+                        text: 'Dropdown kegiatan dinonaktifkan karena sudah ada anggaran dengan status diajukan, disetujui, atau ditolak.',
+                        confirmButtonColor: '#435ebe',
+                        confirmButtonText: 'OK'
+                    });
+                    // Reset to empty
+                    $(this).val('');
+                    return;
+                }
+            });
+
+            // Fungsi untuk download Excel anggaran
+            function downloadExcelAnggaran(jenis) {
+                            // Ambil ID proposal dari URL atau data yang tersedia
+            const urlParams = new URLSearchParams(window.location.search);
+            const proposalId = urlParams.get('proposal_id');
+                
+                if (!proposalId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'ID Proposal tidak ditemukan'
+                    });
+                    return;
+                }
+                
+                // Show loading
+                Swal.fire({
+                    title: 'Memproses...',
+                    text: 'Sedang membuat file Excel',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+                
+                // Download Excel
+                const downloadUrl = `/mahasiswa/download_excel_anggaran?id_proposal=${proposalId}&jenis=${jenis}`;
+                
+                fetch(downloadUrl)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.blob();
+                        }
+                        throw new Error('Network response was not ok');
+                    })
+                    .then(blob => {
+                        // Buat URL untuk download
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = `Anggaran_${jenis.charAt(0).toUpperCase() + jenis.slice(1)}_${new Date().toISOString().slice(0, 10)}.xlsx`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                        
+                        Swal.close();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: 'File Excel berhasil didownload',
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'Terjadi kesalahan saat mendownload file Excel'
+                        });
+                    });
+            }
+
+            // Expose to global scope
+            window.downloadExcelAnggaran = downloadExcelAnggaran;
+
+            // Inisialisasi tooltip global untuk semua elemen dengan data-bs-toggle="tooltip"
+            function initializeTooltips() {
+                // Dispose semua tooltip yang sudah ada
+                const existingTooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+                existingTooltips.forEach(element => {
+                    const tooltip = bootstrap.Tooltip.getInstance(element);
+                    if (tooltip) {
+                        tooltip.dispose();
+                    }
+                });
+
+                // Inisialisasi tooltip baru
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                    new bootstrap.Tooltip(tooltipTriggerEl, {
+                        trigger: 'hover focus',
+                        placement: 'top',
+                        animation: true
+                    });
+                });
+            }
+
+            // Inisialisasi tooltip saat halaman dimuat
+            document.addEventListener('DOMContentLoaded', function() {
+                initializeTooltips();
+            });
+
+            // Inisialisasi tooltip untuk elemen yang ditambahkan secara dinamis
+            function initializeTooltipsForDynamicContent() {
+                setTimeout(() => {
+                    initializeTooltips();
+                }, 100);
+            }
+
+            // Override fungsi updateBadge untuk menambahkan inisialisasi tooltip
+            const originalUpdateBadge = window.updateBadge;
+            window.updateBadge = function(row) {
+                if (originalUpdateBadge) {
+                    originalUpdateBadge(row);
+                }
+                
+                // Inisialisasi tooltip setelah badge diupdate
+                setTimeout(() => {
+                    initializeTooltips();
+                }, 100);
+            };
+        });
+    </script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+</body>
+
+</html>
+

@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Laporan Laba Rugi Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+    
+    <!-- DateRangePicker CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    
+    <style>
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+
+        .modal-body .row.g-3 {
+            row-gap: 18px;
+        }
+
+        @media (max-width: 575.98px) {
+
+            .modal-header,
+            .modal-footer,
+            .modal-body {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .modal-body {
+                padding-top: 16px;
+                padding-bottom: 6px;
+            }
+        }
+
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-circle:active,
+        .btn-circle:focus {
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.13);
+        }
+
+        .btn-circle i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.1em;
+            line-height: 1;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 7px;
+            vertical-align: middle;
+        }
+
+        .status-draf {
+            background: #facc15;
+        }
+
+        .status-text {
+            font-weight: 500;
+            color: #444;
+        }
+
+        /* Styling untuk alert notifications */
+        .alert {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .alert-warning {
+            border-left-color: #ffc107;
+        }
+        
+        .alert-success {
+            border-left-color: #28a745;
+        }
+        
+        .alert-danger {
+            border-left-color: #dc3545;
+        }
+        
+        .alert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .alert .btn-close {
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        
+        .alert .btn-close:hover {
+            opacity: 1;
+        }
+        
+        .alert i {
+            flex-shrink: 0;
+        }
+        
+        /* Styling untuk tombol tambah alat produksi */
+        .btn-tambah-bahan-custom {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+        
+        .btn-tambah-bahan-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            color: white;
+        }
+        
+        .icon-circle {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Styling untuk tombol aksi */
+        .btn-edit-bahan {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-hapus-bahan {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-edit-bahan:hover {
+            background: #e0a800;
+            color: #212529;
+        }
+        
+        .btn-hapus-bahan:hover {
+            background: #c82333;
+            color: white;
+        }
+        
+        /* Styling untuk pesan no data */
+        .no-data-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .no-data-message i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        
+        .no-data-message h5 {
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .no-data-message p {
+            margin-bottom: 0;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .alert {
+                padding: 12px 16px;
+            }
+            
+            .alert .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+            }
+            
+            .alert i {
+                margin-bottom: 8px;
+                margin-right: 0 !important;
+            }
+        }
+
+        .proposal-card {
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .proposal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border-color: #22c55e !important;
+        }
+
+        .proposal-card .card-header {
+            transition: all 0.3s ease;
+            background: #f8f9fa !important;
+            color: #495057;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .btn-tambah-bahan {
+            background: #22c55e !important;
+            border: 2px solid #22c55e !important;
+            color: white !important;
+            font-weight: 600;
+        }
+
+        .btn-tambah-bahan:hover {
+            background: #16a34a !important;
+            border-color: #16a34a !important;
+            transform: scale(1.05);
+        }
+
+        .btn-edit-bahan {
+            background: #435ebe !important;
+            color: white !important;
+        }
+
+        .btn-edit-bahan:hover {
+            background: #25396f !important;
+            transform: scale(1.1);
+        }
+
+        .btn-hapus-bahan {
+            background: #dc3545 !important;
+            color: white !important;
+        }
+
+        .btn-hapus-bahan:hover {
+            background: #c82333 !important;
+            transform: scale(1.1);
+        }
+
+        .no-data-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .no-data-message i {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .btn-tambah-bahan-custom {
+            display: inline-flex;
+            align-items: center;
+            background: #4b7c5a;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 6px 22px 6px 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            gap: 10px;
+        }
+        .btn-tambah-bahan-custom:hover {
+            background: #356346;
+        }
+        .btn-tambah-bahan-custom .icon-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            color: #388e3c;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            margin-right: 8px;
+            font-size: 1.4em;
+            font-weight: bold;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            line-height: 1;
+        }
+
+        .btn-tambah-bahan-custom .bi-plus {
+            font-weight: bold !important;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        /* Styling untuk laba rugi */
+        .laba-positif {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .laba-negatif {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .summary-card h5 {
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .summary-label {
+            font-weight: 500;
+        }
+
+        .summary-value {
+            font-weight: 600;
+        }
+
+        /* DateRangePicker Custom Styling */
+        .daterangepicker {
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border: 1px solid #e9ecef;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .daterangepicker .ranges li {
+            border-radius: 8px;
+            margin: 2px;
+            transition: all 0.2s ease;
+        }
+
+        .daterangepicker .ranges li:hover {
+            background-color: #435ebe;
+            color: white;
+        }
+
+        .daterangepicker .ranges li.active {
+            background-color: #435ebe;
+            color: white;
+        }
+
+        .daterangepicker .drp-buttons {
+            border-top: 1px solid #e9ecef;
+            padding: 12px;
+        }
+
+        .daterangepicker .drp-selected {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+
+        .daterangepicker .cancelBtn {
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .daterangepicker .cancelBtn:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        .daterangepicker .applyBtn {
+            background-color: #435ebe;
+            border: 1px solid #435ebe;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+
+        .daterangepicker .applyBtn:hover {
+            background-color: #25396f;
+            border-color: #25396f;
+        }
+
+        /* Date Range Input Styling */
+        .date-range-input {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            padding: 8px 16px;
+            font-size: 0.875rem;
+            color: #495057;
+            transition: all 0.3s ease;
+            min-width: 200px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .date-range-input:hover {
+            border-color: #435ebe;
+            box-shadow: 0 4px 12px rgba(67, 94, 190, 0.15);
+        }
+
+        .date-range-input:focus {
+            outline: none;
+            border-color: #435ebe;
+            box-shadow: 0 0 0 3px rgba(67, 94, 190, 0.1);
+        }
+
+        .date-range-input i {
+            color: #435ebe;
+            font-size: 1rem;
+        }
+
+        .date-range-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .date-range-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .date-range-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .date-range-input {
+                min-width: 180px;
+                width: 100%;
+            }
+            
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 12px;
+            }
+            
+            .date-range-container {
+                width: 100%;
+            }
+        }
+
+        /* Download dropdown styling */
+        .dropdown-menu {
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            border: 1px solid #e9ecef;
+            padding: 8px 0;
+        }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        .dropdown-item i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Styling untuk tombol kembali */
+        .btn-outline-secondary {
+            border: 2px solid #6c757d;
+            color: #6c757d;
+            font-weight: 600;
+            border-radius: 25px;
+            padding: 8px 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-secondary:hover {
+            background: #6c757d;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+        }
+
+        /* Styling untuk card informasi mahasiswa */
+        .card-title {
+            color: #3b3f5c;
+            font-weight: 600;
+        }
+
+        .card-title i {
+            font-size: 1.2rem;
+        }
+
+        /* Styling untuk alert */
+        .alert {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            color: #1565c0;
+        }
+
+        .alert .d-flex {
+            align-items: center;
+        }
+
+        .alert i {
+            flex-shrink: 0;
+        }
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+        
+        /* Memastikan tfoot tetap terlihat */
+        .dataTables_wrapper tfoot {
+            display: table-footer-group !important;
+        }
+        
+        .dataTables_wrapper tfoot th {
+            background-color: #f8f9fa !important;
+            font-weight: 700 !important;
+            border-top: 2px solid #dee2e6 !important;
+        }
+        
+        .dataTables_wrapper tfoot th.laba-positif {
+            color: #28a745 !important;
+        }
+        
+        .dataTables_wrapper tfoot th.laba-negatif {
+            color: #dc3545 !important;
+        }
+    </style>
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-pembimbing.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}"><img
+                                    src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo"
+                                    srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                    <i class="bi bi-cash-stack"></i>
+                                <span>Pendanaan Hibah</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_proposal') }}">Pengajuan Proposal</a>
+                                    </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_laporan_kemajuan') }}">Laporan Kemajuan</a>
+                                </li>
+                                <li class="submenu-item ">
+                                        <a href="{{ url_for('pembimbing.pembimbing_laporan_akhir') }}">Laporan Akhir</a>
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item active has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu active">
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item active">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>                        
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('pembimbing.daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('pembimbing.daftar_penilaian_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-pencil-square"></i>
+                                <span>Penilaian Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Monitoring Laporan Laba Rugi</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Pantau laporan laba rugi mahasiswa bimbinganmu di AYMP UNJAYA.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.das_pembimbing') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.pembimbing_monitoring_mahasiswa_laporan_laba_rugi') }}">Monitoring Laporan Laba Rugi</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Laporan Laba Rugi</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Tables start -->
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <!-- Tombol Kembali -->
+
+                        {% if proposal_data %}
+                            {% for proposal_id, data in proposal_data.items() %}
+                            <!-- Informasi Mahasiswa -->
+                            <div class="card mb-4" style="border-radius: 15px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h5 class="card-title mb-3">
+                                                <i class="bi bi-person-circle text-primary me-2"></i>
+                                                Informasi Mahasiswa
+                                            </h5>
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <p class="mb-1"><strong>Nama:</strong></p>
+                                                    <p class="text-muted">{{ data.proposal.nama_ketua if data.proposal.nama_ketua else 'Tidak tersedia' }}</p>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <p class="mb-1"><strong>NIM:</strong></p>
+                                                    <p class="text-muted">{{ data.proposal.nim if data.proposal.nim else 'Tidak tersedia' }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <h5 class="card-title mb-3">
+                                                <i class="bi bi-briefcase text-success me-2"></i>
+                                                Informasi Usaha
+                                            </h5>
+                                            <div class="row">
+                                                <div class="col-sm-6">
+                                                    <p class="mb-1"><strong>Judul Usaha:</strong></p>
+                                                    <p class="text-muted">{{ data.proposal.judul_usaha }}</p>
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <p class="mb-1"><strong>Kategori:</strong></p>
+                                                    <p class="text-muted">{{ data.proposal.kategori }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card proposal-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-0">{{ data.proposal.judul_usaha }}</h5>
+                                        <small class="text-muted">{{ data.proposal.kategori }} - Tahun NIB: {% if data.proposal.tahun_nib and data.proposal.tahun_nib != '0' %}{{ data.proposal.tahun_nib }}{% else %}Tidak ada{% endif %}</small>
+                                    </div>
+                                    <div class="date-range-container">
+                                        <span class="date-range-label">Filter Periode:</span>
+                                        <div class="date-range-input" id="dateRange{{ data.proposal.id }}">
+                                            <i class="bi bi-calendar3"></i>
+                                            <span>Pilih Periode</span>
+                                        </div>
+
+                                        <div class="dropdown">
+                                            <button class="btn btn-success btn-sm dropdown-toggle" type="button" id="downloadDropdown{{ data.proposal.id }}" data-bs-toggle="dropdown" aria-expanded="false" style="border-radius: 20px; padding: 6px 12px; font-size: 0.875rem;">
+                                                <i class="bi bi-download"></i> Download
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="downloadDropdown{{ data.proposal.id }}">
+                                                <li><a class="dropdown-item" href="#" onclick="downloadLabaRugi('{{ data.proposal.id }}', 'excel')">
+                                                    <i class="bi bi-file-earmark-excel text-success"></i> Excel (.xlsx)
+                                                </a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="downloadLabaRugi('{{ data.proposal.id }}', 'pdf')">
+                                                    <i class="bi bi-file-earmark-text text-danger"></i> PDF (.pdf)
+                                                </a></li>
+                                                <li><a class="dropdown-item" href="#" onclick="downloadLabaRugi('{{ data.proposal.id }}', 'word')">
+                                                    <i class="bi bi-file-earmark-word text-primary"></i> Word (.docx)
+                                                </a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Summary Card -->
+
+                                    {% if data.laba_rugi_data %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="tableLabaRugi{{ data.proposal.id }}">
+                                            <thead>
+                                                <tr>
+                                                    <th>No</th>
+                                                    <th>Tanggal Produksi</th>
+                                                    <th>Nama Produk</th>
+                                                    <th>Pendapatan</th>
+                                                    <th>Total Biaya Produksi</th>
+                                                    <th>Laba Rugi/Kotor</th>
+                                                    <th>Biaya Operasional</th>
+                                                    <th>Laba Rugi/Bersih</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for item in data.laba_rugi_data %}
+                                                <tr>
+                                                    <td>{{ loop.index }}</td>
+                                                    <td>{{ item.tanggal_produksi.strftime('%d/%m/%Y') if item.tanggal_produksi else '-' }}</td>
+                                                    <td>{{ item.nama_produk }}</td>
+                                                    <td>Rp {{ "{:,.0f}".format(item.pendapatan) }}</td>
+                                                    <td>Rp {{ "{:,.0f}".format(item.total_biaya_produksi) }}</td>
+                                                    <td class="{% if item.laba_rugi_kotor >= 0 %}laba-positif{% else %}laba-negatif{% endif %}">
+                                                        Rp {{ "{:,.0f}".format(item.laba_rugi_kotor) }}
+                                                    </td>
+                                                    <td>Rp {{ "{:,.0f}".format(item.biaya_operasional) }}</td>
+                                                    <td class="{% if item.laba_rugi_bersih >= 0 %}laba-positif{% else %}laba-negatif{% endif %}">
+                                                        Rp {{ "{:,.0f}".format(item.laba_rugi_bersih) }}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                            {% if data.laba_rugi_data %}
+                                            <tfoot>
+                                                <tr>
+                                                    <th colspan="3" class="text-end">Total Semua</th>
+                                                    <th>Rp {{ "{:,.0f}".format(data.laba_rugi_data | sum(attribute='pendapatan')) }}</th>
+                                                    <th>Rp {{ "{:,.0f}".format(data.laba_rugi_data | sum(attribute='total_biaya_produksi')) }}</th>
+                                                    <th class="{% if (data.laba_rugi_data | sum(attribute='laba_rugi_kotor')) >= 0 %}laba-positif{% else %}laba-negatif{% endif %}">
+                                                        Rp {{ "{:,.0f}".format(data.laba_rugi_data | sum(attribute='laba_rugi_kotor')) }}
+                                                    </th>
+                                                    <th>Rp {{ "{:,.0f}".format(data.laba_rugi_data | sum(attribute='biaya_operasional')) }}</th>
+                                                    <th class="{% if (data.laba_rugi_data | sum(attribute='laba_rugi_bersih')) >= 0 %}laba-positif{% else %}laba-negatif{% endif %}">
+                                                        Rp {{ "{:,.0f}".format(data.laba_rugi_data | sum(attribute='laba_rugi_bersih')) }}
+                                                    </th>
+                                                </tr>
+                                            </tfoot>
+                                            {% endif %}
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="alert alert-info" role="alert">
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-info-circle me-3" style="font-size: 1.5rem;"></i>
+                                            <div>
+                                                <h5 class="alert-heading mb-1">Belum ada data laba rugi</h5>
+                                                <p class="mb-0">Mahasiswa belum memiliki data laba rugi. Data akan muncul setelah mahasiswa menambahkan data produksi dan penjualan produk.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </section>
+                <!-- Basic Tables end -->
+            </div>
+
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}">
+    </script>
+    <script
+        src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}">
+    </script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.all.js') }}"></script>
+    
+    <!-- DateRangePicker JavaScript -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+    <script>
+        // Inisialisasi DataTable dan DateRangePicker untuk setiap tabel
+        $(document).ready(function() {
+            {% for proposal_id, data in proposal_data.items() %}
+                {% if data.laba_rugi_data %}
+                // Inisialisasi DataTable
+                var table{{ data.proposal.id }} = $('#tableLabaRugi{{ data.proposal.id }}').DataTable({
+                    responsive: true,
+                    language: {
+                        "sProcessing":   "Sedang memproses...",
+                        "sLengthMenu":   "Tampilkan _MENU_ data",
+                        "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                        "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ data",
+                        "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 data",
+                        "sInfoFiltered": "(disaring dari _MAX_ data keseluruhan)",
+                        "sInfoPostFix":  "",
+                        "sSearch":       "Cari:",
+                        "sUrl":          "",
+                        "oPaginate": {
+                            "sFirst":    "Pertama",
+                            "sPrevious": "Sebelumnya",
+                            "sNext":     "Selanjutnya",
+                            "sLast":     "Terakhir"
+                        },
+                        "oAria": {
+                            "sSortAscending":  ": aktifkan untuk mengurutkan kolom ke atas",
+                            "sSortDescending": ": aktifkan untuk mengurutkan kolom ke bawah"
+                        }
+                    },
+                    // Memastikan tfoot tetap terlihat
+                    drawCallback: function(settings) {
+                        // Pastikan tfoot tetap terlihat setelah DataTables diinisialisasi
+                        if (this.api().data().length > 0) {
+                            $(this).find('tfoot').show();
+                        }
+                    }
+                });
+
+                // Inisialisasi DateRangePicker
+                $('#dateRange{{ data.proposal.id }}').daterangepicker({
+                    opens: 'left',
+                    locale: {
+                        format: 'DD/MM/YYYY',
+                        separator: ' - ',
+                        applyLabel: 'Terapkan',
+                        cancelLabel: 'Batal',
+                        fromLabel: 'Dari',
+                        toLabel: 'Sampai',
+                        customRangeLabel: 'Rentang Kustom',
+                        daysOfWeek: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+                        monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+                        firstDay: 1
+                    },
+                    ranges: {
+                        'Hari Ini': [moment(), moment()],
+                        'Kemarin': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                        '7 Hari Terakhir': [moment().subtract(6, 'days'), moment()],
+                        '30 Hari Terakhir': [moment().subtract(29, 'days'), moment()],
+                        'Bulan Ini': [moment().startOf('month'), moment().endOf('month')],
+                        'Bulan Lalu': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                        '3 Bulan Terakhir': [moment().subtract(3, 'months'), moment()],
+                        '6 Bulan Terakhir': [moment().subtract(6, 'months'), moment()],
+                        'Tahun Ini': [moment().startOf('year'), moment().endOf('year')],
+                        'Semua Data': [moment('2020-01-01'), moment()]
+                    },
+                    startDate: moment().subtract(29, 'days'),
+                    endDate: moment(),
+                    maxDate: moment()
+                }, function(start, end, label) {
+                    // Update teks pada input
+                    $('#dateRange{{ data.proposal.id }} span:last').text(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+                    
+                    // Filter data berdasarkan tanggal
+                    filterTableByDateRange(table{{ data.proposal.id }}, start, end);
+                    
+                    // Show notification
+                    var filteredCount = table{{ data.proposal.id }}.rows({search: 'applied'}).count();
+                    var totalCount = table{{ data.proposal.id }}.rows().count();
+                    
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Filter Diterapkan!',
+                        text: 'Menampilkan ' + filteredCount + ' dari ' + totalCount + ' data laba rugi.',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        toast: true,
+                        position: 'top-end'
+                    });
+                });
+
+                // Fungsi untuk filter tabel berdasarkan rentang tanggal
+                function filterTableByDateRange(table, startDate, endDate) {
+                    // Clear existing filters
+                    $.fn.dataTable.ext.search.splice(0, $.fn.dataTable.ext.search.length);
+                    
+                    // Add custom filtering function
+                    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                        var dateStr = data[1]; // Kolom tanggal (index 1)
+                        if (!dateStr || dateStr === '-') return false;
+                        
+                        // Parse tanggal dari format DD/MM/YYYY
+                        var parts = dateStr.split('/');
+                        if (parts.length !== 3) return false;
+                        
+                        var day = parseInt(parts[0]);
+                        var month = parseInt(parts[1]) - 1; // Month is 0-indexed
+                        var year = parseInt(parts[2]);
+                        
+                        var rowDate = moment(new Date(year, month, day));
+                        
+                        // Check if date is within range
+                        return rowDate.isSameOrAfter(startDate, 'day') && rowDate.isSameOrBefore(endDate, 'day');
+                    });
+                    
+                    // Redraw table
+                    table.draw();
+                }
+
+                // Set default text untuk date range picker
+                $('#dateRange{{ data.proposal.id }} span:last').text('30 Hari Terakhir');
+                
+
+                {% endif %}
+            {% endfor %}
+        });
+
+        // Fungsi untuk download laporan laba rugi
+        function base64ToBlob(base64, mime) {
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            return new Blob([byteArray], {type: mime});
+        }
+
+        function downloadLabaRugi(proposalId, format) {
+            // Ambil rentang tanggal yang dipilih
+            var dateRangePicker = $('#dateRange' + proposalId).data('daterangepicker');
+            var startDate = dateRangePicker.startDate.format('YYYY-MM-DD');
+            var endDate = dateRangePicker.endDate.format('YYYY-MM-DD');
+            
+            // Tampilkan loading
+            Swal.fire({
+                title: 'Menyiapkan Download...',
+                text: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Kirim request download
+            $.ajax({
+                url: '/pembimbing/download_laba_rugi',
+                method: 'POST',
+                data: {
+                    proposal_id: proposalId,
+                    format: format,
+                    start_date: startDate,
+                    end_date: endDate
+                },
+                
+                success: function(response) {
+                    Swal.close();
+                    
+                    if (response.success) {
+                        // Tentukan mime type sesuai ekstensi
+                        let mime = 'application/octet-stream';
+                        if (response.filename.endsWith('.pdf')) mime = 'application/pdf';
+                        if (response.filename.endsWith('.docx')) mime = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                        if (response.filename.endsWith('.xlsx')) mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+                        // Convert base64 ke Blob
+                        const blob = base64ToBlob(response.file_data, mime);
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = response.filename;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        
+                        // Tampilkan notifikasi sukses
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Download Berhasil!',
+                            text: 'File ' + format.toUpperCase() + ' telah diunduh.',
+                            timer: 2000,
+                            showConfirmButton: false
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Download Gagal!',
+                            text: response.message || 'Terjadi kesalahan saat mengunduh file.',
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.close();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Download Gagal!',
+                        text: 'Terjadi kesalahan pada server. Silakan coba lagi.',
+                    });
+                }
+            });
+        }
+
+    </script>
+
+</body>
+
+</html>
+

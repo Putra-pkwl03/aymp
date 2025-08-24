@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal untuk Review - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        .table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-circle:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-circle.kirim-admin-btn {
+            position: relative;
+        }
+        
+        .btn-circle.kirim-admin-btn:disabled::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+        }
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            margin-right: 7px;
+            vertical-align: middle;
+        }
+
+        .status-pending {
+            background: #facc15;
+        }
+
+        .status-reviewing {
+            background: #3b82f6;
+        }
+
+        .status-completed {
+            background: #22c55e;
+        }
+        
+        .status-danger {
+            background: #ef4444;
+        }
+        
+        /* Styling untuk jadwal status */
+        .jadwal-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.8);
+        }
+        
+        .status-indicator.active {
+            border: 2px solid #10b981;
+        }
+        
+        .status-indicator.inactive {
+            border: 2px solid #f59e0b;
+        }
+        
+        .jadwal-time {
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .status-rejected {
+            background: #ef4444;
+        }
+
+        .card {
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            border: none;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .badge {
+            font-size: 0.85em;
+            padding: 6px 12px;
+        }
+
+        .btn-circle.btn-primary {
+            background: #3b82f6 !important;
+            color: #fff !important;
+        }
+
+        .btn-circle.btn-success {
+            background: #22c55e !important;
+            color: #fff !important;
+        }
+
+        .btn-circle.btn-warning {
+            background: #f59e0b !important;
+            color: #fff !important;
+        }
+
+        .btn-circle.btn-danger {
+            background: #ef4444 !important;
+            color: #fff !important;
+        }
+
+        .btn-circle.btn-info {
+            background: #06b6d4 !important;
+            color: #fff !important;
+        }
+
+        .btn-circle i {
+            color: #fff !important;
+            font-size: 1.2em;
+        }
+
+        /* Progress bar styling */
+        .progress-info {
+            min-width: 120px;
+        }
+
+        .progress {
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            transition: width 0.3s ease;
+        }
+
+        .progress-bar.bg-success {
+            background-color: #22c55e !important;
+        }
+
+        /* Status text styling */
+        .status-text {
+            font-weight: 500;
+            color: #3b3f5c;
+        }
+
+        /* Responsive table adjustments */
+        @media (max-width: 1200px) {
+            .progress-info {
+                min-width: 100px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .progress-info {
+                min-width: 80px;
+            }
+            
+            .progress-info small {
+                font-size: 0.7rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .btn-circle {
+                width: 35px !important;
+                height: 35px !important;
+                font-size: 1rem !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .btn-circle {
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 0.9rem !important;
+            }
+        }
+
+        /* Row update animation */
+        .table tbody tr {
+            transition: background-color 0.3s ease;
+        }
+
+        .table tbody tr.updated {
+            background-color: rgba(34, 197, 94, 0.1);
+            animation: highlightRow 2s ease-out;
+        }
+
+        @keyframes highlightRow {
+            0% { background-color: rgba(34, 197, 94, 0.3); }
+            100% { background-color: transparent; }
+        }
+
+        /* Status badge styling */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-sent {
+            background-color: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+
+        /* Card hover effect */
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+
+        /* Ripple effect */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Loading dots animation */
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        /* Confetti animation */
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-10px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('reviewer.dashboard') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('reviewer.dashboard') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('reviewer.proposal') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Proposal untuk Review</span>
+                            </a>
+                        </li>
+
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('reviewer.daftar_mahasiswa_laporan_kemajuan') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Laporan Kemajuan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('reviewer.daftar_mahasiswa_laporan_akhir') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Laporan Akhir</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('index') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Proposal untuk Review</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">Daftar proposal yang ditugaskan untuk Anda review.</p>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('reviewer.dashboard') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Proposal untuk Review</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informasi Status Jadwal Review -->
+                {% if jadwal_proposal %}
+                <div class="card border-0 shadow-sm mb-4" style="background: #f8fafc; border-left: 4px solid #3b82f6;">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-2 text-center">
+                                <div class="jadwal-icon mb-2">
+                                    <i class="bi bi-calendar-event text-primary" style="font-size: 2.5rem;"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-7">
+                                <h5 class="text-dark mb-3 fw-bold">
+                                    📅 Status Jadwal Review Proposal
+                                </h5>
+                                <div class="d-flex align-items-center mb-3">
+                                    <span class="badge fs-6 px-3 py-2 me-3" style="
+                                        background-color: {% if jadwal_proposal.status == 'aktif' %}#10b981{% elif jadwal_proposal.status == 'belum_mulai' %}#f59e0b{% elif jadwal_proposal.status == 'sudah_selesai' %}#ef4444{% else %}#6b7280{% endif %};
+                                        color: white;">
+                                        {% if jadwal_proposal.status == 'aktif' %}
+                                            🟢 Aktif
+                                        {% elif jadwal_proposal.status == 'belum_mulai' %}
+                                            ⏰ Menunggu
+                                        {% elif jadwal_proposal.status == 'sudah_selesai' %}
+                                            🔴 Berakhir
+                                        {% else %}
+                                            {{ jadwal_proposal.status|title }}
+                                        {% endif %}
+                                    </span>
+                                </div>
+                                <p class="text-muted mb-2 fw-medium">{{ jadwal_proposal.pesan }}</p>
+                                {% if jadwal_proposal.jadwal_mulai and jadwal_proposal.jadwal_selesai %}
+                                <div class="jadwal-time text-muted">
+                                    <i class="bi bi-clock me-2"></i>
+                                    <strong>Jadwal:</strong> 
+                                    <span class="fw-bold text-dark">{{ jadwal_proposal.jadwal_mulai.strftime('%d %B %Y, %H:%M') }}</span> - 
+                                    <span class="fw-bold text-dark">{{ jadwal_proposal.jadwal_selesai.strftime('%d %B %Y, %H:%M') }}</span>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 text-center">
+                                {% if jadwal_proposal.bisa_review %}
+                                    <div class="status-indicator active">
+                                        <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                                        <p class="text-success mt-2 mb-0 fw-bold">Bisa Review</p>
+                                    </div>
+                                {% else %}
+                                    <div class="status-indicator inactive">
+                                        <i class="bi bi-x-circle-fill text-warning" style="font-size: 3rem;"></i>
+                                        <p class="text-warning mt-2 mb-0 fw-bold">Tidak Bisa</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <section class="section">
+                    <div class="container-fluid mt-4">
+                        <div class="card" style="padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+                                <div>
+                                    <div style="font-weight:700;font-size:1.25rem;">Daftar Proposal untuk Review</div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table mb-0" id="proposalTable">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Judul Usaha</th>
+                                            <th>Nama Ketua</th>
+                                            <th>Kategori</th>
+                                            <th>Dosen Pembimbing</th>
+                                            <th>Status Review</th>
+                                            <th>Progress Anggaran</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for proposal in proposals %}
+                                            <tr data-proposal-id="{{ proposal.id_proposal }}">
+                                                <td>{{ loop.index }}</td>
+                                                <td>
+                                                    <div class="fw-bold">{{ proposal.judul_usaha }}</div>
+                                                    <small class="text-muted">NIM: {{ proposal.nim }}</small>
+                                                </td>
+                                                <td>
+                                                    <div class="fw-bold">{{ proposal.nama_ketua }}</div>
+                                                    <small class="text-muted">Program Studi: {{ proposal.program_studi }}</small>
+                                                </td>
+                                                <td>{{ proposal.kategori }}</td>
+                                                <td>
+                                                    <div class="fw-bold">{{ proposal.dosen_pembimbing or 'Belum ditentukan' }}</div>
+                                                </td>
+                                                <td>
+                                                    <div class="status-display" style="display: flex; align-items: center;" data-status="{{ proposal.status_review }}">
+                                                        {% if jadwal_proposal and not jadwal_proposal.bisa_review %}
+                                                            {% if jadwal_proposal.status == 'belum_mulai' %}
+                                                                <span class="status-dot status-pending"></span>
+                                                                <span class="status-text">Menunggu Jadwal</span>
+                                                            {% elif jadwal_proposal.status == 'sudah_selesai' %}
+                                                                <span class="status-dot status-danger"></span>
+                                                                <span class="status-text">Jadwal Berakhir</span>
+                                                            {% else %}
+                                                                <span class="status-dot status-pending"></span>
+                                                                <span class="status-text">{{ jadwal_proposal.status|title }}</span>
+                                                            {% endif %}
+                                                        {% elif proposal.status_review == 'belum_direview' %}
+                                                            <span class="status-dot status-pending"></span>
+                                                            <span class="status-text">Belum Direview</span>
+                                                        {% elif proposal.status_review == 'sedang_direview' %}
+                                                            <span class="status-dot status-reviewing"></span>
+                                                            <span class="status-text">Sedang Direview</span>
+                                                        {% elif proposal.status_review == 'selesai_review' %}
+                                                            <span class="status-dot status-completed"></span>
+                                                            <span class="status-text">Selesai Direview</span>
+                                                        {% elif proposal.status_review == 'sudah_dinilai' or proposal.sudah_dinilai > 0 %}
+                                                            <span class="status-dot status-completed"></span>
+                                                            <span class="status-text">Sudah Dinilai</span>
+                                                        {% else %}
+                                                            <span class="status-dot status-pending"></span>
+                                                            <span class="status-text">Belum Direview</span>
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    {% set total_anggaran = (proposal.total_anggaran_awal or 0) + (proposal.total_anggaran_bertumbuh or 0) %}
+                                                    {% set total_reviewed = (proposal.anggaran_awal_reviewed or 0) + (proposal.anggaran_bertumbuh_reviewed or 0) %}
+                                                    {% set total_revisi = (proposal.anggaran_awal_revisi or 0) + (proposal.anggaran_bertumbuh_revisi or 0) %}
+                                                    {% set total_ditolak = (proposal.anggaran_awal_ditolak or 0) + (proposal.anggaran_bertumbuh_ditolak or 0) %}
+                                                    
+                                                    {% if total_anggaran > 0 %}
+                                                        {% set total_completed = total_reviewed + total_ditolak %}
+                                                        <div class="progress-info">
+                                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                <small class="text-muted">Progress: {{ total_completed }}/{{ total_anggaran }}</small>
+                                                                <small class="text-muted">{{ ((total_completed / total_anggaran) * 100)|round(1) }}%</small>
+                                                            </div>
+                                                            <div class="progress" style="height: 6px;">
+                                                                <div class="progress-bar bg-success" role="progressbar" 
+                                                                     style="width: {{ (total_completed / total_anggaran) * 100 }}%"></div>
+                                                            </div>
+                                                            {% if total_reviewed > 0 %}
+                                                                <small class="text-success d-block mt-1">
+                                                                    <i class="bi bi-check-circle"></i> {{ total_reviewed }} disetujui
+                                                                </small>
+                                                            {% endif %}
+                                                            {% if total_ditolak > 0 %}
+                                                                <small class="text-danger d-block mt-1">
+                                                                    <i class="bi bi-x-circle"></i> {{ total_ditolak }} ditolak
+                                                                </small>
+                                                            {% endif %}
+                                                            {% if total_revisi > 0 %}
+                                                                <small class="text-warning d-block mt-1">
+                                                                    <i class="bi bi-exclamation-triangle"></i> {{ total_revisi }} perlu revisi
+                                                                </small>
+                                                            {% endif %}
+                                                        </div>
+                                                    {% else %}
+                                                        <span class="text-muted">Belum ada anggaran</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-2 action-buttons">
+                                                        <button class="btn btn-circle btn-primary" 
+                                                                onclick="viewProposal({{ proposal.id_proposal }})" 
+                                                                title="Lihat Detail Proposal">
+                                                            <i class="fa fa-eye"></i>
+                                                        </button>
+                                                        
+                                                        {% if proposal.tahapan_usaha == 'Usaha Awal' %}
+                                                            <a href="{{ url_for('reviewer.anggaran_awal', proposal_id=proposal.id_proposal) }}" 
+                                                               class="btn btn-circle" style="background:#22c55e;color:#fff;" 
+                                                               title="Review Anggaran Awal">
+                                                                <i class="fa fa-calculator"></i>
+                                                            </a>
+                                                        {% elif proposal.tahapan_usaha == 'Usaha Bertumbuh' %}
+                                                            <a href="{{ url_for('reviewer.anggaran_bertumbuh', proposal_id=proposal.id_proposal) }}" 
+                                                               class="btn btn-circle" style="background:#f59e0b;color:#fff;" 
+                                                               title="Review Anggaran Bertumbuh">
+                                                                <i class="fa fa-chart-line"></i>
+                                                            </a>
+                                                        {% endif %}
+                                                        
+                                                        {% set total_anggaran = (proposal.total_anggaran_awal or 0) + (proposal.total_anggaran_bertumbuh or 0) %}
+                                                        {% set total_reviewed = (proposal.anggaran_awal_reviewed or 0) + (proposal.anggaran_bertumbuh_reviewed or 0) %}
+                                                        {% set total_revisi = (proposal.anggaran_awal_revisi or 0) + (proposal.anggaran_bertumbuh_revisi or 0) %}
+                                                        {% set total_ditolak = (proposal.anggaran_awal_ditolak or 0) + (proposal.anggaran_bertumbuh_ditolak or 0) %}
+                                                        
+                                                        {% if total_anggaran > 0 and total_revisi == 0 and (total_reviewed + total_ditolak) == total_anggaran and proposal.status_review != 'sudah_dinilai' and proposal.status_review != 'sent_to_admin' and proposal.status_review != 'selesai_review' %}
+                                                            <button class="btn btn-circle kirim-admin-btn" style="background:#8b5cf6;color:#fff;" 
+                                                                    onclick="sendProposalToAdmin({{ proposal.id_proposal }}, this)" 
+                                                                    title="{% if total_ditolak > 0 %}Kirim Proposal ke Admin ({{ total_ditolak }} ditolak){% else %}Kirim Proposal ke Admin{% endif %}"
+                                                                    data-proposal-id="{{ proposal.id_proposal }}"
+                                                                    data-status="ready">
+                                                                <i class="fa fa-paper-plane"></i>
+                                                            </button>
+                                                        {% endif %}
+                                                        
+                                                        {% if (proposal.status_review == 'sent_to_admin' or proposal.status_review == 'selesai_review') and proposal.status_review != 'sudah_dinilai' and proposal.sudah_dinilai == 0 and total_anggaran > 0 and (total_reviewed + total_ditolak) == total_anggaran and total_revisi == 0 %}
+                                                            {% if jadwal_proposal and jadwal_proposal.bisa_review %}
+                                                                <a href="{{ url_for('reviewer.penilaian', proposal_id=proposal.id_proposal) }}" 
+                                                                   class="btn btn-circle" style="background:#10b981;color:#fff;" 
+                                                                   title="Penilaian Proposal">
+                                                                    <i class="fa fa-star"></i>
+                                                                </a>
+                                                            {% elif jadwal_proposal and not jadwal_proposal.bisa_review %}
+                                                                <button class="btn btn-circle btn-secondary" disabled 
+                                                                        title="{{ jadwal_proposal.pesan }}">
+                                                                    <i class="fa fa-clock"></i>
+                                                                </button>
+                                                            {% else %}
+                                                                <a href="{{ url_for('reviewer.penilaian', proposal_id=proposal.id_proposal) }}" 
+                                                                   class="btn btn-circle" style="background:#10b981;color:#fff;" 
+                                                                   title="Penilaian Proposal">
+                                                                    <i class="fa fa-star"></i>
+                                                                </a>
+                                                            {% endif %}
+                                                        {% elif proposal.status_review == 'selesai_review' and total_anggaran > 0 and (total_reviewed + total_ditolak) < total_anggaran %}
+                                                            <span class="btn btn-circle" style="background:#e5e7eb;color:#6b7280;cursor:not-allowed;" 
+                                                                  title="Belum semua anggaran direview ({{ total_reviewed + total_ditolak }}/{{ total_anggaran }})">
+                                                                <i class="fa fa-clock"></i>
+                                                            </span>
+                                                        {% elif proposal.status_review == 'selesai_review' and total_revisi > 0 %}
+                                                            <span class="btn btn-circle" style="background:#f59e0b;color:#fff;cursor:not-allowed;" 
+                                                                  title="Ada {{ total_revisi }} anggaran yang perlu direvisi">
+                                                                <i class="fa fa-exclamation-triangle"></i>
+                                                            </span>
+                                                        {% elif proposal.status_review == 'sudah_dinilai' or proposal.sudah_dinilai > 0 %}
+                                                            <span class="btn btn-circle" style="background:#22c55e;color:#fff;cursor:not-allowed;" 
+                                                                  title="Proposal sudah dinilai">
+                                                                <i class="fa fa-check-circle"></i>
+                                                            </span>
+                                                        {% endif %}
+                                                       
+                                                        
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Lihat Detail Proposal -->
+    <div class="modal fade" id="modalLihatProposal" tabindex="-1" aria-labelledby="modalLihatProposalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLihatProposalLabel">Detail Proposal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Tab Navigation -->
+                    <ul class="nav nav-tabs" id="proposalTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="detail-tab" data-bs-toggle="tab" data-bs-target="#detail" type="button" role="tab" aria-controls="detail" aria-selected="true">
+                                <i class="fas fa-file-alt me-2"></i>Detail Proposal
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="anggota-tab" data-bs-toggle="tab" data-bs-target="#anggota" type="button" role="tab" aria-controls="anggota" aria-selected="false">
+                                <i class="fas fa-users me-2"></i>Anggota Tim
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content mt-3" id="proposalTabsContent">
+                        <!-- Detail Proposal Tab -->
+                        <div class="tab-pane fade show active" id="detail" role="tabpanel" aria-labelledby="detail-tab">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Judul Usaha</label>
+                                        <p class="form-control-plaintext" id="detailJudulUsaha"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Kategori</label>
+                                        <p class="form-control-plaintext" id="detailKategori"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Tahapan Usaha</label>
+                                        <p class="form-control-plaintext" id="detailTahapanUsaha"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Merk Produk</label>
+                                        <p class="form-control-plaintext" id="detailMerkProduk"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">NIB</label>
+                                        <p class="form-control-plaintext" id="detailNIB"></p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Tahun NIB</label>
+                                        <p class="form-control-plaintext" id="detailTahunNIB"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Platform Penjualan</label>
+                                        <p class="form-control-plaintext" id="detailPlatformPenjualan"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Dosen Pembimbing</label>
+                                        <p class="form-control-plaintext" id="detailDosenPembimbing"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">NID Dosen</label>
+                                        <p class="form-control-plaintext" id="detailNIDDosen"></p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">Program Studi Dosen</label>
+                                        <p class="form-control-plaintext" id="detailProgramStudiDosen"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">File Proposal & Status</label>
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center">
+                                                <button type="button" id="detailFileProposalBtn" class="btn btn-outline-primary me-3" style="display: none; position: relative; overflow: hidden; background: linear-gradient(135deg, #435ebe 0%, #5a6fd8 100%); border-color: #435ebe; color: #fff; font-weight: 600; padding: 10px 20px; border-radius: 8px; transition: all 0.3s ease;">
+                                                    <i class="fas fa-file-pdf me-2"></i>
+                                                    Lihat File Proposal
+                                                </button>
+                                                <span id="detailFileProposalText" class="text-muted">
+                                                    <i class="fas fa-file-pdf me-2"></i>
+                                                    File proposal tidak tersedia
+                                                </span>
+                                            </div>
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge fs-6 px-3 py-2" id="detailStatus"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3" id="detailTanggalKirimContainer" style="display: none;">
+                                        <label class="form-label fw-bold">Tanggal Kirim</label>
+                                        <p class="form-control-plaintext" id="detailTanggalKirim"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Anggota Tim Tab -->
+                        <div class="tab-pane fade" id="anggota" role="tabpanel" aria-labelledby="anggota-tab">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Perguruan Tinggi</th>
+                                            <th>Program Studi</th>
+                                            <th>NIM</th>
+                                            <th>Nama</th>
+                                            <th>Email</th>
+                                            <th>No. Telpon</th>
+                                            <th>Peran</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detailAnggotaTable">
+                                        <!-- Data anggota akan diisi melalui JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="noAnggotaMessage" class="text-center text-muted py-4" style="display: none;">
+                                <i class="fas fa-users fa-3x mb-3"></i>
+                                <p>Belum ada anggota tim yang ditambahkan</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            $('#proposalTable').DataTable({
+                language: {
+                    "sProcessing":   "Sedang memproses...",
+                    "sLengthMenu":   "Tampilkan _MENU_ entri",
+                    "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                    "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                    "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+                    "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Cari:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "Pertama",
+                        "sPrevious": "Sebelumnya",
+                        "sNext":     "Selanjutnya",
+                        "sLast":     "Terakhir"
+                    }
+                },
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]]
+            });
+        });
+
+        function viewProposal(proposalId) {
+            // Tampilkan loading
+            Swal.fire({
+                title: 'Memuat Detail Proposal...',
+                text: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Ambil data detail proposal dari endpoint
+            fetch(`/reviewer/get_proposal_detail/${proposalId}`)
+                .then(response => response.json())
+                .then(data => {
+                    Swal.close();
+                    
+                    if (data.success) {
+                        // Isi data proposal ke modal
+                        const proposal = data.proposal;
+                        const anggota = data.anggota;
+                        
+                        // Isi detail proposal
+                        document.getElementById('detailJudulUsaha').textContent = proposal.judul_usaha || '-';
+                        document.getElementById('detailKategori').textContent = proposal.kategori || '-';
+                        document.getElementById('detailTahapanUsaha').textContent = proposal.tahapan_usaha || '-';
+                        document.getElementById('detailMerkProduk').textContent = proposal.merk_produk || '-';
+                        document.getElementById('detailNIB').textContent = proposal.nib || '-';
+                        document.getElementById('detailTahunNIB').textContent = proposal.tahun_nib || '-';
+                        document.getElementById('detailPlatformPenjualan').textContent = proposal.platform_penjualan || '-';
+                        document.getElementById('detailDosenPembimbing').textContent = proposal.dosen_pembimbing || '-';
+                        document.getElementById('detailNIDDosen').textContent = proposal.nid_dosen || '-';
+                        document.getElementById('detailProgramStudiDosen').textContent = proposal.program_studi_dosen || '-';
+                        
+                        // Set file proposal button
+                        const fileBtn = document.getElementById('detailFileProposalBtn');
+                        const fileText = document.getElementById('detailFileProposalText');
+                        if (proposal.file_path && proposal.file_path.trim() !== '') {
+                            fileBtn.style.display = 'inline-block';
+                            fileText.style.display = 'none';
+                            
+                            // Hapus event listener lama jika ada
+                            fileBtn.replaceWith(fileBtn.cloneNode(true));
+                            const newFileBtn = document.getElementById('detailFileProposalBtn');
+                            
+                            newFileBtn.onclick = function(e) {
+                                handleFileProposalClick(e);
+                            };
+                            
+                            newFileBtn.onkeydown = function(e) {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    e.preventDefault();
+                                    handleFileProposalClick(e);
+                                }
+                            };
+                            
+                            function handleFileProposalClick(e) {
+                                // Gunakan proposalId dari parameter fungsi viewProposal
+                                const currentProposalId = proposalId;
+                                // Efek ripple
+                                const ripple = document.createElement('span');
+                                const rect = newFileBtn.getBoundingClientRect();
+                                const size = Math.max(rect.width, rect.height);
+                                const x = e.clientX - rect.left - size / 2;
+                                const y = e.clientY - rect.top - size / 2;
+                                
+                                ripple.style.width = ripple.style.height = size + 'px';
+                                ripple.style.left = x + 'px';
+                                ripple.style.top = y + 'px';
+                                ripple.classList.add('ripple');
+                                newFileBtn.appendChild(ripple);
+                                
+                                setTimeout(() => ripple.remove(), 600);
+                                
+                                // Tampilkan loading state
+                                const originalText = newFileBtn.innerHTML;
+                                newFileBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2" style="color: #fff;"></i>Membuka File<span class="loading-dots">...</span>';
+                                newFileBtn.disabled = true;
+                                newFileBtn.style.background = 'linear-gradient(135deg, #6c757d 0%, #495057 100%)';
+                                newFileBtn.style.borderColor = '#6c757d';
+                                newFileBtn.style.position = 'relative';
+                                newFileBtn.style.overflow = 'hidden';
+                                
+                                // Tambahkan progress bar
+                                const progressBar = document.createElement('div');
+                                progressBar.style.position = 'absolute';
+                                progressBar.style.bottom = '0';
+                                progressBar.style.left = '0';
+                                progressBar.style.height = '3px';
+                                progressBar.style.background = 'linear-gradient(90deg, #28a745, #20c997, #17a2b8)';
+                                progressBar.style.width = '0%';
+                                progressBar.style.transition = 'width 2s linear';
+                                progressBar.style.borderRadius = '0 0 8px 8px';
+                                progressBar.style.boxShadow = '0 0 10px rgba(40, 167, 69, 0.5)';
+                                newFileBtn.appendChild(progressBar);
+                                
+                                // Animate progress bar
+                                setTimeout(() => {
+                                    progressBar.style.width = '100%';
+                                }, 100);
+                                
+                                // Buka file di tab baru
+                                const downloadWindow = window.open(`/reviewer/download_proposal/${proposalId}`, '_blank');
+                                
+                                // Kembalikan tombol setelah 2 detik
+                                setTimeout(() => {
+                                    // Tampilkan checkmark terlebih dahulu
+                                    newFileBtn.innerHTML = '<i class="fas fa-check me-2" style="color: #fff;"></i>Berhasil!';
+                                    newFileBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
+                                    newFileBtn.style.borderColor = '#28a745';
+                                    
+                                    // Kembalikan ke tampilan normal setelah 1 detik
+                                    setTimeout(() => {
+                                        newFileBtn.innerHTML = originalText;
+                                        newFileBtn.disabled = false;
+                                        newFileBtn.style.background = 'linear-gradient(135deg, #435ebe 0%, #5a6fd8 100%)';
+                                        newFileBtn.style.borderColor = '#435ebe';
+                                        newFileBtn.style.position = '';
+                                        newFileBtn.style.overflow = '';
+                                        
+                                        // Hapus progress bar
+                                        const progressBar = newFileBtn.querySelector('div[style*="position: absolute"]');
+                                        if (progressBar) {
+                                            progressBar.remove();
+                                        }
+                                    }, 1000);
+                                    
+                                    // Efek suara sederhana (opsional)
+                                    try {
+                                        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                                        const oscillator = audioContext.createOscillator();
+                                        const gainNode = audioContext.createGain();
+                                        
+                                        oscillator.connect(gainNode);
+                                        gainNode.connect(audioContext.destination);
+                                        
+                                        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                                        oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+                                        
+                                        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                                        
+                                        oscillator.start(audioContext.currentTime);
+                                        oscillator.stop(audioContext.currentTime + 0.1);
+                                    } catch (e) {
+                                        // Ignore jika audio tidak didukung
+                                    }
+                                    
+                                    // Efek vibrasi untuk mobile (jika didukung)
+                                    if ('vibrate' in navigator) {
+                                        navigator.vibrate([100, 50, 100]);
+                                    }
+                                    
+                                    // Efek konfetti sederhana
+                                    const colors = ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#6f42c1'];
+                                    for (let i = 0; i < 10; i++) {
+                                        setTimeout(() => {
+                                            const confetti = document.createElement('div');
+                                            confetti.style.position = 'fixed';
+                                            confetti.style.left = Math.random() * window.innerWidth + 'px';
+                                            confetti.style.top = '-10px';
+                                            confetti.style.width = '8px';
+                                            confetti.style.height = '8px';
+                                            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                                            confetti.style.borderRadius = '50%';
+                                            confetti.style.pointerEvents = 'none';
+                                            confetti.style.zIndex = '9999';
+                                            confetti.style.animation = 'confetti-fall 2s linear forwards';
+                                            document.body.appendChild(confetti);
+                                            
+                                            setTimeout(() => confetti.remove(), 2000);
+                                        }, i * 100);
+                                    }
+                                    
+                                    // Tampilkan pesan sukses
+                                    Swal.fire({
+                                        title: 'Berhasil!',
+                                        text: 'File proposal berhasil dibuka di tab baru!',
+                                        icon: 'success',
+                                        timer: 2000,
+                                        showConfirmButton: false,
+                                        confirmButtonColor: '#28a745'
+                                    });
+                                }, 2000);
+                            }
+                        } else {
+                            fileBtn.style.display = 'none';
+                            fileText.style.display = 'inline-block';
+                        }
+                        
+                        // Set status proposal
+                        const statusElement = document.getElementById('detailStatus');
+                        let statusText = '';
+                        let statusClass = '';
+                        
+                        switch(proposal.status) {
+                            case 'draf':
+                                statusText = 'Draf';
+                                statusClass = 'bg-secondary';
+                                break;
+                            case 'dikirim':
+                                statusText = 'Dikirim';
+                                statusClass = 'bg-primary';
+                                break;
+                            case 'direview':
+                                statusText = 'Sedang Direview';
+                                statusClass = 'bg-warning';
+                                break;
+                            case 'disetujui':
+                                statusText = 'Disetujui';
+                                statusClass = 'bg-success';
+                                break;
+                            case 'ditolak':
+                                statusText = 'Ditolak';
+                                statusClass = 'bg-danger';
+                                break;
+                            default:
+                                statusText = 'Tidak Diketahui';
+                                statusClass = 'bg-secondary';
+                        }
+                        
+                        statusElement.textContent = statusText;
+                        statusElement.className = `badge fs-6 px-3 py-2 ${statusClass}`;
+                        
+                        // Set tanggal kirim jika ada
+                        const tanggalContainer = document.getElementById('detailTanggalKirimContainer');
+                        const tanggalElement = document.getElementById('detailTanggalKirim');
+                        if (proposal.tanggal_kirim) {
+                            tanggalContainer.style.display = 'block';
+                            tanggalElement.textContent = proposal.tanggal_kirim;
+                        } else {
+                            tanggalContainer.style.display = 'none';
+                        }
+                        
+                        // Isi data anggota tim berdasarkan struktur tabel anggota_tim
+                        const anggotaTable = document.getElementById('detailAnggotaTable');
+                        const noAnggotaMessage = document.getElementById('noAnggotaMessage');
+                        
+                        // Debug: Log data anggota tim (opsional)
+                        // console.log('Data anggota tim:', anggota);
+                        // console.log('Data proposal:', proposal);
+                        // console.log('Jumlah anggota:', anggota ? anggota.length : 0);
+                        
+                        if (anggota && anggota.length > 0) {
+                            try {
+                                anggotaTable.innerHTML = '';
+                                anggota.forEach((member, index) => {
+                                    const row = document.createElement('tr');
+                                    row.innerHTML = `
+                                        <td>${index + 1}</td>
+                                        <td>${member.perguruan_tinggi ? member.perguruan_tinggi : '-'}</td>
+                                        <td>${member.program_studi ? member.program_studi : '-'}</td>
+                                        <td>${member.nim ? member.nim : '-'}</td>
+                                        <td>${member.nama ? member.nama : '-'}</td>
+                                        <td>${member.email ? member.email : '-'}</td>
+                                        <td>${member.no_telp ? member.no_telp : '-'}</td>
+                                        <td>
+                                            <span class="badge ${member.nim === proposal.nim ? 'bg-primary' : 'bg-secondary'}">
+                                                ${member.nim === proposal.nim ? 'Ketua' : 'Anggota'}
+                                            </span>
+                                        </td>
+                                    `;
+                                    anggotaTable.appendChild(row);
+                                });
+                                anggotaTable.style.display = 'table-row-group';
+                                noAnggotaMessage.style.display = 'none';
+                            } catch (error) {
+                                console.error('Error saat menampilkan data anggota:', error);
+                                anggotaTable.style.display = 'none';
+                                noAnggotaMessage.style.display = 'block';
+                                noAnggotaMessage.innerHTML = `
+                                    <div class="alert alert-danger">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        <strong>Error:</strong> ${error.message}
+                                        <br><small>Silakan coba lagi atau hubungi administrator.</small>
+                                    </div>
+                                `;
+                            }
+                        } else {
+                            anggotaTable.style.display = 'none';
+                            noAnggotaMessage.style.display = 'block';
+                            noAnggotaMessage.innerHTML = `
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-users fa-3x mb-3 text-muted"></i>
+                                    <p class="mb-0"><strong>Belum ada anggota tim</strong></p>
+                                    <small>Anggota tim belum ditambahkan ke proposal ini.</small>
+                                </div>
+                            `;
+                        }
+                        
+                        // Buka modal
+                        const modal = new bootstrap.Modal(document.getElementById('modalLihatProposal'));
+                        modal.show();
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: data.message || 'Gagal memuat detail proposal',
+                            icon: 'error',
+                            confirmButtonColor: '#8b5cf6'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.close();
+                    console.error('Error:', error);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Terjadi kesalahan saat memuat detail proposal',
+                        icon: 'error',
+                        confirmButtonColor: '#8b5cf6'
+                    });
+                });
+        }
+
+        function sendProposalToAdmin(proposalId, buttonElement) {
+            // Prevent multiple clicks
+            if (buttonElement.disabled || buttonElement.getAttribute('data-status') === 'sent') {
+                return;
+            }
+            
+            // Mark button as sent
+            buttonElement.setAttribute('data-status', 'sent');
+            
+            // Disable button immediately
+            buttonElement.disabled = true;
+            buttonElement.style.opacity = '0.6';
+            buttonElement.style.cursor = 'not-allowed';
+            
+            const title = buttonElement.getAttribute('title');
+            const lowerTitle = (title || '').toLowerCase();
+            const hasRejectedItems = lowerTitle.includes('ditolak');
+            const hasRevisiItems = lowerTitle.includes('revisi');
+            
+            let confirmText = 'Proposal akan dikirim ke admin untuk konfirmasi pendanaan. Pastikan semua anggaran sudah direview!';
+            if (hasRejectedItems || hasRevisiItems) {
+                confirmText = 'Proposal akan dikirim ke admin untuk konfirmasi pendanaan. Beberapa anggaran ditolak/revisi akan disampaikan ke admin.';
+            }
+            
+            Swal.fire({
+                title: 'Kirim Proposal ke Admin?',
+                text: confirmText,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#8b5cf6',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Ya, Kirim ke Admin',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Tampilkan loading
+                    Swal.fire({
+                        title: 'Mengirim proposal...',
+                        text: 'Sedang mengirim proposal ke admin',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Kirim request ke server
+                    fetch('/reviewer/send_proposal_to_admin', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            proposal_id: proposalId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonColor: '#8b5cf6'
+                            }).then(() => {
+                                // Update status proposal dan ganti tombol
+                                updateProposalStatus(proposalId, 'sent_to_admin');
+                                replaceButtonWithPenilaian(proposalId, buttonElement);
+                            });
+                        } else {
+                            // Re-enable button if failed
+                            buttonElement.disabled = false;
+                            buttonElement.style.opacity = '1';
+                            buttonElement.style.cursor = 'pointer';
+                            buttonElement.setAttribute('data-status', 'ready');
+                            
+                            Swal.fire({
+                                title: 'Gagal!',
+                                text: data.message,
+                                icon: 'error',
+                                confirmButtonColor: '#8b5cf6'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        // Re-enable button if error occurs
+                        buttonElement.disabled = false;
+                        buttonElement.style.opacity = '1';
+                        buttonElement.style.cursor = 'pointer';
+                        buttonElement.setAttribute('data-status', 'ready');
+                        
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Terjadi kesalahan saat mengirim proposal ke admin',
+                            icon: 'error',
+                            confirmButtonColor: '#8b5cf6'
+                        });
+                    });
+                } else {
+                    // Re-enable button if user cancels
+                    buttonElement.disabled = false;
+                    buttonElement.style.opacity = '1';
+                    buttonElement.style.cursor = 'pointer';
+                    buttonElement.setAttribute('data-status', 'ready');
+                }
+            });
+        }
+
+        // Function to replace button with Penilaian Proposal button
+        function replaceButtonWithPenilaian(proposalId, buttonElement) {
+            // Check if button is still a kirim-admin-btn
+            if (!buttonElement.classList.contains('kirim-admin-btn')) {
+                return; // Button already replaced
+            }
+            
+            // Find the button container (parent div)
+            const buttonContainer = buttonElement.parentElement;
+            
+            // Create new Penilaian Proposal button
+            const penilaianButton = document.createElement('a');
+            penilaianButton.href = `/reviewer/penilaian/${proposalId}`;
+            penilaianButton.className = 'btn btn-circle';
+            penilaianButton.style.cssText = 'background:#10b981;color:#fff;';
+            penilaianButton.title = 'Penilaian Proposal';
+            penilaianButton.innerHTML = '<i class="fa fa-star"></i>';
+            
+            // Replace the old button with the new one
+            buttonContainer.replaceChild(penilaianButton, buttonElement);
+            
+            // Add success animation
+            penilaianButton.style.transform = 'scale(1.1)';
+            penilaianButton.style.transition = 'transform 0.3s ease';
+            setTimeout(() => {
+                penilaianButton.style.transform = 'scale(1)';
+            }, 300);
+            
+            // Add success effect
+            penilaianButton.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.5)';
+            setTimeout(() => {
+                penilaianButton.style.boxShadow = '';
+            }, 1000);
+        }
+
+        // Function to replace button with "Sudah Dinilai" button
+        function replaceButtonWithSudahDinilai(proposalId, buttonElement) {
+            // Find the button container (parent div)
+            const buttonContainer = buttonElement.parentElement;
+            
+            // Create new "Sudah Dinilai" button
+            const sudahDinilaiButton = document.createElement('span');
+            sudahDinilaiButton.className = 'btn btn-circle';
+            sudahDinilaiButton.style.cssText = 'background:#22c55e;color:#fff;cursor:not-allowed;';
+            sudahDinilaiButton.title = 'Proposal sudah dinilai';
+            sudahDinilaiButton.innerHTML = '<i class="fa fa-check-circle"></i>';
+            
+            // Replace the old button with the new one
+            buttonContainer.replaceChild(sudahDinilaiButton, buttonElement);
+            
+            // Add success animation
+            sudahDinilaiButton.style.transform = 'scale(1.1)';
+            sudahDinilaiButton.style.transition = 'transform 0.3s ease';
+            setTimeout(() => {
+                sudahDinilaiButton.style.transform = 'scale(1)';
+            }, 300);
+        }
+
+        // Function to update proposal status without reload
+        function updateProposalStatus(proposalId, status) {
+            // Find the proposal row
+            const proposalRow = document.querySelector(`tr[data-proposal-id="${proposalId}"]`);
+            if (!proposalRow) return;
+
+            // Update status display
+            const statusDisplay = proposalRow.querySelector('.status-display');
+            if (statusDisplay) {
+                if (status === 'sent_to_admin') {
+                    statusDisplay.innerHTML = `
+                        <span class="status-dot status-completed"></span>
+                        <span class="status-text">Dikirim ke Admin</span>
+                    `;
+                    statusDisplay.setAttribute('data-status', 'sent_to_admin');
+                } else if (status === 'selesai_review') {
+                    statusDisplay.innerHTML = `
+                        <span class="status-dot status-completed"></span>
+                        <span class="status-text">Selesai Review</span>
+                    `;
+                    statusDisplay.setAttribute('data-status', 'selesai_review');
+                } else if (status === 'sudah_dinilai') {
+                    statusDisplay.innerHTML = `
+                        <span class="status-dot status-completed"></span>
+                        <span class="status-text">Sudah Dinilai</span>
+                    `;
+                    statusDisplay.setAttribute('data-status', 'sudah_dinilai');
+                }
+            }
+
+            // Add highlight animation
+            proposalRow.classList.add('updated');
+            setTimeout(() => {
+                proposalRow.classList.remove('updated');
+            }, 2000);
+        }
+
+            // Function to check localStorage for sent proposals and update button states
+        function checkSentProposals() {
+            const kirimButtons = document.querySelectorAll('.kirim-admin-btn');
+            kirimButtons.forEach(button => {
+                const proposalId = button.getAttribute('data-proposal-id');
+                // Hanya ganti tombol jika status proposal di database sudah 'sent_to_admin'
+                // Jangan ganti berdasarkan localStorage saja
+                const proposalRow = button.closest('tr');
+                if (proposalRow) {
+                    const statusDisplay = proposalRow.querySelector('.status-display');
+                    if (statusDisplay) {
+                        const status = statusDisplay.getAttribute('data-status');
+                        if (status === 'sent_to_admin' || status === 'selesai_review') {
+                            // Hapus localStorage untuk proposal ini karena sudah tidak diperlukan
+                            localStorage.removeItem(`proposal_${proposalId}_sent`);
+                            // Replace button with Penilaian Proposal button
+                            replaceButtonWithPenilaian(proposalId, button);
+                        } else if (status === 'sudah_dinilai') {
+                            // Hapus localStorage untuk proposal ini karena sudah tidak diperlukan
+                            localStorage.removeItem(`proposal_${proposalId}_sent`);
+                            // Replace button with "Sudah Dinilai" button
+                            replaceButtonWithSudahDinilai(proposalId, button);
+                        }
+                    }
+                }
+            });
+        }
+
+        // Check sent proposals when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            checkSentProposals();
+            
+            // Check for penilaian completion from URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const penilaianCompleted = urlParams.get('penilaian_completed');
+            const completedProposalId = urlParams.get('proposal_id');
+            
+            if (penilaianCompleted === 'true' && completedProposalId) {
+                // Update the proposal status to "sudah_dinilai"
+                updateProposalStatus(completedProposalId, 'sudah_dinilai');
+                
+                // Find and replace the penilaian button with "sudah dinilai" button
+                const penilaianButton = document.querySelector(`a[href="/reviewer/penilaian/${completedProposalId}"]`);
+                if (penilaianButton) {
+                    replaceButtonWithSudahDinilai(completedProposalId, penilaianButton);
+                }
+                
+                // Show success message
+                Swal.fire({
+                    title: 'Penilaian Berhasil!',
+                    text: 'Penilaian proposal telah berhasil disimpan',
+                    icon: 'success',
+                    confirmButtonColor: '#22c55e',
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                
+                // Clean up URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        });
+
+</script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+
+</body>
+
+</html>

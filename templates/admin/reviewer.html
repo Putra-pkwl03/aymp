@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoring Laporan Neraca Mahasiswa - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.bootstrap5.min.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+        integrity="sha512-papm6Q+..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-pembimbing.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/images/favicon.svg') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.css') }}">
+
+    <style>
+        table.dataTable td {
+            padding: 15px 8px;
+        }
+
+        .fontawesome-icons .the-icon svg {
+            font-size: 24px;
+        }
+
+        /* Bulatkan dan rapikan pagination datatable */
+        .dataTables_wrapper .dataTables_paginate .pagination {
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item {
+            margin: 0;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link {
+            border-radius: 50% !important;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            padding: 0 !important;
+            margin: 0 !important;
+            font-weight: 600;
+            font-size: 1rem;
+            line-height: 36px;
+            border: none;
+            background: transparent;
+            color: #3b3f5c;
+            transition: background 0.2s, color 0.2s;
+            text-align: center;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:focus {
+            box-shadow: none;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-item.active .page-link,
+        .dataTables_wrapper .dataTables_paginate .page-link:hover {
+            background: #435ebe;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link:active {
+            background: #25396f;
+            color: #fff !important;
+        }
+
+        .dataTables_wrapper .dataTables_paginate .page-link svg {
+            vertical-align: middle;
+        }
+
+        .modal-content {
+            border-radius: 20px !important;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px 28px 12px 28px;
+        }
+
+        .modal-footer {
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            padding: 16px 28px;
+        }
+
+        .modal-body {
+            padding: 24px 28px 10px 28px;
+        }
+
+        .modal-body .row.g-3 {
+            row-gap: 18px;
+        }
+
+        @media (max-width: 575.98px) {
+
+            .modal-header,
+            .modal-footer,
+            .modal-body {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .modal-body {
+                padding-top: 16px;
+                padding-bottom: 6px;
+            }
+        }
+
+        .btn-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 1.1rem;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .btn-circle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-circle:active,
+        .btn-circle:focus {
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.13);
+        }
+        .btn-circle i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.1em;
+            line-height: 1;
+        }
+
+        /* Styling untuk btn-action-group */
+        .btn-action-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        /* Styling dasar untuk tabel */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #3b3f5c;
+        }
+
+        .table td {
+            vertical-align: middle;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Responsive table */
+        .table-responsive {
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Modal styling */
+        .modal-lg {
+            max-width: 800px;
+        }
+
+        .modal-body .form-label {
+            font-weight: 600;
+            color: #3b3f5c;
+            margin-bottom: 8px;
+        }
+
+        .modal-body .form-control,
+        .modal-body .form-select {
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            padding: 10px 15px;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .modal-body .form-control:focus,
+        .modal-body .form-select:focus {
+            border-color: #435ebe;
+            box-shadow: 0 0 0 0.2rem rgba(67, 94, 190, 0.25);
+            outline: none;
+        }
+
+        /* Responsive design untuk modal */
+        @media (max-width: 768px) {
+            .modal-lg {
+                max-width: 95%;
+                margin: 1rem auto;
+            }
+            
+            .modal-header {
+                padding: 16px 20px 10px 20px;
+            }
+            
+            .modal-header .modal-title {
+                font-size: 1.2rem;
+            }
+            
+            .modal .table {
+                font-size: 0.875rem;
+            }
+            
+            .modal .table th,
+            .modal .table td {
+                padding: 0.5rem 0.25rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .modal-lg {
+                max-width: 98%;
+                margin: 0.5rem auto;
+            }
+            
+            .modal .table {
+                font-size: 0.8rem;
+            }
+            
+            .modal .table th,
+            .modal .table td {
+                padding: 0.375rem 0.125rem;
+            }
+        }
+
+        /* Responsive untuk reviewer management */
+        @media (max-width: 768px) {
+            .reviewer-management .card {
+                margin-bottom: 1rem;
+            }
+            
+            .reviewer-management .btn-action {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 0.5rem;
+            }
+            
+            .btn-action-group {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn-action-group .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .reviewer-management .btn-circle {
+                width: 35px !important;
+                height: 35px !important;
+                font-size: 1rem !important;
+            }
+            
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+            
+            .table td, .table th {
+                padding: 0.5rem 0.25rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .reviewer-management .btn-circle {
+                width: 30px !important;
+                height: 30px !important;
+                font-size: 0.9rem !important;
+            }
+            
+            .btn-circle {
+                width: 32px !important;
+                height: 32px !important;
+                font-size: 0.95rem !important;
+            }
+            
+            .btn-circle i {
+                font-size: 0.85em !important;
+            }
+            
+            .table-responsive {
+                font-size: 0.75rem;
+            }
+            
+            .table td, .table th {
+                padding: 0.375rem 0.125rem;
+            }
+        }
+
+        /* Fix untuk DataTables */
+        .dataTables_wrapper .dataTable {
+            width: 100% !important;
+        }
+
+        .dataTables_wrapper .dataTable th,
+        .dataTables_wrapper .dataTable td {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .dataTables_wrapper .dataTable tbody tr {
+            height: auto;
+        }
+
+        /* Card hover effect */
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+
+        /* Styling untuk placeholder input */
+        .form-control::placeholder {
+            color: #6c757d !important;
+            opacity: 1 !important;
+        }
+        
+        .form-control:focus::placeholder {
+            color: #adb5bd !important;
+            opacity: 0.7 !important;
+        }
+
+        .modal-footer .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+
+        /* Responsive design untuk modal footer */
+        @media (max-width: 768px) {
+            .modal-footer {
+                padding: 14px 20px;
+            }
+            
+            .modal-footer .btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .modal-footer .btn i {
+                font-size: 0.85em;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .modal-footer {
+                padding: 12px 16px;
+            }
+            
+            .modal-footer .btn {
+                padding: 6px 12px;
+                font-size: 0.875rem;
+            }
+            
+            .modal-footer .btn i {
+                font-size: 0.8em;
+            }
+            
+            .modal-body {
+                padding: 16px 12px 8px 12px;
+            }
+            
+            .modal-body .row.g-3 {
+                row-gap: 12px;
+            }
+            
+            .modal-header {
+                padding: 12px 16px 8px 16px;
+            }
+            
+            .modal-header .modal-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Styling untuk SweetAlert */
+        .swal2-popup {
+            border-radius: 16px !important;
+        }
+
+        .swal2-title {
+            color: #3b3f5c !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-html-container {
+            margin: 1rem 0 !important;
+        }
+
+        .swal2-html-container p {
+            margin-bottom: 0.5rem !important;
+            color: #3b3f5c !important;
+        }
+
+        .swal2-html-container small {
+            color: #6c757d !important;
+            font-size: 0.875rem !important;
+        }
+
+        /* Responsive design untuk SweetAlert */
+        @media (max-width: 768px) {
+            .swal2-popup {
+                width: 90% !important;
+                margin: 1rem auto !important;
+            }
+            
+            .swal2-title {
+                font-size: 1.25rem !important;
+            }
+            
+            .swal2-html-container {
+                font-size: 0.875rem !important;
+            }
+            
+            .swal2-html-container small {
+                font-size: 0.8rem !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .swal2-popup {
+                width: 95% !important;
+                margin: 0.5rem auto !important;
+            }
+            
+            .swal2-title {
+                font-size: 1.1rem !important;
+            }
+            
+            .swal2-html-container {
+                font-size: 0.8rem !important;
+            }
+            
+            .swal2-html-container small {
+                font-size: 0.75rem !important;
+            }
+        }
+
+        /* Styling untuk tombol dengan icon */
+        .btn i {
+            font-size: 0.9em;
+        }
+
+        .btn .fa-save {
+            font-weight: 600;
+        }
+
+        .btn .fa-times {
+            font-weight: 600;
+        }
+
+        /* Responsive design untuk tombol dengan icon */
+        @media (max-width: 768px) {
+            .btn i {
+                font-size: 0.85em;
+            }
+            
+            .btn .fa-save,
+            .btn .fa-times {
+                font-weight: 600;
+            }
+            
+            .btn-circle {
+                width: 38px !important;
+                height: 38px !important;
+                font-size: 1.05rem !important;
+            }
+            
+            .btn-circle i {
+                font-size: 0.95em !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .btn i {
+                font-size: 0.8em;
+            }
+            
+            .btn .fa-save,
+            .btn .fa-times {
+                font-weight: 500;
+            }
+            
+            .btn-circle {
+                width: 35px !important;
+                height: 35px !important;
+                font-size: 1rem !important;
+            }
+            
+            .btn-circle i {
+                font-size: 0.9em !important;
+            }
+        }
+
+        /* Fix untuk DataTables */
+        .dataTables_wrapper .dataTable {
+            width: 100% !important;
+        }
+
+        .dataTables_wrapper .dataTable th,
+        .dataTables_wrapper .dataTable td {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+
+        .dataTables_wrapper .dataTable tbody tr {
+            height: auto;
+        }
+
+        .btn.btn-tambah-pembimbing {
+            display: inline-flex;
+            align-items: center;
+            background: #4b7c5a;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 6px 22px 6px 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            gap: 10px;
+        }
+        
+        .btn.btn-tambah-pembimbing:hover {
+            background: #356346;
+        }
+        
+        .btn.btn-tambah-pembimbing .icon-circle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            color: #388e3c;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            margin-right: 8px;
+            font-size: 1.4em;
+            font-weight: bold;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+            line-height: 1;
+        }
+
+        .btn.btn-tambah-pembimbing .fa-plus {
+            font-weight: bold !important;
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        /* Responsive design untuk tombol tambah reviewer */
+        @media (max-width: 768px) {
+            .d-flex.justify-content-between.align-items-center.mb-2.flex-nowrap {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .d-flex.justify-content-between.align-items-center.mb-2.flex-nowrap > div:first-child {
+                width: 100%;
+            }
+            
+            .d-flex.justify-content-between.align-items-center.mb-2.flex-nowrap .btn.btn-tambah-pembimbing {
+                align-self: flex-end;
+                margin-left: auto;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .btn.btn-tambah-pembimbing {
+                padding: 6px 16px 6px 8px;
+                font-size: 0.9rem;
+            }
+            
+            .btn.btn-tambah-pembimbing .icon-circle {
+                width: 28px;
+                height: 28px;
+                font-size: 1.2em;
+            }
+        }
+
+        /* Memastikan tombol tetap di pojok kanan saat zoom */
+        @media (min-width: 769px) {
+            .d-flex.justify-content-between.align-items-center.mb-2.flex-nowrap {
+                min-width: 0;
+            }
+            
+            .d-flex.justify-content-between.align-items-center.mb-2.flex-nowrap > div:first-child {
+                flex: 1;
+                min-width: 0;
+                margin-right: 15px;
+            }
+            
+            .d-flex.justify-content-between.align-items-center.mb-2.flex-nowrap .btn.btn-tambah-pembimbing {
+                flex-shrink: 0;
+                white-space: nowrap;
+            }
+        }
+
+        /* Card hover effect */
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34,197,94,0.15) !important;
+            border-color: #22c55e !important;
+        }
+
+        /* Styling untuk placeholder input */
+        .form-control::placeholder {
+            color: #6c757d !important;
+            opacity: 1 !important;
+        }
+        
+        .form-control:focus::placeholder {
+            color: #adb5bd !important;
+            opacity: 0.7 !important;
+        }
+
+        .modal-footer .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+
+        /* Responsive design untuk modal footer */
+        @media (max-width: 768px) {
+            .modal-footer {
+                padding: 14px 20px;
+            }
+            
+            .modal-footer .btn {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .modal-footer .btn i {
+                font-size: 0.85em;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .modal-footer {
+                padding: 12px 16px;
+            }
+            
+            .modal-footer .btn {
+                padding: 6px 12px;
+                font-size: 0.875rem;
+            }
+            
+            .modal-footer .btn i {
+                font-size: 0.8em;
+            }
+            
+            .modal-body {
+                padding: 16px 12px 8px 12px;
+            }
+            
+            .modal-body .row.g-3 {
+                row-gap: 12px;
+            }
+            
+            .modal-header {
+                padding: 12px 16px 8px 16px;
+            }
+            
+            .modal-header .modal-title {
+                font-size: 1.1rem;
+            }
+        }
+
+        /* Styling untuk SweetAlert */
+        .swal2-popup {
+            border-radius: 16px !important;
+        }
+
+        .swal2-title {
+            color: #3b3f5c !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-html-container {
+            margin: 1rem 0 !important;
+        }
+
+        .swal2-html-container p {
+            margin-bottom: 0.5rem !important;
+            color: #3b3f5c !important;
+        }
+
+        .swal2-html-container small {
+            color: #6c757d !important;
+            font-size: 0.875rem !important;
+        }
+
+        /* Responsive design untuk SweetAlert */
+        @media (max-width: 768px) {
+            .swal2-popup {
+                width: 90% !important;
+                margin: 1rem auto !important;
+            }
+            
+            .swal2-title {
+                font-size: 1.25rem !important;
+            }
+            
+            .swal2-html-container {
+                font-size: 0.875rem !important;
+            }
+            
+            .swal2-html-container small {
+                font-size: 0.8rem !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .swal2-popup {
+                width: 95% !important;
+                margin: 0.5rem auto !important;
+            }
+            
+            .swal2-title {
+                font-size: 1.1rem !important;
+            }
+            
+            .swal2-html-container {
+                font-size: 0.8rem !important;
+            }
+            
+            .swal2-html-container small {
+                font-size: 0.75rem !important;
+            }
+        }
+
+        /* Styling untuk tombol dengan icon */
+        .btn i {
+            font-size: 0.9em;
+        }
+
+        .btn .fa-save {
+            font-weight: 600;
+        }
+
+        .btn .fa-times {
+            font-weight: 600;
+        }
+
+        /* Responsive design untuk tombol dengan icon */
+        @media (max-width: 768px) {
+            .btn i {
+                font-size: 0.85em;
+            }
+            
+            .btn .fa-save,
+            .btn .fa-times {
+                font-weight: 600;
+            }
+            
+            .btn-circle {
+                width: 38px !important;
+                height: 38px !important;
+                font-size: 1.05rem !important;
+            }
+            
+            .btn-circle i {
+                font-size: 0.95em !important;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .btn i {
+                font-size: 0.8em;
+            }
+            
+            .btn .fa-save,
+            .btn .fa-times {
+                font-weight: 500;
+            }
+            
+            .btn-circle {
+                width: 35px !important;
+                height: 35px !important;
+                font-size: 1rem !important;
+            }
+            
+            .btn-circle i {
+                font-size: 0.9em !important;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('pembimbing.das_pembimbing') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.das_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.admin_daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Mahasiswa</span>
+                            </a>
+                            <ul class="submenu">
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('admin.mahasiswa_belum_diverifikasi') }}">Belum Diverifikasi</a>
+                                </li>
+                                <li class="submenu-item">
+                                    <a href="{{ url_for('admin.mahasiswa_sudah_diverifikasi') }}">Sudah Diverifikasi</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi-bar-chart-line"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-clock-history"></i>
+                                <span>Log Aktivitas</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_mahasiswa') }}">Mahasiswa</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_pembimbing') }}">Pembimbing</a> 
+                                </li>
+                                
+                            </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.daftar_nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-award"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.pengajuan_proposal') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Pengajuan Proposal</span>
+                            </a>
+                                </li>
+                                <li class="sidebar-item  ">
+                                    <a href="{{ url_for('admin.admin_laporan_kemajuan') }}" class='sidebar-link'>
+                                        <i class="bi bi-graph-up"></i>
+                                        <span>Laporan Kemajuan</span>
+                                    </a>
+                                </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_akhir') }}" class='sidebar-link'>
+                                <i class="bi bi-clipboard-data"></i>
+                                <span>Laporan Akhir</span>
+                            </a>
+                                </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Pembimbing</span>
+                            </a>
+                                </li>
+                        <li class="sidebar-item  active">
+                            <a href="{{ url_for('admin.reviewer') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Reviewer</span>
+                            </a>
+                                </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.data_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Admin</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.pengaturan') }}" class='sidebar-link'>
+                                <i class="bi bi-gear"></i>
+                                <span>Pengaturan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('logout') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <div class="page-title">
+                    <div class="row">
+                        <div class="col-12 col-md-6 order-md-1 order-last">
+                            <h3>Reviewer</h3>
+                            <p class="text-subtitle text-muted" style="font-size:1.2rem;">
+                                Daftar Reviewer AYMP UNJAYA.
+                            </p>
+                            <div class="alert alert-info border-0 mt-3" role="alert" style="background-color: #e8f4f8; border-left: 4px solid #0dcaf0;">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-info-circle-fill me-3 text-info" style="font-size: 1.2rem;"></i>
+                                    <div>
+                                        <strong class="text-dark">Informasi Kuota Reviewer:</strong>
+                                        <span class="text-dark">Mahasiswa dengan status "selesai" tidak terhitung dalam kuota reviewer. Ini memungkinkan reviewer untuk menerima assignment baru meskipun sudah menangani mahasiswa yang programnya sudah selesai.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 order-md-2 order-first">
+                            <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url_for('pembimbing.das_pembimbing') }}">Dashboard</a></li>
+                                    <li class="breadcrumb-item active" aria-current="page">Reviewer</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="section reviewer-management">
+                    <div class="container-fluid mt-4">
+                        <div class="card" style="border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:24px 18px 10px 18px;">
+                            <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap">
+                                <div>
+                                    <div style="font-weight:700;font-size:1.25rem;">Data Reviewer Akademik</div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <button class="btn btn-tambah-pembimbing" onclick="addReviewer()">
+                                        <span class="icon-circle"><i class="fa fa-plus"></i></span>
+                                        Tambah Reviewer
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table mb-0" id="table1">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama</th>
+                                            <th>Username</th>
+                                            <th>Kuota Review</th>
+                                            <th>Status Kuota</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for reviewer in reviewers %}
+                                        <tr>
+                                            <td>{{ loop.index }}</td>
+                                            <td>{{ reviewer.nama }}</td>
+                                            <td>{{ reviewer.username }}</td>
+                                            <td>{{ reviewer.kuota_review }}</td>
+                                            <td>
+                                                <div class="d-flex flex-column">
+                                                    <small class="text-muted">Total: {{ reviewer.kuota_review or 0 }}</small>
+                                                    <small class="text-muted">Terpakai: {{ reviewer.kuota_terpakai or 0 }}</small>
+                                                    <small class="{% if reviewer.status_kuota == 'tersedia' %}text-success{% else %}text-danger{% endif %} fw-bold">
+                                                        Sisa: {{ reviewer.sisa_kuota or 0 }}
+                                                    </small>
+                                                    <small class="text-info" style="font-size: 0.75rem;">
+                                                        <i class="fa-solid fa-info-circle me-1"></i>
+                                                        Mahasiswa selesai tidak terhitung kuota
+                                                    </small>
+                                                </div>
+                                            </td>
+                                            <td class="td-aksi">
+                                                <div class="btn-action-group">
+                                                    <button class="btn btn-circle" style="background:#102693;color:#fff;"
+                                                            title="Edit" onclick="editReviewer({{ reviewer.id }})">
+                                                        <i class="fa-solid fa-edit"></i>
+                                                </button>
+                                                    <button class="btn btn-circle" style="background:#f472b6;color:#fff;"
+                                                            title="Hapus" onclick="deleteReviewer({{ reviewer.id }}, '{{ reviewer.nama }}')">
+                                                        <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modal Tambah/Edit Reviewer -->
+    <div class="modal fade" id="modalReviewer" tabindex="-1" aria-labelledby="modalReviewerLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalReviewerLabel">Tambah Reviewer</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formReviewer">
+                        <input type="hidden" id="reviewerId" name="id">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                    <label for="nama" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="nama" name="nama" placeholder="Masukkan nama lengkap reviewer" required>
+                            </div>
+                            <div class="col-md-6">
+                                    <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="username" name="username" placeholder="Masukkan username reviewer" required>
+                                </div>
+                                                        <div class="col-md-6">
+                                <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required>
+                                <small class="text-muted">Password untuk login reviewer</small>
+                            </div>
+                                                        <div class="col-md-6">
+                                <label for="kuota_review" class="form-label">Kuota Review</label>
+                                <input type="number" class="form-control" id="kuota_review" name="kuota_review" placeholder="Masukkan kuota review (contoh: 10)" value="0" min="0" step="1">
+                                <small class="text-muted">Jumlah maksimal proposal yang dapat direview</small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa fa-times"></i> Batal
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="saveReviewer()">
+                        <span id="saveBtnText"><i class="fa fa-save"></i> Simpan</span>
+                        <span id="saveBtnLoading" style="display: none;">
+                            <i class="fa fa-spinner fa-spin"></i> Menyimpan...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery/jquery.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/jquery-datatables/custom.jquery.dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/fontawesome/all.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/vendors/sweetalert2/sweetalert2.all.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+    <script>
+        let isEditMode = false;
+        let currentReviewerId = null;
+
+        $(document).ready(function() {
+            try {
+            let jquery_datatable = $("#table1").DataTable({
+                language: {
+                    "sProcessing":   "Sedang memproses...",
+                        "sLengthMenu":   "Tampilkan _MENU_ entri",
+                    "sZeroRecords":  "Tidak ditemukan data yang sesuai",
+                        "sInfo":         "Menampilkan _START_ sampai _END_ dari _TOTAL_ entri",
+                        "sInfoEmpty":    "Menampilkan 0 sampai 0 dari 0 entri",
+                        "sInfoFiltered": "(disaring dari _MAX_ entri keseluruhan)",
+                    "sInfoPostFix":  "",
+                    "sSearch":       "Cari:",
+                    "sUrl":          "",
+                    "oPaginate": {
+                        "sFirst":    "Pertama",
+                        "sPrevious": "Sebelumnya",
+                        "sNext":     "Selanjutnya",
+                        "sLast":     "Terakhir"
+                    }
+                },
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Semua"]],
+                columnDefs: [
+                    {
+                        targets: [0, 4], // No dan Aksi
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                order: [[1, 'asc']] // Urutkan berdasarkan nama reviewer
+            });
+            
+            // Responsive untuk mobile
+            if (window.innerWidth <= 768) {
+                jquery_datatable.page.len(5).draw();
+            }
+            } catch (error) {
+                console.error('Error initializing DataTable:', error);
+            }
+
+            // Set default kuota review saat modal dibuka
+            $('#modalReviewer').on('show.bs.modal', function () {
+                if (!isEditMode) {
+                    const defaultKuota = localStorage.getItem('default_kuota_review') || 0;
+                    $('#kuota_review').val(defaultKuota);
+                }
+            });
+
+            // Reset form ketika modal ditutup
+            $('#modalReviewer').on('hidden.bs.modal', function () {
+                $('#formReviewer')[0].reset();
+                $('#reviewerId').val('');
+                $('#password').val('');
+                
+                // Reset placeholder ke default
+                $('#nama').attr('placeholder', 'Masukkan nama lengkap reviewer');
+                $('#username').attr('placeholder', 'Masukkan username reviewer');
+                $('#password').attr('placeholder', 'Masukkan password');
+                $('#kuota_review').attr('placeholder', 'Masukkan kuota review (contoh: 10)');
+            });
+        });
+
+        function addReviewer() {
+            isEditMode = false;
+            currentReviewerId = null;
+            $('#modalReviewerLabel').text('Tambah Reviewer');
+            $('#formReviewer')[0].reset();
+            $('#reviewerId').val('');
+            $('#password').prop('required', true);
+            
+            // Set placeholder untuk mode tambah
+            $('#nama').attr('placeholder', 'Masukkan nama lengkap reviewer');
+            $('#username').attr('placeholder', 'Masukkan username reviewer');
+            $('#password').attr('placeholder', 'Masukkan password');
+            $('#kuota_review').attr('placeholder', 'Masukkan kuota review (contoh: 10)');
+            
+            // Set default kuota review
+            const defaultKuota = localStorage.getItem('default_kuota_review') || 0;
+            $('#kuota_review').val(defaultKuota);
+            
+            $('#modalReviewer').modal('show');
+        }
+
+        function editReviewer(id) {
+            isEditMode = true;
+            currentReviewerId = id;
+            $('#modalReviewerLabel').text('Edit Reviewer');
+            $('#password').prop('required', false);
+            $('#password').val('').attr('placeholder', 'Kosongkan jika tidak ingin mengubah password');
+            
+            // Set placeholder untuk mode edit
+            $('#nama').attr('placeholder', 'Masukkan nama lengkap reviewer');
+            $('#username').attr('placeholder', 'Masukkan username reviewer');
+            $('#kuota_review').attr('placeholder', 'Masukkan kuota review (contoh: 10)');
+            
+            // Tampilkan loading
+            Swal.fire({
+                title: 'Memuat Data...',
+                text: 'Sedang mengambil data reviewer',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Ambil data reviewer
+            $.ajax({
+                url: `/admin/get_reviewer_detail/${id}`,
+                type: 'GET',
+                success: function(response) {
+                    Swal.close();
+                    if (response.success) {
+                        const data = response.data;
+                        $('#reviewerId').val(data.id);
+                        $('#nama').val(data.nama);
+                        $('#username').val(data.username);
+                        $('#kuota_review').val(data.kuota_review);
+                        $('#modalReviewer').modal('show');
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message,
+                            confirmButtonColor: '#ef4444'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    Swal.close();
+                    console.error('Error:', error);
+                    let errorMessage = 'Terjadi kesalahan saat mengambil data reviewer!';
+                    
+                    if (xhr.responseText) {
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.message || errorMessage;
+                        } catch (e) {
+                            errorMessage = xhr.responseText || errorMessage;
+                        }
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: errorMessage,
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+            });
+        }
+
+        function saveReviewer() {
+            const defaultKuota = localStorage.getItem('default_kuota_review') || 0;
+            const formData = {
+                id: $('#reviewerId').val(),
+                nama: $('#nama').val().trim(),
+                username: $('#username').val().trim(),
+                password: $('#password').val(),
+                kuota_review: (() => {
+                    const val = $('#kuota_review').val();
+                    const parsed = parseInt(val);
+                    return isNaN(parsed) ? defaultKuota : parsed;
+                })()
+            };
+
+            // Validasi
+            if (!formData.nama || !formData.username) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan!',
+                    text: 'Nama dan username harus diisi!'
+                });
+                return;
+            }
+
+            if (!isEditMode && !formData.password) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan!',
+                    text: 'Password harus diisi!'
+                });
+                return;
+            }
+
+            // Validasi kuota review
+            if (formData.kuota_review < 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Peringatan!',
+                    text: 'Kuota review tidak boleh negatif!'
+                });
+                return;
+            }
+
+            // Tampilkan loading
+            $('#saveBtnText').hide();
+            $('#saveBtnLoading').show();
+            $('.btn-primary').prop('disabled', true);
+
+            const url = isEditMode ? '/admin/update_reviewer_data' : '/admin/add_reviewer';
+            const actionText = isEditMode ? 'menyimpan perubahan' : 'menyimpan data';
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    if (response.success) {
+                        // Tutup modal
+                        $('#modalReviewer').modal('hide');
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Berhasil!',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: response.message,
+                            confirmButtonColor: '#ef4444'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error:', error);
+                    let errorMessage = `Terjadi kesalahan saat ${actionText}!`;
+                    
+                    if (xhr.responseText) {
+                        try {
+                            const errorResponse = JSON.parse(xhr.responseText);
+                            errorMessage = errorResponse.message || errorMessage;
+                        } catch (e) {
+                            errorMessage = xhr.responseText || errorMessage;
+                        }
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: errorMessage,
+                        confirmButtonColor: '#ef4444'
+                    });
+                },
+                complete: function() {
+                    $('#saveBtnText').show();
+                    $('#saveBtnLoading').hide();
+                    $('.btn-primary').prop('disabled', false);
+                }
+            });
+        }
+
+        function deleteReviewer(id, nama) {
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: `Apakah Anda yakin ingin menghapus reviewer "${nama}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Hapus!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Tampilkan loading
+                    Swal.fire({
+                        title: 'Memproses...',
+                        text: 'Sedang menghapus data reviewer',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    $.ajax({
+                        url: '/admin/delete_reviewer',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({id: id}),
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Berhasil!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error!',
+                                    text: response.message,
+                                    confirmButtonColor: '#ef4444'
+                                });
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error:', error);
+                            let errorMessage = 'Terjadi kesalahan saat menghapus data!';
+                            
+                            if (xhr.responseText) {
+                                try {
+                                    const errorResponse = JSON.parse(xhr.responseText);
+                                    errorMessage = errorResponse.message || errorMessage;
+                                } catch (e) {
+                                    errorMessage = xhr.responseText || errorMessage;
+                                }
+                            }
+                            
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                text: errorMessage,
+                                confirmButtonColor: '#ef4444'
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

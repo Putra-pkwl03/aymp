@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - AYMP UNJAYA</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='lodaf/unjaya.png') }}" />
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/iconly/bold.css') }}">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/vendors/bootstrap-icons/bootstrap-icons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/responsive-admin.css') }}">
+    
+    <style>
+        /* Styling untuk stats cards */
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .stats-icon i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 1.5rem;
+            line-height: 1;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* Memastikan icon Bootstrap terpusat */
+        .bi {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .stats-icon:hover {
+            transform: scale(1.05);
+        }
+
+        /* Card styling tanpa gradient */
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        /* Text styling */
+        .font-extrabold {
+            font-weight: 800;
+        }
+
+        .font-semibold {
+            font-weight: 600;
+        }
+
+        /* Styling untuk card pembimbing */
+        .card .card {
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+        }
+        
+        .card .card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .card .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border-color: #28a745;
+        }
+        
+        /* Styling untuk avatar section */
+        .avatar-section {
+            flex-shrink: 0;
+        }
+        
+        /* Styling untuk info section */
+        .info-section {
+            min-width: 0;
+        }
+        
+        /* Styling untuk nama pembimbing */
+        .nama-pembimbing h5 {
+            color: #2c3e50;
+            font-size: 1.1rem;
+            line-height: 1.2;
+        }
+        
+        /* Styling untuk detail pembimbing */
+        .detail-pembimbing {
+            font-size: 0.875rem;
+        }
+        
+        .detail-pembimbing i {
+            color: #6c757d;
+            width: 16px;
+            text-align: center;
+        }
+        
+        .detail-pembimbing span {
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        /* Styling untuk info items */
+        .prodi-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .avatar-initial {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 20px !important;
+            }
+            
+            .nama-pembimbing h5 {
+                font-size: 1rem;
+            }
+            
+            .detail-pembimbing {
+                font-size: 0.8rem;
+            }
+            
+            .card .card {
+                margin-bottom: 4px;
+            }
+            
+            .card .card .card-body {
+                padding: 12px !important;
+            }
+            
+            /* Responsive untuk mahasiswa cards */
+            #mahasiswaContainer {
+                flex-wrap: wrap !important;
+                overflow: visible !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+            
+            #mahasiswaContainer .col-12 {
+                min-width: auto !important;
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+            
+            /* Sembunyikan tombol scroll di mobile */
+            .btn-scroll {
+                display: none !important;
+            }
+            
+            /* Responsive untuk stats cards */
+            .col-6.col-lg-3.col-md-6 {
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .avatar-initial {
+                width: 45px !important;
+                height: 45px !important;
+                font-size: 18px !important;
+            }
+            
+            .nama-pembimbing h5 {
+                font-size: 0.95rem;
+            }
+            
+            .detail-pembimbing {
+                font-size: 0.75rem;
+            }
+            
+            .card .card .card-body {
+                padding: 10px !important;
+            }
+            
+            /* Responsive untuk stats cards di mobile kecil */
+            .col-6.col-lg-3.col-md-6 {
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+                margin-bottom: 1rem;
+            }
+            
+            /* Responsive untuk layout utama */
+            .col-12.col-lg-9,
+            .col-12.col-lg-3 {
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+            
+            /* Responsive untuk mahasiswa card content */
+            .card-body.p-4 {
+                padding: 1rem !important;
+            }
+            
+            .avatar.avatar-lg.me-3 {
+                width: 50px !important;
+                height: 50px !important;
+            }
+            
+            .avatar.avatar-lg.me-3 span {
+                font-size: 1.2rem !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Responsive untuk text dan spacing di mobile sangat kecil */
+            .card-title {
+                font-size: 1rem !important;
+            }
+            
+            .text-muted {
+                font-size: 0.8rem !important;
+            }
+            
+            .badge {
+                font-size: 0.65rem !important;
+                padding: 0.3rem 0.6rem !important;
+            }
+            
+            .progress {
+                height: 6px !important;
+            }
+            
+            /* Responsive untuk pembimbing cards */
+            .avatar-initial.rounded-circle {
+                width: 50px !important;
+                height: 50px !important;
+                font-size: 20px !important;
+            }
+        }
+        
+        /* Custom scrollbar styling */
+        .card-body::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .card-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .card-body::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        .card-body::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Firefox scrollbar */
+        .card-body {
+            scrollbar-width: thin;
+            scrollbar-color: #c1c1c1 #f1f1f1;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <div id="sidebar" class="active">
+            <div class="sidebar-wrapper active">
+                <div class="sidebar-header">
+                    <div class="d-flex justify-content-between">
+                        <div class="logo">
+                            <a href="{{ url_for('admin.das_admin') }}"><img src="{{ url_for('static', filename='assets/images/logo/logo.svg') }}" style="width: 110px; height: auto;" alt="Logo" srcset=""></a>
+                        </div>
+                        <div class="toggler">
+                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-menu">
+                    <ul class="menu">
+                        <li class="sidebar-title">Menu</li>
+
+                        <li class="sidebar-item active">
+                            <a href="{{ url_for('admin.das_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-speedometer2"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.admin_daftar_bimbingan_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-chat-dots"></i>
+                                <span>Bimbingan Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-people-fill"></i>
+                                <span>Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.mahasiswa_belum_diverifikasi') }}">Belum Diverifikasi</a>
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.mahasiswa_sudah_diverifikasi') }}">Sudah Diverifikasi</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi-bar-chart-line"></i>
+                                <span>Monitoring Mahasiswa</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_produksi') }}">Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_alat_produksi') }}">Alat Produksi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_operasional') }}">Biaya Operasional</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_biaya_non_operasional') }}">Biaya Lain-lain</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_penjualan_produk') }}">Penjualan Produk</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_laba_rugi') }}">Laporan Laba Rugi</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_arus_kas') }}">Laporan Arus Kas</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_monitoring_mahasiswa_laporan_neraca') }}">Laporan Neraca</a> 
+                                </li>
+                            </ul>
+                        </li>
+                        <li class="sidebar-item  has-sub">
+                            <a href="#" class='sidebar-link'>
+                                <i class="bi bi-clock-history"></i>
+                                <span>Log Aktivitas</span>
+                            </a>
+                            <ul class="submenu ">
+
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_mahasiswa') }}">Mahasiswa</a> 
+                                </li>
+                                <li class="submenu-item ">
+                                    <a href="{{ url_for('admin.admin_daftar_log_pembimbing') }}">Pembimbing</a> 
+                                </li>
+                                
+                            </ul>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.daftar_nilai_mahasiswa') }}" class='sidebar-link'>
+                                <i class="bi bi-award"></i>
+                                <span>Nilai Mahasiswa</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.pengajuan_proposal') }}" class='sidebar-link'>
+                                <i class="bi bi-file-earmark-text"></i>
+                                <span>Pengajuan Proposal</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_kemajuan') }}" class='sidebar-link'>
+                                <i class="bi bi-graph-up"></i>
+                                <span>Laporan Kemajuan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_laporan_akhir') }}" class='sidebar-link'>
+                                <i class="bi bi-clipboard-data"></i>
+                                <span>Laporan Akhir</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.admin_pembimbing') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Pembimbing</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item  ">
+                            <a href="{{ url_for('admin.reviewer') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Reviewer</span>
+                            </a>
+                                </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('admin.data_admin') }}" class='sidebar-link'>
+                                <i class="bi bi-person-badge"></i>
+                                <span>Admin</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item ">
+                            <a href="{{ url_for('admin.pengaturan') }}" class='sidebar-link'>
+                                <i class="bi bi-gear"></i>
+                                <span>Pengaturan</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{ url_for('index') }}" class='sidebar-link'>
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+            </div>
+        </div>
+        <div id="main">
+            <header class="mb-3">
+                <a href="#" class="burger-btn d-block d-xl-none">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+            </header>
+
+            <div class="page-heading">
+                <h3>Selamat datang, {{ session.get('nama', 'Admin') }}!</h3>
+                <p class="text-muted">Sebagai {{ session.get('user_type', 'Admin') }} | NIP:
+                    {{ session.get('nip', 'N/A') }}</p>
+            </div>
+            <div class="page-content">
+                <section class="row">
+                    <div class="col-12 col-lg-9">
+                        <div class="row">
+                            <div class="col-6 col-lg-3 col-md-6">
+                                <div class="card">
+                                    <div class="card-body px-3 py-4-5">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="stats-icon" style="background-color: #28a745;">
+                                                    <i class="bi bi-people-fill" style="color: white;"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h6 class="text-muted font-semibold">Total Mahasiswa</h6>
+                                                <h6 class="font-extrabold mb-0" style="color: #28a745;">{{ total_mahasiswa|default(0) }}</h6>
+                                                <small class="text-muted">Status: Aktif</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-lg-3 col-md-6">
+                                <div class="card">
+                                    <div class="card-body px-3 py-4-5">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="stats-icon" style="background-color: #ffc107;">
+                                                    <i class="bi bi-clock-history" style="color: white;"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h6 class="text-muted font-semibold">Proposal Diajukan</h6>
+                                                <h6 class="font-extrabold mb-0" style="color: #ffc107;">{{ proposal_diajukan|default(0) }}</h6>
+                                                <small class="text-muted">Status: Diajukan</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-lg-3 col-md-6">
+                                <div class="card">
+                                    <div class="card-body px-3 py-4-5">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="stats-icon" style="background-color: #28a745;">
+                                                    <i class="bi bi-check-circle-fill" style="color: white;"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h6 class="text-muted font-semibold">Proposal Disetujui</h6>
+                                                <h6 class="font-extrabold mb-0" style="color: #28a745;">{{ proposal_disetujui|default(0) }}</h6>
+                                                <small class="text-muted">Status: Disetujui</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 col-lg-3 col-md-6">
+                                <div class="card">
+                                    <div class="card-body px-3 py-4-5">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="stats-icon" style="background-color: #17a2b8;">
+                                                    <i class="bi bi-award-fill" style="color: white;"></i>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h6 class="text-muted font-semibold">Proposal Lolos</h6>
+                                                <h6 class="font-extrabold mb-0" style="color: #17a2b8;">{{ proposal_lolos|default(0) }}</h6>
+                                                <small class="text-muted">Status: Lolos </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h4>Mahasiswa Aktif</h4>
+
+                                    </div>
+                                    <div class="card-body position-relative">
+                                        {% if mahasiswa_list %}
+                                            <!-- Tombol Scroll Kiri -->
+                                            <button class="btn btn-success btn-sm position-absolute btn-scroll d-flex align-items-center justify-content-center" 
+                                                    style="left: 5px; top: 50%; transform: translateY(-50%); z-index: 1000; border-radius: 50%; width: 45px; height: 45px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 2px solid white; transition: all 0.2s ease; background: linear-gradient(135deg, #198754, #0f5132); padding: 0;"
+                                                    onclick="scrollMahasiswa('left')">
+                                                <i class="bi bi-chevron-left text-white fw-bold" style="font-size: 1.2rem; line-height: 1;"></i>
+                                            </button>
+                                            
+                                            <!-- Tombol Scroll Kanan -->
+                                            <button class="btn btn-success btn-sm position-absolute btn-scroll d-flex align-items-center justify-content-center" 
+                                                    style="right: 5px; top: 50%; transform: translateY(-50%); z-index: 1000; border-radius: 50%; width: 45px; height: 45px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 2px solid white; transition: all 0.2s ease; background: linear-gradient(135deg, #198754, #0f5132); padding: 0;"
+                                                    onclick="scrollMahasiswa('right')">
+                                                <i class="bi bi-chevron-right text-white fw-bold" style="font-size: 1.2rem; line-height: 1;"></i>
+                                            </button>
+                                            
+                                            <div class="row flex-nowrap overflow-auto pb-2" id="mahasiswaContainer" style="scrollbar-width: thin; scrollbar-color: #c1c1c1 #f1f1f1; padding-left: 50px; padding-right: 50px;">
+                                                {% for mahasiswa in mahasiswa_list %}
+                                                <div class="col-12 col-md-6 col-lg-4 col-xl-3 mb-4" style="min-width: 300px; flex-shrink: 0;">
+                                                    <div class="card h-100" style="border-radius: 15px; border: 2px solid #e9ecef; transition: all 0.3s ease; min-height: 290px;">
+                                                        <div class="card-body p-4">
+                                                            <div class="d-flex align-items-center mb-3">
+                                                                <div class="avatar avatar-lg me-3" style="background-color: #28a745; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                                                    <span style="color: white; font-size: 1.5rem; font-weight: bold;">
+                                                                        {{ mahasiswa.nama_ketua[:2].upper()|e if mahasiswa.nama_ketua else 'NA' }}
+                                                                    </span>
+                                                        </div>
+                                                                <div class="flex-grow-1">
+                                                                    <h5 class="card-title mb-1" style="font-weight: 600; color: #333;">
+                                                                        {{ mahasiswa.nama_ketua|default('Nama tidak tersedia')|e }}
+                                                                    </h5>
+                                                                    <p class="text-muted mb-1" style="font-size: 0.9rem;">
+                                                                        {{ mahasiswa.program_studi|default('Program studi tidak tersedia')|e }}
+                                                                    </p>
+                                                                    <p class="text-muted mb-0" style="font-size: 0.85rem;">
+                                                                        NIM: {{ mahasiswa.nim|default('NIM tidak tersedia')|e }}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="mb-3">
+                                                                <h6 class="text-dark mb-2" style="font-weight: 600;">
+                                                                    {% if mahasiswa.judul_usaha and mahasiswa.judul_usaha != 'None' %}
+                                                                        {{ mahasiswa.judul_usaha }}
+                                                                    {% else %}
+                                                                        Belum memiliki usaha
+                                                                    {% endif %}
+                                                                </h6>
+                                                                
+                                                                <!-- Nama Pembimbing -->
+                                                                <div class="d-flex align-items-center mb-2">
+                                                                    <i class="bi bi-person-badge me-2" style="color: #6c757d; font-size: 0.9rem;"></i>
+                                                                    <span class="text-muted" style="font-size: 0.9rem;">
+                                                                        Pembimbing: 
+                                                                        {% if mahasiswa.dosen_pembimbing and mahasiswa.dosen_pembimbing != 'None' and mahasiswa.dosen_pembimbing != 'Belum ditentukan' %}
+                                                                            {{ mahasiswa.dosen_pembimbing|e }}
+                                                                        {% else %}
+                                                                            Belum memiliki pembimbing
+                                                                        {% endif %}
+                                                                    </span>
+                                                                </div>
+                                                                
+                                                                <!-- Status Admin Proposal -->
+                                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                    <span class="text-muted" style="font-size: 0.9rem;">Status Admin:</span>
+                                                                    <span class="badge" style="
+                                                                        {% if mahasiswa.status_admin and mahasiswa.status_admin != 'None' %}
+                                                                            {% if mahasiswa.status_admin == 'lolos' %}
+                                                                                background-color: #28a745; color: white;
+                                                                            {% elif mahasiswa.status_admin == 'tidak_lolos' %}
+                                                                                background-color: #dc3545; color: white;
+                                                                            {% else %}
+                                                                                background-color: #ffc107; color: #333;
+                                                                            {% endif %}
+                                                                        {% else %}
+                                                                            background-color: #ffc107; color: #333;
+                                                                        {% endif %}
+                                                                        font-size: 0.7rem;">
+                                                                        {% if mahasiswa.status_admin and mahasiswa.status_admin != 'None' %}
+                                                                            {{ mahasiswa.status_admin|replace('_', ' ')|title }}
+                                                                        {% else %}
+                                                                            Belum ditinjau
+                                                                        {% endif %}
+                                                                    </span>
+                                                                </div>
+                                                                
+                                                                <!-- Status Proposal -->
+                                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                    <span class="text-muted" style="font-size: 0.9rem;">Status Proposal:</span>
+                                                                    <span class="badge" style="
+                                                                        {% if mahasiswa.status_proposal and mahasiswa.status_proposal != 'None' %}
+                                                                            {% if mahasiswa.status_proposal == 'disetujui' %}
+                                                                                background-color: #28a745; color: white;
+                                                                            {% elif mahasiswa.status_proposal == 'ditolak' %}
+                                                                                background-color: #dc3545; color: white;
+                                                                            {% elif mahasiswa.status_proposal == 'revisi' %}
+                                                                                background-color: #fd7e14; color: white;
+                                                                            {% elif mahasiswa.status_proposal == 'selesai' %}
+                                                                                background-color: #17a2b8; color: white;
+                                                                            {% elif mahasiswa.status_proposal == 'diajukan' %}
+                                                                                background-color: #ffc107; color: #333;
+                                                                            {% else %}
+                                                                                background-color: #6c757d; color: white;
+                                                                            {% endif %}
+                                                                        {% else %}
+                                                                            background-color: #6c757d; color: white;
+                                                                        {% endif %}
+                                                                        font-size: 0.7rem;">
+                                                                        {% if mahasiswa.status_proposal and mahasiswa.status_proposal != 'None' %}
+                                                                            {{ mahasiswa.status_proposal|title }}
+                                                                        {% else %}
+                                                                            Belum ada proposal
+                                                                        {% endif %}
+                                                                    </span>
+                                                                </div>
+                                                                
+                                                                <!-- Status -->
+                                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                                    <span class="text-muted" style="font-size: 0.9rem;">Status:</span>
+                                                                    <span class="badge" style="
+                                                                        {% if mahasiswa.status == 'aktif' %}
+                                                                            background-color: #28a745; color: white;
+                                                                        {% else %}
+                                                                            background-color: #6c757d; color: white;
+                                                                        {% endif %}
+                                                                        font-size: 0.8rem;">
+                                                                        {{ mahasiswa.status|default('Tidak diketahui')|title|e }}
+                                                                    </span>
+                                                                </div>
+                                                                
+                                                                <!-- Progress Bar Anggota Tim -->
+                                                                <div class="mb-2">
+                                                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                        <span class="text-muted" style="font-size: 0.9rem;">Anggota Tim:</span>
+                                                                        <span class="badge" style="background-color: #28a745; color: white; font-size: 0.7rem;">
+                                                                            {{ mahasiswa.jumlah_anggota|default(1) }}/4
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="progress" style="height: 8px; border-radius: 10px;">
+                                                                        {% set progress_percentage = ((mahasiswa.jumlah_anggota|default(1)) / 4) * 100 %}
+                                                                        <div class="progress-bar" role="progressbar" 
+                                                                             style="background-color: #28a745; width: {{ progress_percentage }}%; border-radius: 10px;"
+                                                                             aria-valuenow="{{ mahasiswa.jumlah_anggota|default(1) }}" 
+                                                                             aria-valuemin="0" 
+                                                                             aria-valuemax="4">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            <div class="d-flex justify-content-between align-items-center">
+                                                                <span class="badge" style="
+                                                                    {% if mahasiswa.status_proposal and mahasiswa.status_proposal != 'None' %}
+                                                                        {% if mahasiswa.status_proposal == 'disetujui' %}
+                                                                            background-color: #28a745; color: white;
+                                                                        {% elif mahasiswa.status_proposal == 'diajukan' %}
+                                                                            background-color: #ffc107; color: #333;
+                                                                        {% elif mahasiswa.status_proposal == 'ditolak' %}
+                                                                            background-color: #dc3545; color: white;
+                                                                        {% elif mahasiswa.status_proposal == 'revisi' %}
+                                                                            background-color: #fd7e14; color: white;
+                                                                        {% else %}
+                                                                            background-color: #6c757d; color: white;
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        background-color: #6c757d; color: white;
+                                                                    {% endif %}
+                                                                    font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                                                                    {% if mahasiswa.status_proposal and mahasiswa.status_proposal != 'None' %}
+                                                                        {{ mahasiswa.status_proposal|title }}
+                                                                    {% else %}
+                                                                        Belum ada proposal
+                                                                    {% endif %}
+                                                                </span>
+                                                                <small class="text-muted" style="font-size: 0.8rem;">
+                                                                    {{ mahasiswa.tanggal_daftar.strftime('%d/%m/%Y') if mahasiswa.tanggal_daftar else 'Tanggal tidak tersedia' }}
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <div class="text-center py-5">
+                                                <div style="font-size: 4rem; color: #e9ecef; margin-bottom: 1rem; margin-left: -15px;">
+                                                    <i class="bi bi-people"></i>
+                                                </div>
+                                                <h5 class="text-muted mb-2">Belum Ada Mahasiswa</h5>
+                                                <p class="text-muted mb-0">Mahasiswa aktif akan muncul di sini</p>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-12 col-lg-3">
+                        <div class="card">
+                            <div class="card-body py-4 px-5">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar avatar-xl" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">
+                                        <span style="color: white; font-size: 1.5rem; font-weight: bold;">
+                                            {{ session.get('nama', 'A')[:2].upper() }}
+                                        </span>
+                                    </div>
+                                    <div class="ms-3 name">
+                                        <h5 class="font-bold">{{ session.get('nama', 'Admin') }}</h5>
+                                        <h6 class="text-muted mb-0">{{ session.get('user_type', 'Admin') }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h4>Dosen Pembimbing</h4>
+                                <span class="badge fs-6 px-3 py-2" style="background-color: #0f5132; color: white;">{{ pembimbing_list|length if pembimbing_list else 0 }}</span>
+                            </div>
+                            <div class="card-body" style="min-height: 340px; max-height: 340px; overflow-y: auto;">
+                                {% if pembimbing_list %}
+                                    <div class="row g-2">
+                                        {% for pembimbing in pembimbing_list %}
+                                        <div class="col-12">
+                                            <div class="card" style="border-radius: 12px; border: 1px solid #e9ecef; transition: all 0.3s ease; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);">
+                                                <div class="card-body p-3">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="avatar-section me-3">
+                                                                                                        <div class="avatar-initial rounded-circle bg-primary d-flex align-items-center justify-content-center" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold; color: white; background: #0a2472 !important;">
+                                                {{ pembimbing.nama[:2].upper() }}
+                                            </div>
+                                                        </div>
+                                                        <div class="info-section flex-grow-1">
+                                                            <div class="nama-pembimbing mb-2">
+                                                                <h5 class="mb-0 fw-bold text-primary">{{ pembimbing.nama }}</h5>
+                                    </div>
+                                                            <div class="detail-pembimbing mb-2">
+                                                                <div class="prodi-info">
+                                                                    <i class="bi bi-award me-1"></i>
+                                                                    <span class="text-muted">{{ pembimbing.program_studi }}</span>
+                                    </div>
+                                </div>
+                                                            <div class="progress-section">
+                                                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                                                    <span class="text-muted" style="font-size: 0.8rem;">Mahasiswa Aktif:</span>
+                                                                    <span class="badge" style="background-color: #28a745; color: white; font-size: 0.7rem;">
+                                                                        {{ pembimbing.jumlah_mahasiswa }}/{{ pembimbing.kuota_mahasiswa }}
+                                                                    </span>
+                                    </div>
+                                                                <div class="progress" style="height: 8px; border-radius: 10px;">
+                                                                    {% set progress_percentage = (pembimbing.jumlah_mahasiswa / pembimbing.kuota_mahasiswa) * 100 %}
+                                                                    <div class="progress-bar" role="progressbar" 
+                                                                         style="background-color: #28a745; width: {{ progress_percentage }}%; border-radius: 10px;"
+                                                                         aria-valuenow="{{ pembimbing.jumlah_mahasiswa }}" 
+                                                                         aria-valuemin="0" 
+                                                                         aria-valuemax="{{ pembimbing.kuota_mahasiswa }}">
+                                    </div>
+                                </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                                        {% endfor %}
+                                    </div>
+                                {% else %}
+                                    <div class="text-center py-5" style="min-height: 240px; display: flex; flex-direction: column; justify-content: center;">
+                                        <div class="avatar-initial rounded-circle bg-secondary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 60px; height: 60px; font-size: 24px; font-weight: bold; color: white; display: flex; align-items: center; justify-content: center;">
+                                            <i class="bi bi-person-badge" style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%;"></i>
+                                        </div>
+                                        <h6 class="text-muted mb-1">Belum ada pembimbing</h6>
+                                        <small class="text-muted">Data pembimbing akan muncul di sini</small>
+                            </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/bootstrap.bundle.min.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/vendors/apexcharts/apexcharts.js') }}"></script>
+    <script src="{{ url_for('static', filename='assets/js/pages/dashboard.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='assets/js/mazer.js') }}"></script>
+    
+    <style>
+        /* Custom scrollbar styling untuk horizontal scroll */
+        .overflow-auto::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .overflow-auto::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .overflow-auto::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        .overflow-auto::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Firefox scrollbar */
+        .overflow-auto {
+            scrollbar-width: thin;
+            scrollbar-color: #c1c1c1 #f1f1f1;
+        }
+        
+        /* Smooth scroll behavior */
+        .overflow-auto {
+            scroll-behavior: smooth;
+        }
+        
+        /* Hover effect untuk tombol scroll */
+        .btn-scroll:hover {
+            background: linear-gradient(135deg, #0f5132, #0a3624) !important;
+            transform: translateY(-50%) scale(1.15) !important;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4) !important;
+            transition: all 0.3s ease;
+        }
+        
+        /* Disabled state untuk tombol scroll */
+        .btn-scroll:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: linear-gradient(135deg, #6c757d, #495057) !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+        }
+        
+        /* Active state untuk tombol scroll */
+        .btn-scroll:active {
+            transform: translateY(-50%) scale(0.95) !important;
+        }
+        
+        /* Memastikan tombol selalu terlihat */
+        .btn-scroll {
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        /* Container untuk memastikan tombol tidak tertutup */
+        .card-body.position-relative {
+            overflow: visible !important;
+        }
+        
+        /* Memastikan icon berada di tengah sempurna */
+        .btn-scroll i {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Override Bootstrap button padding */
+        .btn-scroll {
+            padding: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        /* Responsive container untuk mahasiswa */
+        @media (max-width: 768px) {
+            #mahasiswaContainer {
+                flex-wrap: wrap !important;
+                overflow: visible !important;
+                padding-left: 0 !important;
+                padding-right: 0 !important;
+            }
+            
+            #mahasiswaContainer .col-12 {
+                min-width: auto !important;
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+            
+            .btn-scroll {
+                display: none !important;
+            }
+        }
+        
+        /* Responsive untuk tablet */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            #mahasiswaContainer .col-12 {
+                min-width: 280px !important;
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+            }
+        }
+    </style>
+    
+    <script>
+        function scrollMahasiswa(direction) {
+            const container = document.getElementById('mahasiswaContainer');
+            const scrollAmount = 320; // Sesuai dengan min-width card + margin
+            
+            if (direction === 'left') {
+                container.scrollBy({
+                    left: -scrollAmount,
+                    behavior: 'smooth'
+                });
+            } else if (direction === 'right') {
+                container.scrollBy({
+                    left: scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
+            
+            // Update tombol setelah scroll
+            setTimeout(updateScrollButtons, 300);
+        }
+        
+        function updateScrollButtons() {
+            const container = document.getElementById('mahasiswaContainer');
+            const leftBtn = container.parentElement.querySelector('button[onclick="scrollMahasiswa(\'left\')"]');
+            const rightBtn = container.parentElement.querySelector('button[onclick="scrollMahasiswa(\'right\')"]');
+            
+            // Cek apakah dalam mode mobile (width < 768px)
+            if (window.innerWidth < 768) {
+                // Sembunyikan tombol scroll di mobile
+                if (leftBtn) leftBtn.style.display = 'none';
+                if (rightBtn) rightBtn.style.display = 'none';
+                return;
+            }
+            
+            // Tampilkan tombol scroll di desktop
+            if (leftBtn) leftBtn.style.display = 'flex';
+            if (rightBtn) rightBtn.style.display = 'flex';
+            
+            // Disable tombol kiri jika sudah di awal
+            if (container.scrollLeft <= 0) {
+                leftBtn.disabled = true;
+                leftBtn.style.opacity = '0.5';
+            } else {
+                leftBtn.disabled = false;
+                leftBtn.style.opacity = '1';
+            }
+            
+            // Disable tombol kanan jika sudah di akhir
+            if (container.scrollLeft >= container.scrollWidth - container.clientWidth) {
+                rightBtn.disabled = true;
+                rightBtn.style.opacity = '0.5';
+            } else {
+                rightBtn.disabled = false;
+                rightBtn.style.opacity = '1';
+            }
+        }
+        
+        // Update tombol saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            updateScrollButtons();
+            
+            // Update tombol saat scroll manual
+            const container = document.getElementById('mahasiswaContainer');
+            if (container) {
+                container.addEventListener('scroll', updateScrollButtons);
+            }
+            
+            // Update tombol saat window resize
+            window.addEventListener('resize', function() {
+                updateScrollButtons();
+                
+                // Tambahan: sembunyikan tombol scroll di mobile dan tampilkan di desktop
+                const leftBtn = container.parentElement.querySelector('button[onclick="scrollMahasiswa(\'left\')"]');
+                const rightBtn = container.parentElement.querySelector('button[onclick="scrollMahasiswa(\'right\')"]');
+                
+                if (window.innerWidth < 768) {
+                    if (leftBtn) leftBtn.style.display = 'none';
+                    if (rightBtn) rightBtn.style.display = 'none';
+                } else {
+                    if (leftBtn) leftBtn.style.display = 'flex';
+                    if (rightBtn) rightBtn.style.display = 'flex';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
+
